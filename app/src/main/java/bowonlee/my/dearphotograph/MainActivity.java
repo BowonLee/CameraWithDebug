@@ -1,7 +1,10 @@
 package bowonlee.my.dearphotograph;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
@@ -22,12 +25,18 @@ public class MainActivity extends AppCompatActivity {
     * Dialog를 통해 잠시 앱의 동작을 멈추는 기능이 필요하다
     * */
 
-    AutoFitTextureView mTextureView;
+    private AutoFitTextureView mTextureView;
+    private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        checkPermission();
+        mTextureView = findViewById(R.id.camera_preview_session);
+        cameraPreview = new CameraPreview(this,mTextureView);
+
 
     }
 
@@ -46,27 +55,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cameraPreview.startBackgroundThread();
+        /*
+        * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
+        * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
+        *
+        *
+        * */
+        if(mTextureView.isAvailable()){
+            cameraPreview.openCamera(mTextureView.getWidth(),mTextureView.getHeight());
+        }else{
+            cameraPreview.setSurface();
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cameraPreview.closeCamera();
+        cameraPreview.stopBackgroundThread();
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setRequestCameraPermission(){
         if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)){
-            //new ConfirmationDialog().show(,);
+            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
         }else{
-
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         }
     }
-    /*
-    * Camera의 캠쳐세션과 프리뷰세션을 출력할 surface이다.
-    * */
+
 
 
     public static class ConfirmationDialog extends DialogFragment{
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final Activity parent = getActivity();
+            return new AlertDialog.Builder(getActivity()).setMessage(R.string.request_caemra_permission)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA},REQUEST_CAMERA_PERMISSION);
+                        }
+                    }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if(parent != null){
+                                parent.finish();
+                            }
+                        }
+                    }).create();
 
-            return super.onCreateDialog(savedInstanceState);
         }
     }
 

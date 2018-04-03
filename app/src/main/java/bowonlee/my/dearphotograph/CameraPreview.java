@@ -33,6 +33,7 @@ import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
+import android.view.TextureView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -114,6 +115,29 @@ public class CameraPreview {
     private Context mContext;
 
     /*Callback Method*/
+    /*SurfaceTexture 관련 콜벡 Surface가 생성되면 호출되어 프리뷰세션을 생성한다.*/
+    private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
+
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            openCamera(width, height);
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+            configureTransform(width,height);
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+            return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
+        }
+    };
 
     /*
     * Device상태에 따른 카메라의 동작을 정의한 Callback Method이다.
@@ -447,10 +471,18 @@ public class CameraPreview {
 
 
     /*
+    * Texture가 생성되 전
+    * */
+    public void setSurface(){
+       mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+    }
+
+
+    /*
     * 카메라 기기를 열고 닫는 쓰레드 부분
     * */
     @SuppressLint("MissingPermission")
-    private void openCamera(int width, int height) {
+    public void openCamera(int width, int height) {
 
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
@@ -470,7 +502,7 @@ public class CameraPreview {
         }
     }
 
-    private void closeCamera(){
+    public void closeCamera(){
         try{
             mCameraOpenCloseLock.acquire();
             if(null != mCaptureSession){
@@ -492,13 +524,13 @@ public class CameraPreview {
         }
     }
     /*backgroundListener의 설정 및 시작*/
-    private void startBackgroundThread(){
+    public void startBackgroundThread(){
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
 
     }
-    private void stopBackgroundThread(){
+    public void stopBackgroundThread(){
         mBackgroundThread.quitSafely();
 
         try {
@@ -580,6 +612,24 @@ public class CameraPreview {
     private int getOrientation(int rotation){
 
         return (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360;
+    }
+
+    /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
+    public void takePicture(){
+        lockFocus();
+    }
+    /*사진활영을 위한 화면 고정설정
+    *
+    * */
+    private void lockFocus(){
+      try{
+          mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CameraMetadata.CONTROL_AF_TRIGGER_START);
+
+          mState = STATE_WAITING_LOCK;
+          mCaptureSession.capture(mPreviewRequestBuilder.build(),mCaptureCallback,mBackgroundHandler);
+      }  catch (CameraAccessException e){
+          e.printStackTrace();
+      }
     }
 
     /*촬영이 끝나고 나서 촬영을 위해 한 셋팅을 다시 초기화 시킨다.*/
