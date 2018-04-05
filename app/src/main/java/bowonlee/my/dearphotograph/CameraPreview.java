@@ -24,9 +24,11 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -118,6 +120,7 @@ public class CameraPreview {
     /*SurfaceTexture 관련 콜벡 Surface가 생성되면 호출되어 프리뷰세션을 생성한다.*/
     private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
             openCamera(width, height);
@@ -125,7 +128,7 @@ public class CameraPreview {
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
-            configureTransform(width,height);
+            configureTransform(width, height);
         }
 
         @Override
@@ -245,10 +248,9 @@ public class CameraPreview {
     }
 
 
-
     /*Camera Preview Session의 생성 관련 메소드*/
-    private void createCameraPreviewSession(){
-        try{
+    private void createCameraPreviewSession() {
+        try {
             SurfaceTexture texture = mTextureView.getSurfaceTexture();
             //assert를 이용하여 runtime에서 textureview의 상태를 점검한다.
             assert texture != null;
@@ -267,7 +269,7 @@ public class CameraPreview {
 
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                            if(null == mCameraDevice){
+                            if (null == mCameraDevice) {
                                 return;
                             }
                             mCaptureSession = cameraCaptureSession;
@@ -277,8 +279,8 @@ public class CameraPreview {
                                 setAutoFlash(mPreviewRequestBuilder);
 
                                 mPreviewRequest = mPreviewRequestBuilder.build();
-                                mCaptureSession.setRepeatingRequest(mPreviewRequest,mCaptureCallback,mBackgroundHandler);
-                            }catch (CameraAccessException e){
+                                mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
+                            } catch (CameraAccessException e) {
                                 e.printStackTrace();
                             }
 
@@ -286,19 +288,17 @@ public class CameraPreview {
 
                         @Override
                         public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                            Log.e(TAG,"Failed In CreateCaptureSession");
+                            Log.e(TAG, "Failed In CreateCaptureSession");
                         }
-                    },null
+                    }, null
             );
 
 
-
-        }catch (CameraAccessException e){
+        } catch (CameraAccessException e) {
             e.printStackTrace();
         }
 
     }
-
 
 
     /*
@@ -473,28 +473,33 @@ public class CameraPreview {
     /*
     * Texture가 생성되 전
     * */
-    public void setSurface(){
-       mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+    public void setSurface() {
+        mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
 
 
     /*
     * 카메라 기기를 열고 닫는 쓰레드 부분
     * */
-    @SuppressLint("MissingPermission")
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void openCamera(int width, int height) {
+        Activity activity = (Activity) mContext;
 
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+         //   activity.requestPermissions(new String[]{Manifest.permission.CAMERA},1);
+            return;
+        }
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
-        Activity activity = (Activity) mContext;
 
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                 throw new RuntimeException("Time out waiting to lock camera opening");
-             }
+            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                throw new RuntimeException("Time out waiting to lock camera opening");
+            }
 
-                manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+
+            manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.",e);
         } catch (CameraAccessException e) {
@@ -702,5 +707,6 @@ public class CameraPreview {
         }
 
     }
+
 
 }

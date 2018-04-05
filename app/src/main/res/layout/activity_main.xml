@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="bowonlee.my.dearphotograph.MainActivity">
 
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
     <bowonlee.my.dearphotograph.AutoFitTextureView
         android:layout_width="match_parent"
@@ -21,5 +18,5 @@
 
 
 
-    </FrameLayout>
-</android.support.constraint.ConstraintLayout>
+
+</LinearLayout>
