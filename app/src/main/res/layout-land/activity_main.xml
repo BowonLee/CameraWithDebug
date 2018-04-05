@@ -19,6 +19,7 @@
             android:id="@+id/imageview"
             android:layout_width="271dp"
             android:layout_height="251dp"
+
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:cropToPadding="true" />
@@ -27,8 +28,8 @@
             android:id="@+id/take_picture"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="bottom|center"
-            android:layout_marginBottom="50dp"
+            android:layout_gravity="right|center"
+            android:layout_marginRight="50dp"
             android:background="@drawable/ic_photo_camera_black_48dp" />
     </FrameLayout>
 
