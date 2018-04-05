@@ -486,8 +486,7 @@ public class CameraPreview {
         Activity activity = (Activity) mContext;
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-         //   activity.requestPermissions(new String[]{Manifest.permission.CAMERA},1);
-            return;
+           return;
         }
         setUpCameraOutputs(width, height);
         configureTransform(width, height);

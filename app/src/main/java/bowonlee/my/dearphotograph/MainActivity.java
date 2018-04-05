@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         mTextureView = (AutoFitTextureView) findViewById(R.id.camera_preview_session);
-        cameraPreview = new CameraPreview(this,mTextureView);
         setRequestCameraPermission();
 
     }
@@ -48,7 +47,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        cameraPreview = new CameraPreview(this,mTextureView);
+
         cameraPreview.startBackgroundThread();
+
         /*
         * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
         * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
@@ -74,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setRequestCameraPermission(){
-         new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
+        }
     }
 
     @Override
