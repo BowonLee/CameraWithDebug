@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -29,18 +30,22 @@ public class MainActivity extends AppCompatActivity {
     * 따라서 권한 요청을 하기도 전에 카메라를 열려고 시도하기에 초기 1회 crash가 발생하게되므로
     * Dialog를 통해 잠시 앱의 동작을 멈추는 기능이 필요하다
     * */
+    private static final String ALBUMNAME = "DearPhotograph";
 
     private AutoFitTextureView mTextureView;
     private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final int LOCATE_PERMISSION =2;
     private ImageView mImageView;
+    private FileStroageHelper mFileStroageHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mFileStroageHelper = new FileStroageHelper();
+        mFileStroageHelper.getAlbumStorageDir(ALBUMNAME);
 
         mTextureView = (AutoFitTextureView) findViewById(R.id.camera_preview_session);
         mImageView = (ImageView)findViewById(R.id.imageview);
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(mImageView!=null){
-              setmImageView();
+          //,    setmImageView();
         }
     }
 
@@ -138,6 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    private void takePicture(){
+        /*사진 촬영과 저장*/
+    }
+    public void onClickSutter(View view){
+        cameraPreview.takePicture();
+    }
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {

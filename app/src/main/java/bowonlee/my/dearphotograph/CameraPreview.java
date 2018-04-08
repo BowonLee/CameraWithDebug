@@ -108,7 +108,7 @@ public class CameraPreview {
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
-            //mBackroundHandler.post(new ImageSaver)
+            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),mFile));
         }
     };
 
@@ -605,6 +605,7 @@ public class CameraPreview {
 
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
+            //captureBuiler 초기화
             mCaptureSession.capture(captureBuilder.build(),CaptureCallback,null);
 
         }catch (CameraAccessException e){
@@ -665,47 +666,6 @@ public class CameraPreview {
         }
     }
 
-    /*이미지의 저장을 위한 클레스*/
-    private static class ImageSaver implements Runnable {
-
-        /**
-         * The JPEG image
-         */
-        private final Image mImage;
-        /**
-         * The file we save the image into.
-         */
-        private final File mFile;
-
-        ImageSaver(Image image, File file) {
-            mImage = image;
-            mFile = file;
-        }
-
-        @Override
-        public void run() {
-            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
-            FileOutputStream output = null;
-            try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-    }
 
 
 }
