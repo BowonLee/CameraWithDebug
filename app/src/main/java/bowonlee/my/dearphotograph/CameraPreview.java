@@ -104,11 +104,11 @@ public class CameraPreview {
 
     /*For StillImageCapture */
     private ImageReader mImageReader;
-    private File mFile;
+
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
-            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),mFile));
+            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage()));
         }
     };
 

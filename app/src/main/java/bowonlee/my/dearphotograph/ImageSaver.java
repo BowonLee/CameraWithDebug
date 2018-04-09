@@ -1,6 +1,7 @@
 package bowonlee.my.dearphotograph;
 
 import android.media.Image;
+import android.media.MediaScannerConnection;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,23 +35,22 @@ public class ImageSaver implements Runnable {
 
     private FileStroageHelper mFileStroageHelper;
     private String mFileName;
-    ImageSaver(Image image, File file) {
+    ImageSaver(Image image) {
         mImage = image;
-        mFile = file;
     }
 
     @Override
     public void run() {
-/*
+
         long now = System.currentTimeMillis();
         Date date = new Date(now);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyymmdd");
         String getTime = sdf.format(date);
-        mFileName = getTime;
-        mFile = new File(mFileName);
-*/
+        mFileName = getTime +".jpg";
+
+
         mFileStroageHelper = new FileStroageHelper();
-        mFile = mFileStroageHelper.getAlbumStorageDir("myAlbum");
+        mFile = new File(mFileStroageHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
 
         ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.remaining()];
@@ -71,5 +71,7 @@ public class ImageSaver implements Runnable {
                 }
             }
         }
+
+
     }
 }

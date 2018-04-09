@@ -1,5 +1,6 @@
 package bowonlee.my.dearphotograph;
 
+import android.media.Image;
 import android.os.Environment;
 import android.util.Log;
 
@@ -10,7 +11,7 @@ import java.io.File;
  */
 
 /*
-* 앱 내부에서 사용할 저장소 디렉토리를 만들고 관리하는 클레스
+*   앱 내부에서 사용할 저장소 디렉토리를 만들고 관리하는 클레스
 *
 * */
 
@@ -20,12 +21,27 @@ public class FileStroageHelper {
     /*공유 디렉토리 File Path 생성*/
     public File getAlbumStorageDir(String albumName){
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),albumName);
-        if(!file.mkdirs()){
-            Log.e(TAG,"Directory not created");
+
+        if(!file.exists()){
+            if(!file.mkdirs()){
+               Log.e(TAG,"Directory not created");
+            }
+        }else{
+            Log.i(TAG,"Directory alreay createed");
         }
 
         return file;
     }
+    /*
+    *
+    * Input : Image
+    * output : True/False 작업의 성공 여부
+    * */
+    public File createImageToJPEG(Image image){
 
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"DearPhotoGraph");
+
+        return file;
+    }
 
 }
