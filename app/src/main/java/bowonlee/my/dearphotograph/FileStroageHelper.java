@@ -32,16 +32,8 @@ public class FileStroageHelper {
 
         return file;
     }
-    /*
-    *
-    * Input : Image
-    * output : True/False 작업의 성공 여부
-    * */
-    public File createImageToJPEG(Image image){
+  /**/
 
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"DearPhotoGraph");
 
-        return file;
-    }
 
 }

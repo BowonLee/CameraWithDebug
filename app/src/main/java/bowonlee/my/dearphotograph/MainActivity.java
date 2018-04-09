@@ -4,11 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -21,6 +24,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.io.File;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity {
@@ -35,11 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private AutoFitTextureView mTextureView;
     private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final int LOCATE_PERMISSION =2;
+
     private ImageView mImageView;
     private FileStroageHelper mFileStroageHelper;
 
-
+    private ImageSaver mImageSaver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+
+
 
     public static class ConfirmationDialog extends DialogFragment{
         @NonNull

@@ -24,6 +24,8 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -105,10 +107,11 @@ public class CameraPreview {
     /*For StillImageCapture */
     private ImageReader mImageReader;
 
+
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
-            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage()));
+            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),mContext));
         }
     };
 
@@ -234,6 +237,8 @@ public class CameraPreview {
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
             progress(result);
+
+
         }
     };
 
@@ -352,6 +357,7 @@ public class CameraPreview {
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
+
 
                 StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 if (map == null) {
@@ -657,6 +663,9 @@ public class CameraPreview {
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
         }
     }
+
+
+
 
     /*카메라가 출력되는 Surface의 Size관련 Support */
     static class CompareSizeByArea implements Comparator<Size>{
