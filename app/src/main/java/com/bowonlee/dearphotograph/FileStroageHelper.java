@@ -1,6 +1,5 @@
-package bowonlee.my.dearphotograph;
+package com.bowonlee.dearphotograph;
 
-import android.media.Image;
 import android.os.Environment;
 import android.util.Log;
 

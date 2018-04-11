@@ -1,4 +1,4 @@
-package bowonlee.my.dearphotograph; /**
+package com.bowonlee.dearphotograph; /**
  * Created by bowon on 2018-03-29.
  */
 

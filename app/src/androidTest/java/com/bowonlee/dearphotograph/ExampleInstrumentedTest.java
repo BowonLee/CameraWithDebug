@@ -1,4 +1,4 @@
-package bowonlee.my.dearphotograph;
+package com.bowonlee.dearphotograph;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

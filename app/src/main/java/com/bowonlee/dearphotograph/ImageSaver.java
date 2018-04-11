@@ -1,4 +1,4 @@
-package bowonlee.my.dearphotograph;
+package com.bowonlee.dearphotograph;
 
 import android.content.Context;
 import android.media.Image;
@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.Date;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 
 /**

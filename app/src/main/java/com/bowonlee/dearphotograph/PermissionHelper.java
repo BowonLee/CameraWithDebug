@@ -1,4 +1,4 @@
-package bowonlee.my.dearphotograph;
+package com.bowonlee.dearphotograph;
 
 import android.Manifest;
 import android.app.Activity;

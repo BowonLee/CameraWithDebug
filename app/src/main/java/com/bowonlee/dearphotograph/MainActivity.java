@@ -1,17 +1,12 @@
-package bowonlee.my.dearphotograph;
+package com.bowonlee.dearphotograph;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.SurfaceTexture;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -20,15 +15,14 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.OrientationEventListener;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.File;
-
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface{
+public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface {
 
     /*
     * 안드로이드의 카메라 프리뷰세션 여는 요청은 비동기 쓰레드 콜벡을 통해 이루어진다.
@@ -37,13 +31,15 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     * */
     private static final String ALBUMNAME = "DearPhotograph";
 
-    private AutoFitTextureView mTextureView;
+    private TextureView mTextureView;
     private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     private ImageView mImageView;
     private FileStroageHelper mFileStroageHelper;
     private ImageSaver imageSaver;
+
+    private OrientationEventListener mOrientationEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +48,33 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         mFileStroageHelper = new FileStroageHelper();
         mFileStroageHelper.getAlbumStorageDir(ALBUMNAME);
 
-        mTextureView = (AutoFitTextureView) findViewById(R.id.camera_preview_session);
+        mTextureView = (TextureView) findViewById(R.id.camera_preview_session);
         mImageView = (ImageView)findViewById(R.id.imageview);
         setRequestCameraPermission();
 
     }
 
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        /*
+        * fullscreen window
+        * */
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+       // Log.e("mainOrientation","Orientation is : " + getRequestedOrientation());
         cameraPreview = new CameraPreview(this,mTextureView);
 
         cameraPreview.startBackgroundThread();
@@ -83,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         if(mImageView!=null){
           //,    setmImageView();
         }
+
+
     }
 
     @Override
