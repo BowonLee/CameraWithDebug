@@ -31,13 +31,16 @@ public class ImageSaver implements Runnable {
      * ImageReader에서 사용하기위한 이미지 객체
      */
 
-    interface OnMImageSaveListener{
+    interface OnMImageSaveListener {
         void onSaveImageComplete(File mFile);
+
+        void onTestListenter();
     }
+
     private OnMImageSaveListener mImageSaveListener;
     private Image mImage;
 
-   /**
+    /**
      * 이미지를 저장할 파일 객체
      */
     private File mFile;
@@ -45,17 +48,16 @@ public class ImageSaver implements Runnable {
 
     private FileStroageHelper mFileStroageHelper;
     private String mFileName;
-    ImageSaver(){}
-    ImageSaver(Image image,Context context) {
+
+    ImageSaver(Image image, Context context) {
         mImage = image;
-        mContext =context;
+        mContext = context;
     }
 
-    public void setOnImageSaveListner(OnMImageSaveListener listner){
-        mImageSaveListener = listner;
 
+    void setOnImageSaveListenr(Context context){
+        mImageSaveListener = (OnMImageSaveListener)context;
     }
-
 
     @Override
     public void run() {
@@ -92,6 +94,7 @@ public class ImageSaver implements Runnable {
                 }
             }
         }
+
         MediaScannerConnection.scanFile(mContext, new String[]{mFile.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
                     @Override
                     public void onScanCompleted(String path, Uri uri) {
@@ -101,7 +104,6 @@ public class ImageSaver implements Runnable {
                     }
                 }
         );
-
 
 
 

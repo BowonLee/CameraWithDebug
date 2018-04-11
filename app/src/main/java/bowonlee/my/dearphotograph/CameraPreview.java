@@ -57,6 +57,10 @@ import java.util.concurrent.TimeUnit;
 
 public class CameraPreview {
 
+    interface CameraInterface{
+        void onPostTakePicture();
+    }
+    private CameraInterface anInterface;
     private static final String TAG = "Camera2Preview";
 
     /*Orientation of Camera*/
@@ -112,6 +116,7 @@ public class CameraPreview {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
             mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),mContext));
+
         }
     };
 
@@ -239,6 +244,7 @@ public class CameraPreview {
             progress(result);
 
 
+
         }
     };
 
@@ -249,7 +255,7 @@ public class CameraPreview {
     public CameraPreview(Context context, AutoFitTextureView mTextureView) {
         mContext = context;
         this.mTextureView = mTextureView;
-
+        anInterface = (CameraInterface) context;
     }
 
 
@@ -604,8 +610,10 @@ public class CameraPreview {
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     // 캡쳐가 완료되면 작업이 수행됨을 알려주거나, 후처리를 한다.
+                    anInterface.onPostTakePicture();
 
                     unlockFocus();
+
                 }
             };
 

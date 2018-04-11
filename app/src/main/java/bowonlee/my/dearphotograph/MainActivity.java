@@ -28,7 +28,7 @@ import android.widget.Toast;
 import java.io.File;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface{
 
     /*
     * 안드로이드의 카메라 프리뷰세션 여는 요청은 비동기 쓰레드 콜벡을 통해 이루어진다.
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView mImageView;
     private FileStroageHelper mFileStroageHelper;
+    private ImageSaver imageSaver;
 
-    private ImageSaver mImageSaver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +110,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onPostTakePicture() {
+        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_LONG);
+        Log.e("Mainactivity","Post Excute In CapturePreview");
+
+    }
 
 
 
@@ -154,33 +160,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void takePicture(){
         /*사진 촬영과 저장*/
-    }
-    public void onClickSutter(View view){
         cameraPreview.takePicture();
     }
-
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
+    public void onClickSutter(View view){
+        takePicture();
     }
+
+
 
 
 }
