@@ -23,4 +23,9 @@ public class PhotoGallaryActivity extends Activity{
         mGridView = (GridView)findViewById(R.id.gridview_gallary);
 
     }
+    /*
+    * 갤러리로부터 이미지 가져오기 + gridview로 가져온 이미지 리스트 보내주기
+    *
+    * */
+
 }

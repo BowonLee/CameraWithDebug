@@ -86,7 +86,7 @@ public class CameraPreview {
 
     /*PreviewComponent*/
     private Size mPreviewSize;
-    private TextureView mTextureView;
+    private AutoFitTextureView mTextureView;
 
     /*For BackgroundThread*/
     private HandlerThread mBackgroundThread;
@@ -165,6 +165,9 @@ public class CameraPreview {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
+            if(((Activity)mContext) != null){
+            ((Activity)mContext).finish();
+            }
 
         }
     };
@@ -242,7 +245,7 @@ public class CameraPreview {
     private int mState = STATE_PREVIEW;
 
 
-    public CameraPreview(Context context, TextureView mTextureView) {
+    public CameraPreview(Context context, AutoFitTextureView mTextureView) {
         mContext = context;
         this.mTextureView = mTextureView;
         anInterface = (CameraInterface) context;
@@ -317,14 +320,20 @@ public class CameraPreview {
         int h = aspectRatio.getHeight();
 
         for (Size option : choice) {
+          //  Log.e("chooing optimal",String.format("(%s), (%d,%d)",choice.length,option.getWidth(),option.getHeight()));
+
             if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w) {
-                if (option.getWidth() >= textureViewWidth && option.getHeight() >= textureViewHeight) {
+
+                if (option.getWidth() >= textureViewWidth &&
+                        option.getHeight() >= textureViewHeight) {
                     bigEnough.add(option);
                 } else {
                     notBigEnough.add(option);
                 }
+
             }
         }
+
         if (bigEnough.size() > 0) {
             return Collections.min(bigEnough, new CompareSizeByArea());
         } else if (notBigEnough.size() > 0) {
@@ -360,18 +369,27 @@ public class CameraPreview {
                     continue;
                 }
 
+                /*
+                *
+                * 해상도
+                * 16 : 9 4160 2340
+                *  4 : 3 4160 3120
+                *  1 : 1 3120 3120
+                * */
                 Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizeByArea());
-                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.JPEG, 2);
-                Log.e(TAG,String.format("mImageReaderSize Width : %d height : %d",mTextureView.getWidth(),mTextureView.getHeight()));
+                mImageReader = ImageReader.newInstance(4160,2340, ImageFormat.JPEG, 2);
+                Log.e(TAG,String.format("mImageReaderSize Width : %d height : %d",largest.getWidth(),largest.getHeight()));
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+                Log.e(TAG,String.format("displayrotation : %d",displayRotation));
 
                 /*
                 *   화면 회전시의 프리뷰사이즈변경 적용
                 *   가로, 세로의 화면이 변경되면 각각 다른 프리뷰세션 크기를 설정한다.
                 * */
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
                 boolean swappedDimensions = false;
                 switch (displayRotation) {
                     case Surface.ROTATION_0:
@@ -417,18 +435,20 @@ public class CameraPreview {
                 * 카메라의 한도를 넘어서 프리뷰사이즈를 지정하는 경우 프리뷰 자체에는 문제가 없을 수 있다.
                 * 하지만 화면을 캡쳐해야 하는 경우 남은 공간에 쓰레기값이 들어가버려 이미지캡쳐가 제대로 작동하지 않는다.
                 * */
+
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
                         maxPreviewHeight, largest);
-
+                Log.e("After chooseOptimal",String.format("width : %d height : %d",mPreviewSize.getWidth(),mPreviewSize.getHeight()));
+                mPreviewSize = new Size(1280,720);
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = mContext.getResources().getConfiguration().orientation;
                 if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                //    mTextureView.setAspectRatio(
-                 //           mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                    mTextureView.setAspectRatio(
+                            mPreviewSize.getWidth(), mPreviewSize.getHeight());
                 } else {
-                 //   mTextureView.setAspectRatio(
-                  //          mPreviewSize.getHeight(), mPreviewSize.getWidth());
+                    mTextureView.setAspectRatio(
+                            mPreviewSize.getHeight(), mPreviewSize.getWidth());
                 }
 
                 Boolean isAviable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
@@ -491,6 +511,8 @@ public class CameraPreview {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
            return;
         }
+
+        Log.e("size in opencamera",String.format("%d,%d",width,height));
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
 
@@ -670,7 +692,7 @@ public class CameraPreview {
     static class CompareSizeByArea implements Comparator<Size>{
         @Override
         public int compare(Size lhs, Size rhs) {
-            return Long.signum((long)lhs.getHeight() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
+            return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
         }
     }
 

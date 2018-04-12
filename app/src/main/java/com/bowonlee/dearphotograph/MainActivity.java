@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     * */
     private static final String ALBUMNAME = "DearPhotograph";
 
-    private TextureView mTextureView;
+    private AutoFitTextureView mTextureView;
     private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         mFileStroageHelper = new FileStroageHelper();
         mFileStroageHelper.getAlbumStorageDir(ALBUMNAME);
 
-        mTextureView = (TextureView) findViewById(R.id.camera_preview_session);
+        mTextureView = (AutoFitTextureView) findViewById(R.id.camera_preview_session);
         mImageView = (ImageView)findViewById(R.id.imageview);
         setRequestCameraPermission();
 
@@ -61,6 +62,13 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         /*
         * fullscreen window
         * */
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -68,24 +76,19 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
        // Log.e("mainOrientation","Orientation is : " + getRequestedOrientation());
         cameraPreview = new CameraPreview(this,mTextureView);
 
         cameraPreview.startBackgroundThread();
-
         /*
         * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
         * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
         * */
-        if(mTextureView.isAvailable()){
-            Log.e("MainActivity",String.format("textureview width : %d textureviewHeight : %d ",mTextureView.getWidth(),mTextureView.getHeight()) );
 
+
+        if(mTextureView.isAvailable()){
+
+                Log.e("MainActivity",String.format("textureview width : %d textureviewHeight : %d ",mTextureView.getWidth(),mTextureView.getHeight()) );
             cameraPreview.openCamera(mTextureView.getWidth(),mTextureView.getHeight());
 
         }else{

@@ -5,6 +5,7 @@ package com.bowonlee.dearphotograph; /**
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.TextureView;
 
 /*
@@ -47,12 +48,15 @@ public class AutoFitTextureView extends TextureView {
         }
         mRatioWidth = width;
         mRatioHeight = height;
+
+        Log.e("AutoFitTextureView",String.format("aspect width : %d height : %d",mRatioWidth,mRatioHeight));
         requestLayout();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
@@ -65,6 +69,7 @@ public class AutoFitTextureView extends TextureView {
                 setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
             }
         }
+        Log.e("AutoFitTextureView",String.format("Mea width : %d height : %d",mRatioWidth,mRatioHeight));
     }
 
 }

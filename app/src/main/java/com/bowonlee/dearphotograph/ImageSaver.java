@@ -63,7 +63,7 @@ public class ImageSaver implements Runnable {
 
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyymmdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyymmddhhmmss");
         String getTime = sdf.format(date);
         mFileName = "dpf"+getTime +".jpg";
 
@@ -71,7 +71,9 @@ public class ImageSaver implements Runnable {
         mFileStroageHelper = new FileStroageHelper();
         mFile = new File(mFileStroageHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
 
+
         ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
         FileOutputStream output = null;
