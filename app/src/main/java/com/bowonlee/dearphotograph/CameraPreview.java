@@ -378,11 +378,11 @@ public class CameraPreview {
                 * */
                 Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizeByArea());
                 mImageReader = ImageReader.newInstance(4160,2340, ImageFormat.JPEG, 2);
-                Log.e(TAG,String.format("mImageReaderSize Width : %d height : %d",largest.getWidth(),largest.getHeight()));
+
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-                Log.e(TAG,String.format("displayrotation : %d",displayRotation));
+
 
                 /*
                 *   화면 회전시의 프리뷰사이즈변경 적용
@@ -439,7 +439,7 @@ public class CameraPreview {
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
                         maxPreviewHeight, largest);
-                Log.e("After chooseOptimal",String.format("width : %d height : %d",mPreviewSize.getWidth(),mPreviewSize.getHeight()));
+
                 mPreviewSize = new Size(1280,720);
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
                 int orientation = mContext.getResources().getConfiguration().orientation;
@@ -512,7 +512,7 @@ public class CameraPreview {
            return;
         }
 
-        Log.e("size in opencamera",String.format("%d,%d",width,height));
+
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
 

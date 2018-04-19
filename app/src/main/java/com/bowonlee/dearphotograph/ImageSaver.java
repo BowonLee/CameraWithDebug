@@ -45,7 +45,7 @@ public class ImageSaver implements Runnable {
     private File mFile;
     private Context mContext;
 
-    private FileStroageHelper mFileStroageHelper;
+    private FileIOHelper mFileIOHelper;
     private String mFileName;
 
     ImageSaver(Image image, Context context) {
@@ -68,8 +68,8 @@ public class ImageSaver implements Runnable {
         mFileName = "dpf"+getTime +".jpg";
 
 
-        mFileStroageHelper = new FileStroageHelper();
-        mFile = new File(mFileStroageHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
+        mFileIOHelper = new FileIOHelper();
+        mFile = new File(mFileIOHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
 
 
         ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
