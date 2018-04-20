@@ -73,7 +73,7 @@ public class PhotoLoader extends AsyncTaskLoader<List<Photo>>{
     private Uri uriTothumnail(String imageId){
         tableUri = MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI;
         projection = new String[]{MediaStore.Images.Thumbnails.DATA};
-        selection = MediaStore.Images.Thumbnails.IMAGE_ID + "?";
+        selection = MediaStore.Images.Thumbnails.IMAGE_ID + "=?";
         selectionArgs = new String[]{imageId};
 
         Cursor thumnailCursor = contentResolver.query(tableUri,projection,

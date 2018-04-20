@@ -3,7 +3,11 @@ package com.bowonlee.dearphotograph.gallary;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.FileIOHelper;
@@ -16,25 +20,26 @@ import com.bowonlee.dearphotograph.R;
 public class PhotoGallaryActivity extends AppCompatActivity{
 
     private static String TAG = "PhotoGallary";
-    private GridView mGridView;
-    private String mFilePath;
-    private ImageAdapter mImageAdapter;
-    private FileIOHelper mFileIOHelper;
+
+    private RecyclerView mGridPhotoGallary;
+    private PhotoAdapter mPhotoAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gally);
-        //  mImageAdapter = new ImageAdapter(this);
-
-        Toast.makeText(this,"open",Toast.LENGTH_SHORT);
-         mGridView = (GridView)findViewById(R.id.gridview_gallary);
-         //mGridView.setAdapter(mImageAdapter);
-      //   mGridView.setAdapter(new );
-        mFileIOHelper = new FileIOHelper();
 
 
-       // MediaStore.Images.Thumbnails.getThumbnail()
+        mGridPhotoGallary = (RecyclerView) findViewById(R.id.gallary_recyclerview);
+        mPhotoAdapter = new PhotoAdapter(this);
+
+        getLoaderManager().initLoader(0,null,mPhotoAdapter);
+        mGridPhotoGallary.setLayoutManager(new GridLayoutManager(null,3, LinearLayoutManager.VERTICAL,false));
+        mGridPhotoGallary.setAdapter(mPhotoAdapter);
+
+
+
+
     }
 
     @Override

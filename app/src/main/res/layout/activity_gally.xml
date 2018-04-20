@@ -24,14 +24,9 @@
 
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/gridview_gallary"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:numColumns="auto_fit"
-        android:columnWidth="100dp"
-        android:stretchMode="columnWidth"
-        ></GridView>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gallary_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

@@ -43,4 +43,8 @@ public class Photo implements Parcelable{
         thumnailUri.writeToParcel(dest,flags);
         imageUri.writeToParcel(dest,flags);
     }
+
+
+    public Uri getThumnailUri(){return thumnailUri;}
+    public Uri getImageUri(){return imageUri;}
 }
