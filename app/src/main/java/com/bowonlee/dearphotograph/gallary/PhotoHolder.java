@@ -22,6 +22,8 @@ public class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClick
         super(view);
 
         photoView= (ImageView)view.findViewById(R.id.photoholder_image);
+
+        view.setOnClickListener(this);
     }
 
     public void setPhoto(Photo photo){
@@ -37,5 +39,7 @@ public class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClick
         * */
 
         Log.i("PhotoHolder","Image : " + photo.getImageUri().toString());
+        Log.i("PhotoHolder","size : " + photoView.getWidth() + " , "+ photoView.getHeight());
+
     }
 }
