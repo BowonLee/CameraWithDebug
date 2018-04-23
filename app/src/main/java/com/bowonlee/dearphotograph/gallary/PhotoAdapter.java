@@ -5,6 +5,7 @@ import android.app.LoaderManager;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
-        implements LoaderManager.LoaderCallbacks<List<Photo>>{
+        implements LoaderManager.LoaderCallbacks<List<Photo>>,PhotoHolder.PhotoPickListener{
 
     private PhotoGallaryActivity activity;
     private List<Photo> photos;
@@ -34,8 +35,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     @Override
     public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallary_photo_holder,parent,false);
-
-        return new PhotoHolder(view);
+        PhotoHolder holder =  new PhotoHolder(view);
+        holder.setOnPhotoPickListener(this);
+        return holder;
     }
 
     @Override
@@ -64,4 +66,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
         photos.clear();
         notifyDataSetChanged();
     }
+
+    @Override
+    public void photoPick(Photo photo) {
+        Log.i("PhotoHolder","Image : " + photo.getImageUri().toString());
+
+    }
+
+
 }
