@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/cropper_drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <!-- crop context view -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- drawer view -->
+        <ScrollView
+            android:layout_width="240dp"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="240dp"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
+            <!--insert item-->
+            <TextView
+                style="Cropper.Widget.Drawer.Title.TextView"
+                android:text="TitleTest"
+                />
+            <View style="Cropper.Widget.Drawer.Seperator"></View>
+
+            <TextView
+                style="Cropper.Widget.Drawer.Option.TextView"
+                android:text="test1"
+                android:id="@+id/crop_drawer_test1"
+                />
+
+            <TextView
+                style="Cropper.Widget.Drawer.Option.TextView"
+                android:text="test2"
+                android:id="@+id/crop_drawer_test2"
+                />
+
+            <TextView
+                style="Cropper.Widget.Drawer.Option.TextView"
+                android:text="test3"
+                android:id="@+id/crop_drawer_test3"
+                />
+
+        </ScrollView>
+
+    </FrameLayout>
+
+</android.support.v4.widget.DrawerLayout>
