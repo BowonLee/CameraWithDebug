@@ -264,11 +264,7 @@ public class CameraFragment extends Fragment{
         mTextureView = (AutoFitTextureView)view.findViewById(R.id.camera_preview_session);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main_camera,container,false);
-    }
+
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override

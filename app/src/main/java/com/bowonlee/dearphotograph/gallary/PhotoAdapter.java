@@ -22,7 +22,7 @@ import java.util.List;
  */
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
-        implements LoaderManager.LoaderCallbacks<List<Photo>>,PhotoHolder.PhotoPickListener{
+        implements LoaderManager.LoaderCallbacks<List<Photo>>{
 
     private Activity activity;
     private List<Photo> photos;
@@ -36,7 +36,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallary_photo_holder,parent,false);
         PhotoHolder holder =  new PhotoHolder(view);
-        holder.setOnPhotoPickListener(this);
+
         return holder;
     }
 
@@ -65,12 +65,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     public void onLoaderReset(Loader<List<Photo>> loader) {
         photos.clear();
         notifyDataSetChanged();
-    }
-
-    @Override
-    public void photoPick(Photo photo) {
-        Log.i("PhotoHolder","Image : " + photo.getImageUri().toString());
-
     }
 
 

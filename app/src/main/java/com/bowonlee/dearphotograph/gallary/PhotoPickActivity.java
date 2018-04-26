@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.Photo;
-import com.theartofdev.edmodo.cropper.CropImage;
+
 
 /**
  * Created by bowon on 2018-04-13.
@@ -57,7 +57,7 @@ public class PhotoPickActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_post_photo_pick_complete: {
-                CropImage.activity();}
+                }
         }
     }
 }
