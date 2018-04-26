@@ -24,10 +24,10 @@ import java.util.List;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
         implements LoaderManager.LoaderCallbacks<List<Photo>>,PhotoHolder.PhotoPickListener{
 
-    private PhotoGallaryActivity activity;
+    private Activity activity;
     private List<Photo> photos;
 
-    public PhotoAdapter(PhotoGallaryActivity activity){
+    public PhotoAdapter(Activity activity){
         this.activity = activity;
 
     }
