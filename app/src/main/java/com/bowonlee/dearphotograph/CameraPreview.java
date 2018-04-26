@@ -92,7 +92,7 @@ public class CameraPreview {
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
 
-    /*Syncronizing Semapore*/
+    /*Syncronize Semapore*/
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
     /*Camera Device Option*/
