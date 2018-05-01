@@ -4,10 +4,19 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
+import android.media.ExifInterface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -22,9 +31,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
+import com.bowonlee.dearphotograph.models.Photo;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface, View.OnClickListener,SensorEventListener {
 
     /*
     * 안드로이드의 카메라 프리뷰세션 여는 요청은 비동기 쓰레드 콜벡을 통해 이루어진다.
@@ -32,18 +42,47 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     * Dialog를 통해 잠시 앱의 동작을 멈추는 기능이 필요하다
     * */
     private static final String ALBUMNAME = "DearPhotograph";
+    public static final int RESULT_OK = 9456;
+    public static final int RESULT_CANCLE = 9458;
+
 
     private AutoFitTextureView mTextureView;
     private CameraPreview cameraPreview;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     private ImageView mImageView;
-    private FileIOHelper mFileIOHelper;
-
-
     private Button mTakePictureButton;
     private Button mOpenGallaryButton;
     private Button mFinishAppButton;
+
+
+    //Sensor for change orientation
+    private Sensor mAcellerometerSensor;
+    private Sensor mMagneticSensor;
+
+    private SensorManager mSensorManager;
+    private float[] mAcceleroArr;
+    private float[] mMagneticArr;
+
+
+    private FileIOHelper mFileIOHelper;
+
+
+
+    //Orientation 설정을 위한 셋팅
+    private final int ORIENTATION_PORTRAIT = ExifInterface.ORIENTATION_ROTATE_90; //6
+    private final int ORIENTATION_LANDSCAPE_REVERSE = ExifInterface.ORIENTATION_ROTATE_180;// 3
+    private final int ORIENTATION_LANDSCAPE = ExifInterface.ORIENTATION_NORMAL; //1
+    private final int ORIENTATION_PORTRAIT_REVERSE = ExifInterface.ORIENTATION_ROTATE_270; //8
+
+    int smoothness = 1;
+    private float averagePitch = 0;
+    private float averageRoll = 0;
+    private int orientation = ORIENTATION_PORTRAIT;
+
+    private float[] pitches;
+    private float[] rolls;
+
 
 
     @Override
@@ -68,9 +107,12 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
         setRequestCameraPermission();
 
+        setSensors();
+
+        pitches = new float[smoothness];
+        rolls = new float[smoothness];
+
     }
-
-
 
     @Override
     protected void onResume() {
@@ -103,15 +145,36 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         if(mImageView!=null){
           //,    setmImageView();
         }
-
-
+        setSensorListener();
     }
 
+    //sensor 가동 및 리스너
+    private void setSensors(){
+        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+
+        mAcellerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mMagneticSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+    }
+    private void setSensorListener(){
+
+        //센서가 동작하지 않는 기기가 있을 수 있다. 이에 대한 예외처리가 필요할 것이다.
+        if(mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null&&mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null) {
+            mSensorManager.registerListener(this, mAcellerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager.registerListener(this, mMagneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        }else{
+            Log.e("MainActivity","Sensor is disable");
+        }
+//
+
+    }
     @Override
     protected void onPause() {
         super.onPause();
         cameraPreview.closeCamera();
         cameraPreview.stopBackgroundThread();
+        mSensorManager.unregisterListener(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -134,14 +197,98 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
     @Override
     public void onPostTakePicture() {
-        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_LONG);
+        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_LONG).show();
         Log.e("Mainactivity","Post Excute In CapturePreview");
+
+    }
+
+    // sensors
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            mAcceleroArr = event.values;
+
+
+        }
+        if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
+            mMagneticArr = event.values;
+        }
+
+
+
+        if(mAcceleroArr!=null&&mMagneticArr!=null){
+            float[] R = new float[9];
+            float[] I = new float[9];
+
+            if(SensorManager.getRotationMatrix(R,I,mAcceleroArr,mMagneticArr)){
+                float[] orientationData = new float[3];
+                SensorManager.getOrientation(R,orientationData);
+                averagePitch = addValue(orientationData[1],pitches);
+                averageRoll = addValue(orientationData[2],rolls);
+                orientation = calculateOrientation();
+
+                if(orientation == ORIENTATION_PORTRAIT||orientation == ORIENTATION_PORTRAIT_REVERSE){
+                    Log.i("CurrentOrientation","portrait");
+                }else{
+                    Log.i("CurrentOrientation","landscape");
+
+                }
+            }
+        }
+
+
+    }
+
+    private float addValue(float value, float[] values){
+        float average = 0;
+        value = (float)Math.round(Math.toDegrees(value));
+
+        for (int i= 1;i<smoothness;i++){
+            values[i -1] = values[i];
+            average += values[i];
+        }
+        values[smoothness -1] = value;
+        average = (average + value) / smoothness;
+        return average;
+
+    }
+
+    private int calculateOrientation(){
+        if((orientation == ORIENTATION_PORTRAIT||orientation == ORIENTATION_PORTRAIT_REVERSE
+        &&(averageRoll>-30&&averageRoll<30))){
+            if (averagePitch>0){
+                return ORIENTATION_PORTRAIT_REVERSE;
+            }else{
+                return ORIENTATION_PORTRAIT;
+            }
+        }else{
+            if(Math.abs(averagePitch)>=30){
+                if(averagePitch>0){
+                    return ORIENTATION_PORTRAIT_REVERSE;
+                }else{
+                    return ORIENTATION_PORTRAIT;
+                }
+            }else{
+                if(averageRoll>0){
+                    return ORIENTATION_LANDSCAPE_REVERSE;
+                }else{
+                    return ORIENTATION_LANDSCAPE;
+                }
+            }
+        }
+
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
 
 
 
+    //end of sensors
 
+    //Dialog for Permissions
     public static class ConfirmationDialog extends DialogFragment{
         @NonNull
         @Override
@@ -178,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     private void openGallary(){
 
         Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,156);
 
 
     }
@@ -195,7 +342,8 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
 
 
-    public void setmImageView(){
+
+    public void setmImageView(Photo photo){
         //Bitmap image =
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -204,10 +352,23 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         options.inJustDecodeBounds = false;
 
 
-        mImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.cafe_demoimage,options));
+        //mImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.cafe_demoimage,options));
+        mImageView.setImageURI(photo.getImageUri());
 
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        switch (requestCode){
+            case 156 : {if(resultCode == RESULT_OK){
+                Photo photo = data.getParcelableExtra("result");
+             setmImageView(photo);
+            }}
+        }
+
+
+    }
 }

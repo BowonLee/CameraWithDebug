@@ -21,6 +21,7 @@ public class PhotoGallaryActivity extends AppCompatActivity{
 
     private static String TAG = "PhotoGallary";
 
+
     private RecyclerView mGridPhotoGallary;
     private PhotoAdapter mPhotoAdapter;
 

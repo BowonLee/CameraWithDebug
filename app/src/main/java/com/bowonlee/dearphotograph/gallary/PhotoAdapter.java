@@ -2,14 +2,19 @@ package com.bowonlee.dearphotograph.gallary;
 
 import android.app.Activity;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.bowonlee.dearphotograph.MainActivity;
 import com.bowonlee.dearphotograph.PhotoLoader;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.Photo;
@@ -22,7 +27,7 @@ import java.util.List;
  */
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
-        implements LoaderManager.LoaderCallbacks<List<Photo>>{
+        implements LoaderManager.LoaderCallbacks<List<Photo>>,PhotoHolder.OnItemClickListener {
 
     private Activity activity;
     private List<Photo> photos;
@@ -36,6 +41,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallary_photo_holder,parent,false);
         PhotoHolder holder =  new PhotoHolder(view);
+        holder.setOnItemClickListener(this);
 
         return holder;
     }
@@ -68,4 +74,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onItemClick(Photo photo) {
+
+
+        Intent intent = activity.getIntent();
+        intent.putExtra("result",photo);
+        activity.setResult(MainActivity.RESULT_OK,intent);
+        activity.finish();
+    }
 }

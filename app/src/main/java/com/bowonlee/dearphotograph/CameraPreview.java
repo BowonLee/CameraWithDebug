@@ -421,6 +421,7 @@ public class CameraPreview {
                     rotatedPreviewHeight = width;
                     maxPreviewWidth = displaySize.y;
                     maxPreviewHeight = displaySize.x;
+
                 }
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
@@ -616,7 +617,7 @@ public class CameraPreview {
             setAutoFlash(captureBuilder);
 
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 0);
 
             CameraCaptureSession.CaptureCallback CaptureCallback = new CameraCaptureSession.CaptureCallback() {
                 @Override
@@ -642,6 +643,7 @@ public class CameraPreview {
 
     /* 사진의 저장을 위해 현제 화면의 상태를 알려준다*/
     private int getOrientation(int rotation){
+
 
         return (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360;
     }
