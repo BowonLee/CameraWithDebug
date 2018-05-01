@@ -34,7 +34,7 @@ import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.Photo;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface, View.OnClickListener,SensorEventListener {
+public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface, View.OnClickListener, SensorOrientation.OrientationChangeListener {
 
     /*
     * 안드로이드의 카메라 프리뷰세션 여는 요청은 비동기 쓰레드 콜벡을 통해 이루어진다.
@@ -59,30 +59,10 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     //Sensor for change orientation
     private Sensor mAcellerometerSensor;
     private Sensor mMagneticSensor;
-
     private SensorManager mSensorManager;
-    private float[] mAcceleroArr;
-    private float[] mMagneticArr;
-
+    private SensorOrientation mSensorOrientation;
 
     private FileIOHelper mFileIOHelper;
-
-
-
-    //Orientation 설정을 위한 셋팅
-    private final int ORIENTATION_PORTRAIT = ExifInterface.ORIENTATION_ROTATE_90; //6
-    private final int ORIENTATION_LANDSCAPE_REVERSE = ExifInterface.ORIENTATION_ROTATE_180;// 3
-    private final int ORIENTATION_LANDSCAPE = ExifInterface.ORIENTATION_NORMAL; //1
-    private final int ORIENTATION_PORTRAIT_REVERSE = ExifInterface.ORIENTATION_ROTATE_270; //8
-
-    int smoothness = 1;
-    private float averagePitch = 0;
-    private float averageRoll = 0;
-    private int orientation = ORIENTATION_PORTRAIT;
-
-    private float[] pitches;
-    private float[] rolls;
-
 
 
     @Override
@@ -107,10 +87,10 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
         setRequestCameraPermission();
 
+        mSensorOrientation = new SensorOrientation();
+        mSensorOrientation.setOnOrientationListener(this);
         setSensors();
 
-        pitches = new float[smoothness];
-        rolls = new float[smoothness];
 
     }
 
@@ -158,10 +138,10 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     }
     private void setSensorListener(){
 
-        //센서가 동작하지 않는 기기가 있을 수 있다. 이에 대한 예외처리가 필요할 것이다.
+        //센서가 동작하지 않는 기기가 있을 수 있다.(기기특성, 고장, 일시적 오류 등) 이에 대한 예외처리가 필요할 것이다.
         if(mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null&&mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null) {
-            mSensorManager.registerListener(this, mAcellerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-            mSensorManager.registerListener(this, mMagneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager.registerListener(mSensorOrientation.getEventListener(), mAcellerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager.registerListener(mSensorOrientation.getEventListener(), mMagneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         }else{
             Log.e("MainActivity","Sensor is disable");
@@ -174,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         super.onPause();
         cameraPreview.closeCamera();
         cameraPreview.stopBackgroundThread();
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(mSensorOrientation.getEventListener());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -202,91 +182,16 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
     }
 
-    // sensors
     @Override
-    public void onSensorChanged(SensorEvent event) {
-
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            mAcceleroArr = event.values;
-
-
-        }
-        if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            mMagneticArr = event.values;
-        }
-
-
-
-        if(mAcceleroArr!=null&&mMagneticArr!=null){
-            float[] R = new float[9];
-            float[] I = new float[9];
-
-            if(SensorManager.getRotationMatrix(R,I,mAcceleroArr,mMagneticArr)){
-                float[] orientationData = new float[3];
-                SensorManager.getOrientation(R,orientationData);
-                averagePitch = addValue(orientationData[1],pitches);
-                averageRoll = addValue(orientationData[2],rolls);
-                orientation = calculateOrientation();
-
-                if(orientation == ORIENTATION_PORTRAIT||orientation == ORIENTATION_PORTRAIT_REVERSE){
-                    Log.i("CurrentOrientation","portrait");
-                }else{
-                    Log.i("CurrentOrientation","landscape");
-
-                }
-            }
-        }
-
-
-    }
-
-    private float addValue(float value, float[] values){
-        float average = 0;
-        value = (float)Math.round(Math.toDegrees(value));
-
-        for (int i= 1;i<smoothness;i++){
-            values[i -1] = values[i];
-            average += values[i];
-        }
-        values[smoothness -1] = value;
-        average = (average + value) / smoothness;
-        return average;
-
-    }
-
-    private int calculateOrientation(){
-        if((orientation == ORIENTATION_PORTRAIT||orientation == ORIENTATION_PORTRAIT_REVERSE
-        &&(averageRoll>-30&&averageRoll<30))){
-            if (averagePitch>0){
-                return ORIENTATION_PORTRAIT_REVERSE;
-            }else{
-                return ORIENTATION_PORTRAIT;
-            }
+    public void OnOrientationChanged(int orientation) {
+        if(orientation == SensorOrientation.ORIENTATION_PORTRAIT||orientation == SensorOrientation.ORIENTATION_PORTRAIT_REVERSE){
+            Log.i("SensorState","Portrait");
         }else{
-            if(Math.abs(averagePitch)>=30){
-                if(averagePitch>0){
-                    return ORIENTATION_PORTRAIT_REVERSE;
-                }else{
-                    return ORIENTATION_PORTRAIT;
-                }
-            }else{
-                if(averageRoll>0){
-                    return ORIENTATION_LANDSCAPE_REVERSE;
-                }else{
-                    return ORIENTATION_LANDSCAPE;
-                }
-            }
+            Log.i("SensorState","Landscape");
         }
 
     }
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-    }
-
-
-
-    //end of sensors
 
     //Dialog for Permissions
     public static class ConfirmationDialog extends DialogFragment{

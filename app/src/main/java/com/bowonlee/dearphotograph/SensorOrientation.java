@@ -8,10 +8,10 @@ import android.media.ExifInterface;
 
 public class SensorOrientation {
 
-    private final int ORIENTATION_PORTRAIT = ExifInterface.ORIENTATION_ROTATE_90;
-    private final int ORIENTATION_LANDSCAPE_REVERSE = ExifInterface.ORIENTATION_ROTATE_180;
-    private final int ORIENTATION_LANDSCAPE = ExifInterface.ORIENTATION_NORMAL;
-    private final int ORIENTATION_PORTRAIT_REVERSE = ExifInterface.ORIENTATION_ROTATE_270;
+    public static final int ORIENTATION_PORTRAIT = ExifInterface.ORIENTATION_ROTATE_90;
+    public static final int ORIENTATION_LANDSCAPE_REVERSE = ExifInterface.ORIENTATION_ROTATE_180;
+    public static final int ORIENTATION_LANDSCAPE = ExifInterface.ORIENTATION_NORMAL;
+    public static final int ORIENTATION_PORTRAIT_REVERSE = ExifInterface.ORIENTATION_ROTATE_270;
 
     int smoothness = 1;
     private float averagePitch = 0;
@@ -22,7 +22,7 @@ public class SensorOrientation {
     private float[] rolls;
 
     interface OrientationChangeListener{
-        public int OnOrientationChanged();
+        void OnOrientationChanged(int orientation);
     }
 
     private OrientationChangeListener listener;
@@ -48,7 +48,11 @@ public class SensorOrientation {
                     SensorManager.getOrientation(R,orientationData);
                     averagePitch = addValue(orientationData[1],pitches);
                     averageRoll = addValue(orientationData[2],rolls);
-                    orientation = calculateOrientation();
+
+                    if(orientation != calculateOrientation()){
+                        orientation = calculateOrientation();
+                        listener.OnOrientationChanged(orientation);
+                    }
                 }
             }
         }
