@@ -111,6 +111,7 @@ public class DummyMainActivity extends AppCompatActivity implements CameraFragme
         mSensorOrientation.setOnOrientationListener(this);
         setSensors();
         mCameraFragment.setOnCameraInterface(this);
+        mCameraFragment.setTextureSize(3120,4160);
 
     }
 
@@ -254,10 +255,12 @@ public class DummyMainActivity extends AppCompatActivity implements CameraFragme
         }
     }
     private void openGallary(){
-
+/*
         Intent intent = new Intent(DummyMainActivity.this, PhotoGallaryActivity.class);
         startActivityForResult(intent,156);
-
+*/
+    mCameraFragment.setTextureSize(2340,4160);
+    mCameraFragment.refreshFragment();
 
     }
 

@@ -93,6 +93,7 @@ public class CameraFragment extends Fragment{
     /*PreviewComponent*/
     private Size mPreviewSize;
     private AutoFitTextureView mTextureView;
+    private Size mTextureSize;
 
     /*For BackgroundThread*/
     private HandlerThread mBackgroundThread;
@@ -406,8 +407,8 @@ public class CameraFragment extends Fragment{
                  *  4 : 3 4160 3120
                  *  1 : 1 3120 3120
                  * */
-                Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CameraPreview.CompareSizeByArea());
-                mImageReader = ImageReader.newInstance(4160,2340, ImageFormat.JPEG, 2);
+
+                mImageReader = ImageReader.newInstance(mTextureSize.getWidth(),mTextureSize.getHeight(), ImageFormat.JPEG, 2);
 
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
@@ -418,9 +419,6 @@ public class CameraFragment extends Fragment{
                  *   화면 회전시의 프리뷰사이즈변경 적용
                  *   가로, 세로의 화면이 변경되면 각각 다른 프리뷰세션 크기를 설정한다.
                  * */
-
-
-
                 Point displaySize = new Point();
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
                 int rotatedPreviewWidth = width;
@@ -441,21 +439,17 @@ public class CameraFragment extends Fragment{
                  * 카메라의 한도를 넘어서 프리뷰사이즈를 지정하는 경우 프리뷰 자체에는 문제가 없을 수 있다.
                  * 하지만 화면을 캡쳐해야 하는 경우 남은 공간에 쓰레기값이 들어가버려 이미지캡쳐가 제대로 작동하지 않는다.
                  * */
-
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
-                        maxPreviewHeight, largest);
+                        maxPreviewHeight, mTextureSize);
+                Log.i("PreviewSize",mPreviewSize.toString());
 
-                mPreviewSize = new Size(1280,720);
+
+
+
+                // 프리뷰 세션의 해상도 결정
+                mTextureView.setAspectRatio(mTextureSize.getWidth(),mTextureSize.getHeight());
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
-                int orientation = getActivity().getResources().getConfiguration().orientation;
-                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    mTextureView.setAspectRatio(
-                            mPreviewSize.getWidth(), mPreviewSize.getHeight());
-                } else {
-                    mTextureView.setAspectRatio(
-                            mPreviewSize.getHeight(), mPreviewSize.getWidth());
-                }
 
                 Boolean isAviable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
                 mFlashSupported = isAviable == null ? false : isAviable;
@@ -497,15 +491,6 @@ public class CameraFragment extends Fragment{
         mTextureView.setTransform(matrix);
 
     }
-
-
-    /*
-     * Texture가 생성되 전
-     * */
-    public void setSurface() {
-        mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-    }
-
 
     /*
      * 카메라 기기를 열고 닫는 쓰레드 부분
@@ -621,7 +606,7 @@ public class CameraFragment extends Fragment{
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             setAutoFlash(captureBuilder);
 
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, mOrientation);
 
             CameraCaptureSession.CaptureCallback CaptureCallback = new CameraCaptureSession.CaptureCallback() {
@@ -649,7 +634,10 @@ public class CameraFragment extends Fragment{
     public void setOrientation(int orientation){
         mOrientation = orientation;
     }
-    /* 사진의 저장을 위해 현제 화면의 상태를 알려준다*/
+    public void setTextureSize(int textureWidth,int textureHeight){
+        mTextureSize = new Size(textureWidth,textureHeight);
+    }
+    /* 사진의 저장을 위해 현제 화면의 상태를려준다*/
 
     /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
     public void takePicture(){
@@ -706,4 +694,7 @@ public class CameraFragment extends Fragment{
         anInterface = cameraInterface;
     }
 
+    public void refreshFragment(){
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
 }

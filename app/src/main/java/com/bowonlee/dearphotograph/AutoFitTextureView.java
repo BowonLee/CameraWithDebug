@@ -49,7 +49,6 @@ public class AutoFitTextureView extends TextureView {
         mRatioWidth = width;
         mRatioHeight = height;
 
-        Log.e("AutoFitTextureView",String.format("aspect width : %d height : %d",mRatioWidth,mRatioHeight));
         requestLayout();
     }
 
