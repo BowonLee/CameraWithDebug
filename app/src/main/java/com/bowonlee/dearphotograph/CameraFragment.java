@@ -3,7 +3,6 @@ package com.bowonlee.dearphotograph;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -31,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -64,20 +64,12 @@ public class CameraFragment extends Fragment{
     interface CameraInterface{
         void onPostTakePicture();
     }
-    private CameraPreview.CameraInterface anInterface;
+    private CameraFragment.CameraInterface anInterface;
     private static final String TAG = "Camera2Preview";
 
-    /*Orientation of Camera*/
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
-
-    private int mSensorOrientation;
+    /*camera orientation*/
+    int mOrientation = 90;
 
     /*Camrara Status*/
     private static final int STATE_PREVIEW = 0;
@@ -261,10 +253,14 @@ public class CameraFragment extends Fragment{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mTextureView = (AutoFitTextureView)view.findViewById(R.id.camera_preview_session);
+        mTextureView = (AutoFitTextureView)view.findViewById(R.id.texture_camera);
     }
 
-
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_camera,container,false);
+    }
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -422,26 +418,8 @@ public class CameraFragment extends Fragment{
                  *   화면 회전시의 프리뷰사이즈변경 적용
                  *   가로, 세로의 화면이 변경되면 각각 다른 프리뷰세션 크기를 설정한다.
                  * */
-                mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
-                boolean swappedDimensions = false;
-                switch (displayRotation) {
-                    case Surface.ROTATION_0:
-                    case Surface.ROTATION_180: {
-                        if (mSensorOrientation == 90 || mSensorOrientation == 270) {
-                            swappedDimensions = true;
-                        }
-                        break;
-                    }
-                    case Surface.ROTATION_90:
-                    case Surface.ROTATION_270:
-                        if (mSensorOrientation == 0 || mSensorOrientation == 180) {
-                            swappedDimensions = true;
-                        }
-                        break;
-                    default:
-                        Log.e(TAG, "Display rotation is invalid" + displayRotation);
-                }
+
 
                 Point displaySize = new Point();
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
@@ -450,12 +428,6 @@ public class CameraFragment extends Fragment{
                 int maxPreviewWidth = displaySize.x;
                 int maxPreviewHeight = displaySize.y;
 
-                if (swappedDimensions) {
-                    rotatedPreviewWidth = height;
-                    rotatedPreviewHeight = width;
-                    maxPreviewWidth = displaySize.y;
-                    maxPreviewHeight = displaySize.x;
-                }
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
                     maxPreviewWidth = MAX_PREVIEW_WIDTH;
@@ -650,7 +622,7 @@ public class CameraFragment extends Fragment{
             setAutoFlash(captureBuilder);
 
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, mOrientation);
 
             CameraCaptureSession.CaptureCallback CaptureCallback = new CameraCaptureSession.CaptureCallback() {
                 @Override
@@ -674,11 +646,10 @@ public class CameraFragment extends Fragment{
         }
     }
 
-    /* 사진의 저장을 위해 현제 화면의 상태를 알려준다*/
-    private int getOrientation(int rotation){
-
-        return (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360;
+    public void setOrientation(int orientation){
+        mOrientation = orientation;
     }
+    /* 사진의 저장을 위해 현제 화면의 상태를 알려준다*/
 
     /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
     public void takePicture(){
@@ -729,4 +700,10 @@ public class CameraFragment extends Fragment{
             return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
         }
     }
+
+    public static CameraFragment newInstance(){return new CameraFragment();}
+    public void setOnCameraInterface(CameraInterface cameraInterface){
+        anInterface = cameraInterface;
+    }
+
 }
