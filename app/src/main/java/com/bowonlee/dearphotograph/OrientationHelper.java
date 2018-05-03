@@ -6,12 +6,25 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.ExifInterface;
 
-public class SensorOrientation {
+public class OrientationHelper {
+
 
     public static final int ORIENTATION_PORTRAIT = ExifInterface.ORIENTATION_ROTATE_90;
     public static final int ORIENTATION_LANDSCAPE_REVERSE = ExifInterface.ORIENTATION_ROTATE_180;
     public static final int ORIENTATION_LANDSCAPE = ExifInterface.ORIENTATION_NORMAL;
     public static final int ORIENTATION_PORTRAIT_REVERSE = ExifInterface.ORIENTATION_ROTATE_270;
+
+    //for view orientation
+    public static final int ORIENTATION_PORTRAIT_VIEW = 90;
+    public static final int ORIENTATION_LANDSCAPE_VIEW = 0;
+    public static final int ORIENTATION_PORTRAIT_REVERSE_VIEW = 270;
+    public static final int ORIENTATION_LANDSCPAE_REVERSE_VIEW = 180;
+
+    //for item orientation
+    public static final int ORIENTATION_PORTRAIT_ITEM = 0;
+    public static final int ORIENTATION_LANDSCAPE_ITEM = 90;
+    public static final int ORIENTATION_PORTRAIT_REVERSE_ITEM = 180;
+    public static final int ORIENTATION_LANDSCAPE_REVERSE_ITEM = 270;
 
     int smoothness = 1;
     private float averagePitch = 0;
@@ -63,7 +76,7 @@ public class SensorOrientation {
         }
     };
 
-    public SensorOrientation(){
+    public OrientationHelper(){
         pitches = new float[smoothness];
         rolls = new float[smoothness];
     }

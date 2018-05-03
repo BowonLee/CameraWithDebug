@@ -4,31 +4,26 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
-import android.media.ExifInterface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -37,20 +32,23 @@ import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.Photo;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements CameraPreview.CameraInterface, View.OnClickListener, SensorOrientation.OrientationChangeListener {
+public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface, View.OnClickListener,
+        OrientationHelper.OrientationChangeListener {
+
 
     /*
-    * 안드로이드의 카메라 프리뷰세션 여는 요청은 비동기 쓰레드 콜벡을 통해 이루어진다.
-    * 따라서 권한 요청을 하기도 전에 카메라를 열려고 시도하기에 초기 1회 crash가 발생하게되므로
-    * Dialog를 통해 잠시 앱의 동작을 멈추는 기능이 필요하다
+    * MainActivity의 변화가 있을 경우 먼저 테스트 해보는 테스트용 메인 코드
+    *
+    *
     * */
     private static final String ALBUMNAME = "DearPhotograph";
+
     public static final int RESULT_OK = 9456;
     public static final int RESULT_CANCLE = 9458;
 
 
-    private AutoFitTextureView mTextureView;
-    private CameraPreview cameraPreview;
+
+
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
     private ImageView mImageView;
@@ -63,20 +61,31 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     private Sensor mAcellerometerSensor;
     private Sensor mMagneticSensor;
     private SensorManager mSensorManager;
-    private SensorOrientation mSensorOrientation;
+    private OrientationHelper mSensorOrientation;
 
     private FileIOHelper mFileIOHelper;
+
+    private CameraFragment mCameraFragment;
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mCameraFragment = CameraFragment.newInstance();
+
+
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
-
-        mTextureView = (AutoFitTextureView) findViewById(R.id.camera_preview_session);
+        if(null  == savedInstanceState){
+            mFragmentTransaction.replace(R.id.container,mCameraFragment).commit();
+        }
         mImageView = (ImageView)findViewById(R.id.imageview);
 
         mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
@@ -90,16 +99,18 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
         setRequestCameraPermission();
 
-        mSensorOrientation = new SensorOrientation();
+        mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
         setSensors();
-
+        mCameraFragment.setOnCameraInterface(this);
+        mCameraFragment.setTextureSize(3,4);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
 
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -108,27 +119,19 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        cameraPreview = new CameraPreview(this,mTextureView);
 
-        cameraPreview.startBackgroundThread();
         /*
-        * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
-        * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
-        * */
-
-
-        if(mTextureView.isAvailable()){
-
-            cameraPreview.openCamera(mTextureView.getWidth(),mTextureView.getHeight());
-
-        }else{
-            cameraPreview.setSurface();
-        }
+         * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
+         * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
+         * */
 
         if(mImageView!=null){
-          //,    setmImageView();
+            //,    setmImageView();
         }
         setSensorListener();
+        DisplayMetrics dm;
+        dm = getApplicationContext().getResources().getDisplayMetrics();
+        Log.e("Device Size",String.format("width : %d height : %d",dm.widthPixels,dm.heightPixels));
     }
 
     //sensor 가동 및 리스너
@@ -155,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     @Override
     protected void onPause() {
         super.onPause();
-        cameraPreview.closeCamera();
-        cameraPreview.stopBackgroundThread();
         mSensorManager.unregisterListener(mSensorOrientation.getEventListener());
     }
 
@@ -187,51 +188,47 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
     @Override
     public void OnOrientationChanged(int orientation) {
-        if(orientation == SensorOrientation.ORIENTATION_PORTRAIT||orientation == SensorOrientation.ORIENTATION_PORTRAIT_REVERSE){
+        if(orientation == OrientationHelper.ORIENTATION_PORTRAIT||orientation == OrientationHelper.ORIENTATION_PORTRAIT_REVERSE){
             //portrait
-            if(orientation == SensorOrientation.ORIENTATION_PORTRAIT){
+            if(orientation == OrientationHelper.ORIENTATION_PORTRAIT){
+                //정방향
                 Log.i("Current Orientation","Portrait");
+                mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_PORTRAIT_VIEW);
+                rotateItemsByOrientation(OrientationHelper.ORIENTATION_PORTRAIT_ITEM);
             }else{
+                //역방향
                 Log.i("Current Orientation","Portrait Reverse");
+                mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_VIEW);
+                rotateItemsByOrientation(OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_ITEM);
             }
-
         }else{
             //landscape
-            if(orientation == SensorOrientation.ORIENTATION_LANDSCAPE){
+            if(orientation == OrientationHelper.ORIENTATION_LANDSCAPE){
+                //정방향
                 Log.i("Current Orientation","Landscape");
+                mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_VIEW);
+                rotateItemsByOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_ITEM);
             }else{
+                //역방향
                 Log.i("Current Orientation","Landscape Reverse");
+                mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_LANDSCPAE_REVERSE_VIEW);
+                rotateItemsByOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_REVERSE_ITEM);
             }
+
+
         }
-        rotateItemsByOrientation();
+
     }
-    public void rotateItemsByOrientation(){
+    public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
-        Animation animation = AnimationUtils.loadAnimation(this,R.anim.rotate_right);
-        animation.setDuration(500);
-        animation.setFillAfter(true);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
 
-            }
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                /*
-                mFinishAppButton.setRotation(90);
-                mOpenGallaryButton.setRotation(90);
-                mTakePictureButton.setRotation(90);*/
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {
 
-            }
-        });
-        mTakePictureButton.setAnimation(animation);
-        mOpenGallaryButton.setAnimation(animation);
-        mFinishAppButton.setAnimation(animation);
+        mOpenGallaryButton.setRotation(roation);
+        mFinishAppButton.setRotation(roation);
+        mTakePictureButton.setRotation(roation);
+        mImageView.setRotation(roation);
 
-        mFinishAppButton.startAnimation(animation);
+
 
     }
 
@@ -242,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Activity parent = getActivity();
+            final Activity parent = getActivity();
             return new AlertDialog.Builder(getActivity()).setMessage(R.string.request_caemra_permission)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
@@ -274,14 +271,15 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
     private void openGallary(){
 
         Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
-        startActivityForResult(intent,156);
+        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
+
 
 
     }
 
     private void takePicture(){
         /*사진 촬영과 저장*/
-        cameraPreview.takePicture();
+        mCameraFragment.takePicture();
     }
     private void finishApp(){
         finish();
@@ -293,16 +291,15 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
 
 
     public void setmImageView(Photo photo){
-        //Bitmap image =
-        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
 
-        options.inSampleSize = 4;
+        options.inSampleSize = 2;
         options.inJustDecodeBounds = false;
 
 
-        //mImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.cafe_demoimage,options));
-        mImageView.setImageURI(photo.getImageUri());
+        mImageView.setImageBitmap(BitmapFactory.decodeFile(photo.getImageUri().getPath(),options));
 
     }
 
@@ -312,10 +309,10 @@ public class MainActivity extends AppCompatActivity implements CameraPreview.Cam
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode){
-            case 156 : {if(resultCode == RESULT_OK){
+            case PhotoGallaryActivity.REQUEST_CODE : {if(resultCode == RESULT_OK){
                 Photo photo = data.getParcelableExtra("result");
-             setmImageView(photo);
-            }}
+                setmImageView(photo); }break;
+            }
         }
 
 

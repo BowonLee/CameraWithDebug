@@ -20,7 +20,7 @@ import com.bowonlee.dearphotograph.R;
 public class PhotoGallaryActivity extends AppCompatActivity{
 
     private static String TAG = "PhotoGallary";
-
+    public static final int REQUEST_CODE = 4001;
 
     private RecyclerView mGridPhotoGallary;
     private PhotoAdapter mPhotoAdapter;

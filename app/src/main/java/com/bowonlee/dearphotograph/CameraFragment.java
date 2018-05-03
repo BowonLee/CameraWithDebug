@@ -125,6 +125,7 @@ public class CameraFragment extends Fragment{
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            Log.e("Fragment opencamera WH",width+height+"");
             openCamera(width, height);
         }
 
@@ -270,6 +271,7 @@ public class CameraFragment extends Fragment{
         startBackgroundThread();
         if (mTextureView.isAvailable()){
             openCamera(mTextureView.getWidth(),mTextureView.getHeight());
+            Log.e("Fragment WH",mTextureView.getWidth()+mTextureView.getHeight()+"");
         }else{
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
@@ -395,31 +397,35 @@ public class CameraFragment extends Fragment{
                 }
 
 
+
                 StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
                 if (map == null) {
                     continue;
                 }
+                Point displaySize = new Point();
+                Size largest = Collections.max(
+                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                        new CompareSizesByArea());
 
                 /*
-                 *
                  * 해상도
                  * 16 : 9 4160 2340
                  *  4 : 3 4160 3120
                  *  1 : 1 3120 3120
                  * */
-
-                mImageReader = ImageReader.newInstance(mTextureSize.getWidth(),mTextureSize.getHeight(), ImageFormat.JPEG, 2);
+                // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
+                // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
+                mImageReader = ImageReader.newInstance(1920,1080, ImageFormat.JPEG, 2);
 
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
-
-                int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-
 
                 /*
                  *   화면 회전시의 프리뷰사이즈변경 적용
                  *   가로, 세로의 화면이 변경되면 각각 다른 프리뷰세션 크기를 설정한다.
                  * */
-                Point displaySize = new Point();
+
+
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
                 int rotatedPreviewWidth = width;
                 int rotatedPreviewHeight = height;
@@ -441,14 +447,15 @@ public class CameraFragment extends Fragment{
                  * */
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
-                        maxPreviewHeight, mTextureSize);
-                Log.i("PreviewSize",mPreviewSize.toString());
-
+                        maxPreviewHeight, largest);
+                Log.e("PreviewSize", mPreviewSize.getWidth()+""+mPreviewSize.getHeight());
+                // 여기서의 프리뷰 사이즈가 실제로 카메라 상에 출력되는 프리뷰 사이즈에 영향을 끼친다. 현제는 테스트 기기의 전체 화면 사이즈에 맞게 하드코딩 하였다.
+                mPreviewSize = new Size(1280,720);
 
 
 
                 // 프리뷰 세션의 해상도 결정
-                mTextureView.setAspectRatio(mTextureSize.getWidth(),mTextureSize.getHeight());
+                //mTextureView.setAspectRatio(mPreviewSize.getHeight(),mPreviewSize.getWidth());
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
 
                 Boolean isAviable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
@@ -472,12 +479,15 @@ public class CameraFragment extends Fragment{
             return;
         }
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        Log.e("FragmentOrientation",rotation+" ");
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
+
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
@@ -485,8 +495,10 @@ public class CameraFragment extends Fragment{
                     (float) viewWidth / mPreviewSize.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+
         } else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
+
         }
         mTextureView.setTransform(matrix);
 
@@ -678,16 +690,19 @@ public class CameraFragment extends Fragment{
         }
     }
 
+    static class CompareSizesByArea implements Comparator<Size> {
 
-
-
-    /*카메라가 출력되는 Surface의 Size관련 Support */
-    static class CompareSizeByArea implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs) {
-            return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
+            // We cast here to ensure the multiplications won't overflow
+            return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
+                    (long) rhs.getWidth() * rhs.getHeight());
         }
+
     }
+
+
+
 
     public static CameraFragment newInstance(){return new CameraFragment();}
     public void setOnCameraInterface(CameraInterface cameraInterface){
