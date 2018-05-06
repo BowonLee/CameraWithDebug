@@ -75,17 +75,10 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-        mCameraFragment = CameraFragment.newInstance();
-
 
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
-        if(null  == savedInstanceState){
-            mFragmentTransaction.replace(R.id.container,mCameraFragment).commit();
-        }
         mImageView = (ImageView)findViewById(R.id.imageview);
 
         mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
@@ -101,7 +94,26 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
-        setSensors();
+
+
+
+    }
+
+    private void hideUi(){
+                    getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+    }
+    public void startCameraFragment(){
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mCameraFragment = CameraFragment.newInstance();
+        mFragmentTransaction.replace(R.id.container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
         mCameraFragment.setTextureSize(3,4);
 
@@ -110,51 +122,30 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     @Override
     protected void onResume() {
         super.onResume();
-
-
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
-        /*
-         * 앱을 실행한 경우이면 surfaceTexture부터 생성하고 카메라를 오픈하지만
-         * 단순히 화면만 껏다켠 경우는 카메라장치만 다시 열면 된다.
-         * */
-
-        if(mImageView!=null){
-            //,    setmImageView();
-        }
+        hideUi();
+        startCameraFragment();
+        setSensors();
         setSensorListener();
-        DisplayMetrics dm;
-        dm = getApplicationContext().getResources().getDisplayMetrics();
-        Log.e("Device Size",String.format("width : %d height : %d",dm.widthPixels,dm.heightPixels));
     }
 
     //sensor 가동 및 리스너
     private void setSensors(){
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-
         mAcellerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mMagneticSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
     }
-    private void setSensorListener(){
 
+    private void setSensorListener(){
         //센서가 동작하지 않는 기기가 있을 수 있다.(기기특성, 고장, 일시적 오류 등) 이에 대한 예외처리가 필요할 것이다.
         if(mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null&&mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null) {
             mSensorManager.registerListener(mSensorOrientation.getEventListener(), mAcellerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
             mSensorManager.registerListener(mSensorOrientation.getEventListener(), mMagneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
         }else{
             Log.e("MainActivity","Sensor is disable");
         }
-//
-
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -188,18 +179,19 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @Override
     public void OnOrientationChanged(int orientation) {
+        int itemOrientation = 0;
         if(orientation == OrientationHelper.ORIENTATION_PORTRAIT||orientation == OrientationHelper.ORIENTATION_PORTRAIT_REVERSE){
             //portrait
             if(orientation == OrientationHelper.ORIENTATION_PORTRAIT){
                 //정방향
                 Log.i("Current Orientation","Portrait");
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_PORTRAIT_VIEW);
-                rotateItemsByOrientation(OrientationHelper.ORIENTATION_PORTRAIT_ITEM);
+                itemOrientation = OrientationHelper.ORIENTATION_PORTRAIT_ITEM;
             }else{
                 //역방향
                 Log.i("Current Orientation","Portrait Reverse");
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_VIEW);
-                rotateItemsByOrientation(OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_ITEM);
+                itemOrientation = OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_ITEM;
             }
         }else{
             //landscape
@@ -207,29 +199,24 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                 //정방향
                 Log.i("Current Orientation","Landscape");
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_VIEW);
-                rotateItemsByOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_ITEM);
+                itemOrientation = OrientationHelper.ORIENTATION_LANDSCAPE_ITEM;
             }else{
                 //역방향
                 Log.i("Current Orientation","Landscape Reverse");
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_LANDSCPAE_REVERSE_VIEW);
-                rotateItemsByOrientation(OrientationHelper.ORIENTATION_LANDSCAPE_REVERSE_ITEM);
+                itemOrientation = OrientationHelper.ORIENTATION_LANDSCAPE_REVERSE_ITEM;
             }
-
+            rotateItemsByOrientation(itemOrientation);
 
         }
 
     }
     public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
-
-
         mOpenGallaryButton.setRotation(roation);
         mFinishAppButton.setRotation(roation);
         mTakePictureButton.setRotation(roation);
         mImageView.setRotation(roation);
-
-
-
     }
 
 

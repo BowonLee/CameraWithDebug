@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotograph.gallary;
 
 import android.content.AsyncTaskLoader;
 import android.content.ContentResolver;

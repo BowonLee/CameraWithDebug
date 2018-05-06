@@ -268,6 +268,7 @@ public class CameraFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+
         startBackgroundThread();
         if (mTextureView.isAvailable()){
             openCamera(mTextureView.getWidth(),mTextureView.getHeight());
@@ -336,25 +337,41 @@ public class CameraFragment extends Fragment{
         }
 
     }
-
-
     /*
-     * 카메라가 디바이스의 모든 화면을 사용하는 것이 아닌 경우 ImageCapture를 위한 메소드이다.
-     * 일반적인 카메라로 찍은 사진의 Size = 디바이스의 사이즈 이다.
-     *
-     *
-     * */
+    * 적절한 해상도를 찾는다. (저장되는 사진과 연관)
+    * 최고해상도를 찾아야만 하는지는 추후 고려해 보아야 한다.
+    *
+    * */
+    private Size chooseOptimalResolution(Size[] jpegSizes,Size ratio){
+
+        List<Size> result = new ArrayList<>();
+        int w = ratio.getWidth();
+        int h = ratio.getHeight();
+        for(Size resolution : result){
+                if(resolution.getWidth() == resolution.getHeight() * h/w){
+                    result.add(resolution);
+                }
+        }
+        if(result.size()>0){
+            return Collections.min(result,new CameraFragment.CompareSizeByArea());
+        }else{
+            return jpegSizes[0];
+        }
+    }
+    /*
+    * 현재 상태에 맞추어 적절한 프리뷰사이즈를 리턴해준다. ( 프리뷰와 연관)
+    * */
     private static Size chooseOptimalSize(Size[] choice, int textureViewWidth, int textureViewHeight
             , int maxWidth, int maxHeight, Size aspectRatio) {
         List<Size> bigEnough = new ArrayList<>();
         List<Size> notBigEnough = new ArrayList<>();
 
-        int w = aspectRatio.getWidth();
-        int h = aspectRatio.getHeight();
+        int w = 1280;
+        int h = 720;
 
         for (Size option : choice) {
-            //  Log.e("chooing optimal",String.format("(%s), (%d,%d)",choice.length,option.getWidth(),option.getHeight()));
-
+              Log.e("chooing optimal",String.format("(%s), (%d,%d) ",choice.toString(),option.getWidth(),option.getHeight()));
+              Log.e("value",(option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w)+"");
             if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w) {
 
                 if (option.getWidth() >= textureViewWidth &&
@@ -368,9 +385,9 @@ public class CameraFragment extends Fragment{
         }
 
         if (bigEnough.size() > 0) {
-            return Collections.min(bigEnough, new CameraPreview.CompareSizeByArea());
+            return Collections.min(bigEnough, new CameraFragment.CompareSizeByArea());
         } else if (notBigEnough.size() > 0) {
-            return Collections.max(notBigEnough, new CameraPreview.CompareSizeByArea());
+            return Collections.max(notBigEnough, new CameraFragment.CompareSizeByArea());
         } else {
             Log.e(TAG, "Couldn' find any suitable preview size");
             return choice[0];
@@ -408,6 +425,11 @@ public class CameraFragment extends Fragment{
                         Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                         new CompareSizesByArea());
 
+                for(Size temp : Arrays.asList(map.getOutputSizes(ImageFormat.JPEG))){
+                    Log.e("SizeList",String.format("(%d,%d)",temp.getWidth(),temp.getHeight()));
+                }
+
+
                 /*
                  * 해상도
                  * 16 : 9 4160 2340
@@ -431,27 +453,30 @@ public class CameraFragment extends Fragment{
                 int rotatedPreviewHeight = height;
                 int maxPreviewWidth = displaySize.x;
                 int maxPreviewHeight = displaySize.y;
-
-
-                if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
-                    maxPreviewWidth = MAX_PREVIEW_WIDTH;
+                if(width> maxPreviewWidth){
+                    maxPreviewWidth = width;
+                }
+                if(height > maxPreviewHeight){
+                    maxPreviewHeight = height;
                 }
 
-                if (maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
-                    maxPreviewHeight = MAX_PREVIEW_HEIGHT;
-                }
+
 
                 /*
-                 * 카메라의 한도를 넘어서 프리뷰사이즈를 지정하는 경우 프리뷰 자체에는 문제가 없을 수 있다.
-                 * 하지만 화면을 캡쳐해야 하는 경우 남은 공간에 쓰레기값이 들어가버려 이미지캡쳐가 제대로 작동하지 않는다.
+                 * 프리뷰 사이즈가 잘못 지정 될 경우 사진데이터의 왜곡 현상이 일어날 수 있다.
+                 *
                  * */
+                Log.e("choose op",String.format(" (%d,%d),(%d,%d) (%d,%d)",rotatedPreviewWidth,rotatedPreviewHeight,maxPreviewWidth,maxPreviewHeight,largest.getWidth(),largest.getHeight()));
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                        rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
-                        maxPreviewHeight, largest);
+                        height, width, maxPreviewHeight,
+                        maxPreviewWidth, largest);
                 Log.e("PreviewSize", mPreviewSize.getWidth()+""+mPreviewSize.getHeight());
                 // 여기서의 프리뷰 사이즈가 실제로 카메라 상에 출력되는 프리뷰 사이즈에 영향을 끼친다. 현제는 테스트 기기의 전체 화면 사이즈에 맞게 하드코딩 하였다.
-                mPreviewSize = new Size(1280,720);
+               // mPreviewSize = new Size(854,480);
 
+
+
+                mTextureView.setAspectRatio(mPreviewSize.getHeight(),mPreviewSize.getWidth());
 
 
                 // 프리뷰 세션의 해상도 결정
@@ -472,6 +497,7 @@ public class CameraFragment extends Fragment{
         }
 
     }
+
 
     private void configureTransform(int viewWidth, int viewHeight) {
         Activity activity = getActivity();
@@ -711,5 +737,12 @@ public class CameraFragment extends Fragment{
 
     public void refreshFragment(){
         getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
+    static class CompareSizeByArea implements Comparator<Size>{
+        @Override
+        public int compare(Size lhs, Size rhs) {
+            return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
+        }
     }
 }

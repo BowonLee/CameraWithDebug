@@ -624,6 +624,7 @@ public class CameraPreview {
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     // 캡쳐가 완료되면 작업이 수행됨을 알려주거나, 후처리를 한다.
+
                     anInterface.onPostTakePicture();
 
                     unlockFocus();
@@ -691,12 +692,7 @@ public class CameraPreview {
 
 
     /*카메라가 출력되는 Surface의 Size관련 Support */
-    static class CompareSizeByArea implements Comparator<Size>{
-        @Override
-        public int compare(Size lhs, Size rhs) {
-            return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
-        }
-    }
+
 
 
 

@@ -8,14 +8,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.MainActivity;
-import com.bowonlee.dearphotograph.PhotoLoader;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.Photo;
 
@@ -77,7 +74,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onItemClick(Photo photo) {
-
 
         Intent intent = activity.getIntent();
         intent.putExtra("result",photo);
