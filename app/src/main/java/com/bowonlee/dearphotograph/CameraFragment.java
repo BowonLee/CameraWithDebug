@@ -347,13 +347,13 @@ public class CameraFragment extends Fragment{
         List<Size> result = new ArrayList<>();
         int w = ratio.getWidth();
         int h = ratio.getHeight();
-        for(Size resolution : result){
-                if(resolution.getWidth() == resolution.getHeight() * h/w){
+        for(Size resolution : jpegSizes){
+                if(resolution.getHeight() == resolution.getWidth() * h/w){
                     result.add(resolution);
                 }
         }
         if(result.size()>0){
-            return Collections.min(result,new CameraFragment.CompareSizeByArea());
+            return Collections.max(result,new CameraFragment.CompareSizeByArea());
         }else{
             return jpegSizes[0];
         }
@@ -366,12 +366,12 @@ public class CameraFragment extends Fragment{
         List<Size> bigEnough = new ArrayList<>();
         List<Size> notBigEnough = new ArrayList<>();
 
-        int w = 1280;
-        int h = 720;
+        int w = aspectRatio.getWidth();
+        int h = aspectRatio.getHeight();
 
         for (Size option : choice) {
-              Log.e("chooing optimal",String.format("(%s), (%d,%d) ",choice.toString(),option.getWidth(),option.getHeight()));
-              Log.e("value",(option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w)+"");
+             // Log.e("chooing optimal",String.format("(%s), (%d,%d) ",choice.toString(),option.getWidth(),option.getHeight()));
+           //   Log.e("value",(option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w)+"");
             if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w) {
 
                 if (option.getWidth() >= textureViewWidth &&
@@ -421,14 +421,7 @@ public class CameraFragment extends Fragment{
                     continue;
                 }
                 Point displaySize = new Point();
-                Size largest = Collections.max(
-                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                        new CompareSizesByArea());
-
-                for(Size temp : Arrays.asList(map.getOutputSizes(ImageFormat.JPEG))){
-                    Log.e("SizeList",String.format("(%d,%d)",temp.getWidth(),temp.getHeight()));
-                }
-
+                Size largest = chooseOptimalResolution(map.getOutputSizes(ImageFormat.JPEG),new Size(16,9));
 
                 /*
                  * 해상도
@@ -438,7 +431,8 @@ public class CameraFragment extends Fragment{
                  * */
                 // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
                 // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
-                mImageReader = ImageReader.newInstance(1920,1080, ImageFormat.JPEG, 2);
+                mImageReader = ImageReader.newInstance(largest.getWidth(),largest.getHeight(), ImageFormat.JPEG, 2);
+
 
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
