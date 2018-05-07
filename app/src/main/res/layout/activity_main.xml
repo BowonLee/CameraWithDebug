@@ -17,14 +17,16 @@
             android:id="@+id/container"
             android:background="#000"
             ></FrameLayout>
+
         <ImageView
             android:id="@+id/imageview"
             android:layout_width="271dp"
             android:layout_height="251dp"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            />
+            android:background="@drawable/image_border"
+            android:scaleType="centerInside"
+            android:cropToPadding="true" />
 
         <Button
             android:id="@+id/btn_take_picture"

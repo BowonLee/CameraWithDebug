@@ -1,6 +1,7 @@
 package com.bowonlee.dearphotograph;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -36,11 +38,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         OrientationHelper.OrientationChangeListener {
 
 
-    /*
-    * MainActivity의 변화가 있을 경우 먼저 테스트 해보는 테스트용 메인 코드
-    *
-    *
-    * */
     private static final String ALBUMNAME = "DearPhotograph";
 
     public static final int RESULT_OK = 9456;
@@ -69,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
+    private DrawPhotoFrameView mDrawPhotoFrameView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         mImageView = (ImageView)findViewById(R.id.imageview);
 
-        mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
+       mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
         mOpenGallaryButton = (Button)findViewById(R.id.btn_open_gallary);
         mFinishAppButton = (Button)findViewById(R.id.btn_app_finish);
 
@@ -95,7 +94,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
 
-
+        // 가져온 사진이 그려지는 객체
+        mDrawPhotoFrameView = new DrawPhotoFrameView(this);
+        addContentView(mDrawPhotoFrameView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
     }
 
@@ -126,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         startCameraFragment();
         setSensors();
         setSensorListener();
+
+        Log.e("ImageLocate",String.format("(%d,%d)",mImageView.getWidth(),mImageView.getHeight()));
+
     }
 
     //sensor 가동 및 리스너
@@ -180,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     @Override
     public void OnOrientationChanged(int orientation) {
         int itemOrientation = 0;
-        if(orientation == OrientationHelper.ORIENTATION_PORTRAIT||orientation == OrientationHelper.ORIENTATION_PORTRAIT_REVERSE){
+        if(orientation == OrientationHelper.ORIENTATION_PORTRAIT || orientation == OrientationHelper.ORIENTATION_PORTRAIT_REVERSE){
             //portrait
             if(orientation == OrientationHelper.ORIENTATION_PORTRAIT){
                 //정방향
@@ -193,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_VIEW);
                 itemOrientation = OrientationHelper.ORIENTATION_PORTRAIT_REVERSE_ITEM;
             }
-        }else{
+        }else {
             //landscape
             if(orientation == OrientationHelper.ORIENTATION_LANDSCAPE){
                 //정방향
@@ -206,10 +210,10 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                 mCameraFragment.setOrientation(OrientationHelper.ORIENTATION_LANDSCPAE_REVERSE_VIEW);
                 itemOrientation = OrientationHelper.ORIENTATION_LANDSCAPE_REVERSE_ITEM;
             }
-            rotateItemsByOrientation(itemOrientation);
+
 
         }
-
+        rotateItemsByOrientation(itemOrientation);
     }
     public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
@@ -260,8 +264,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
         startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
 
-
-
     }
 
     private void takePicture(){
@@ -286,7 +288,11 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         options.inJustDecodeBounds = false;
 
 
-        mImageView.setImageBitmap(BitmapFactory.decodeFile(photo.getImageUri().getPath(),options));
+        Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageUri().getPath(),options);
+        mImageView.setX(100f);
+        mImageView.setY(100f);
+        mImageView.setImageBitmap(bitmap);
+
 
     }
 

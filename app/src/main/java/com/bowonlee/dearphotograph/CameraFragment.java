@@ -370,8 +370,6 @@ public class CameraFragment extends Fragment{
         int h = aspectRatio.getHeight();
 
         for (Size option : choice) {
-             // Log.e("chooing optimal",String.format("(%s), (%d,%d) ",choice.toString(),option.getWidth(),option.getHeight()));
-           //   Log.e("value",(option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w)+"");
             if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight && option.getHeight() == option.getWidth() * h / w) {
 
                 if (option.getWidth() >= textureViewWidth &&
@@ -424,7 +422,7 @@ public class CameraFragment extends Fragment{
                 Size largest = chooseOptimalResolution(map.getOutputSizes(ImageFormat.JPEG),new Size(16,9));
 
                 /*
-                 * 해상도
+                 * 화면 비율 별 최대 해상도
                  * 16 : 9 4160 2340
                  *  4 : 3 4160 3120
                  *  1 : 1 3120 3120
@@ -432,19 +430,12 @@ public class CameraFragment extends Fragment{
                 // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
                 // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
                 mImageReader = ImageReader.newInstance(largest.getWidth(),largest.getHeight(), ImageFormat.JPEG, 2);
-
-
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
-                /*
-                 *   화면 회전시의 프리뷰사이즈변경 적용
-                 *   가로, 세로의 화면이 변경되면 각각 다른 프리뷰세션 크기를 설정한다.
-                 * */
-
-
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
-                int rotatedPreviewWidth = width;
-                int rotatedPreviewHeight = height;
+
+
+
                 int maxPreviewWidth = displaySize.x;
                 int maxPreviewHeight = displaySize.y;
                 if(width> maxPreviewWidth){
@@ -458,9 +449,7 @@ public class CameraFragment extends Fragment{
 
                 /*
                  * 프리뷰 사이즈가 잘못 지정 될 경우 사진데이터의 왜곡 현상이 일어날 수 있다.
-                 *
                  * */
-                Log.e("choose op",String.format(" (%d,%d),(%d,%d) (%d,%d)",rotatedPreviewWidth,rotatedPreviewHeight,maxPreviewWidth,maxPreviewHeight,largest.getWidth(),largest.getHeight()));
                 mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                         height, width, maxPreviewHeight,
                         maxPreviewWidth, largest);
@@ -469,12 +458,9 @@ public class CameraFragment extends Fragment{
                // mPreviewSize = new Size(854,480);
 
 
-
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(),mPreviewSize.getWidth());
+                //  AutoFitTextureView를 통한 좌우비 조정
 
-
-                // 프리뷰 세션의 해상도 결정
-                //mTextureView.setAspectRatio(mPreviewSize.getHeight(),mPreviewSize.getWidth());
                 // We fit the aspect ratio of TextureView to the size of preview we picked.
 
                 Boolean isAviable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
@@ -721,6 +707,9 @@ public class CameraFragment extends Fragment{
 
     }
 
+    public Size getPreviewSize(){
+        return mPreviewSize;
+    }
 
 
 
