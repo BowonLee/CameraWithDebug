@@ -32,8 +32,6 @@ public class ImageSaver implements Runnable {
 
     interface OnMImageSaveListener {
         void onSaveImageComplete(File mFile);
-
-        void onTestListenter();
     }
 
     private OnMImageSaveListener mImageSaveListener;

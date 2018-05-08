@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
-    private ImageView mImageView;
+
     private Button mTakePictureButton;
     private Button mOpenGallaryButton;
     private Button mFinishAppButton;
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
-    private DrawPhotoFrameView mDrawPhotoFrameView;
 
 
     @Override
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
-        mImageView = (ImageView)findViewById(R.id.imageview);
 
        mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
         mOpenGallaryButton = (Button)findViewById(R.id.btn_open_gallary);
@@ -94,9 +92,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
 
-        // 가져온 사진이 그려지는 객체
-   //     mDrawPhotoFrameView = new DrawPhotoFrameView(this);
-    //    addContentView(mDrawPhotoFrameView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
     }
 
@@ -128,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         setSensors();
         setSensorListener();
 
-        Log.e("ImageLocate",String.format("(%d,%d)",mImageView.getWidth(),mImageView.getHeight()));
+
 
     }
 
@@ -220,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mOpenGallaryButton.setRotation(roation);
         mFinishAppButton.setRotation(roation);
         mTakePictureButton.setRotation(roation);
-        mImageView.setRotation(roation);
+
     }
 
 
@@ -278,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
 
-
     public void setmImageView(Photo photo){
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -288,10 +282,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         options.inJustDecodeBounds = false;
 
 
-        Bitmap bitmap = BitmapFactory.decodeFile(photo.getImageUri().getPath(),options);
-        mImageView.setX(100f);
-        mImageView.setY(100f);
-        mImageView.setImageBitmap(bitmap);
+
 
 
     }

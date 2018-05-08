@@ -4,15 +4,14 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
@@ -35,7 +34,8 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
     private Button cropPhotoButton;
     private Button rotatePhotoButton;
 
-    private ModifyPhotoView modifyPhotoView;
+    private BasePhotoDrawerView basePhotoDrawerView;
+    private ModifyPhotoView mModifyPhotoView;
     private ModifiedPhoto modifiedPhoto;
 
     private FrameLayout mContainer;
@@ -54,8 +54,8 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
         mContainer = (FrameLayout)findViewById(R.id.container_modifier);
 
-        modifyPhotoView = new ModifyPhotoView(this);
-        addContentView(modifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
+        mModifyPhotoView = new ModifyPhotoView(this);
+        addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
         getExtras();
     }
 
@@ -68,7 +68,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         modifiedPhoto.setStartXY(new Point(100,100));
         modifiedPhoto.setRatio((float) 0.5);
 
-        modifyPhotoView.setPhoto(modifiedPhoto);
+        mModifyPhotoView.setPhoto(modifiedPhoto);
     }
     //720,1280
     @Override
@@ -78,7 +78,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
 
         Log.e("width,height",String.format("(%d,%d)",mContainer.getWidth(),mContainer.getHeight()));
-        modifyPhotoView.postInvalidate();
+        mModifyPhotoView.postInvalidate();
 
     }
 
@@ -92,10 +92,14 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()){
             case R.id.btn_modify_complete : {}break;
             case R.id.btn_modify_crop : {}break;
-            case R.id.btn_modify_rotate : {}break;
+            case R.id.btn_modify_rotate : {rotatePhoto();}break;
         }
     }
 
+    public void rotatePhoto(){
+        // 누를 때 마다 시계방향으로 회전
+
+    }
     private void hideUi(){
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE

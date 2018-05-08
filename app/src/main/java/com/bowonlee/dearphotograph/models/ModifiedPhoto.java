@@ -6,7 +6,7 @@ import android.util.Size;
 
 
 /*
-* 사진 수정을 거친 후의 사진 데이터
+* 사진 수정 단계을 거친 후의 사진 데이터
 * 원본 사진에 비해 축소된 비율과 그려져야 할 시작 좌표를 추가한다.
 * */
 public class ModifiedPhoto extends Photo{
