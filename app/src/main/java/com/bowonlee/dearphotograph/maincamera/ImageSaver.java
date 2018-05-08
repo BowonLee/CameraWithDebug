@@ -1,10 +1,12 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotograph.maincamera;
 
 import android.content.Context;
 import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
+
+import com.bowonlee.dearphotograph.FileIOHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;

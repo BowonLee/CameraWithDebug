@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotograph.maincamera;
 
 import android.support.v4.app.Fragment;
 

@@ -34,7 +34,7 @@ public class OrientationHelper {
     private float[] pitches;
     private float[] rolls;
 
-    interface OrientationChangeListener{
+    public interface OrientationChangeListener{
         void OnOrientationChanged(int orientation);
     }
 

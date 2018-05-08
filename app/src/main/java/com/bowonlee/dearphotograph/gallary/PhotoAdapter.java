@@ -12,10 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bowonlee.dearphotograph.MainActivity;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.Photo;
-import com.bowonlee.dearphotograph.modify.ModifyPhotoActivity;
+import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
 
 import java.util.ArrayList;
 import java.util.List;

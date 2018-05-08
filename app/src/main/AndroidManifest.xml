@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name="com.bowonlee.dearphotograph.MainActivity"
+            android:name="com.bowonlee.dearphotograph.maincamera.MainActivity"
             android:screenOrientation="portrait"
             >
             <intent-filter>
@@ -30,7 +30,7 @@
         </activity>
 
         <activity
-            android:name="com.bowonlee.dearphotograph.modify.ModifyPhotoActivity"
+            android:name="com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity"
             android:screenOrientation="portrait"
             >
 

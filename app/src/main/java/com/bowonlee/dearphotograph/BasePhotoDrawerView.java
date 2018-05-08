@@ -8,6 +8,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.Xfermode;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -23,6 +26,9 @@ public class BasePhotoDrawerView extends View{
 
     protected ModifiedPhoto mModifiedPhoto;
     protected Bitmap mPhotoBitmap;
+    private Rect photoRect;
+
+    private int rotateDegree = 0;
 
     public BasePhotoDrawerView(Context context){
         super(context);
@@ -46,23 +52,62 @@ public class BasePhotoDrawerView extends View{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if(mModifiedPhoto != null){
-            setPhotoBitmap();
             Paint paint = new Paint();
+            setPhotoBitmap();
+
+            canvas.rotate(rotateDegree,
+                    mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
+         //   canvas.rotate(90);
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
 
         }else{
         }
     }
 
-    protected void rotateCW(Canvas canvas){
-        canvas.save();
-        canvas.rotate(90);
-        canvas.restore();
+
+    protected void setCanvasRotate(int degree){
+        this.rotateDegree = degree;
+
+    }
+    protected int getCanvasRotate(){return rotateDegree;}
+    protected void setPhotoBitmap(){
+        mPhotoBitmap = resizedBitmapFromUri(mModifiedPhoto.getImageUri(),mModifiedPhoto.getRatio());
 
     }
 
-    protected void setPhotoBitmap(){
-        mPhotoBitmap = resizedBitmapFromUri(mModifiedPhoto.getImageUri(),mModifiedPhoto.getRatio());
+    protected Rect getPhotoRect(){
+        int top,left,bottom,right;
+         //사진의 원래 영역
+            left = mModifiedPhoto.getStartXY().x;
+            top  = mModifiedPhoto.getStartXY().y;
+            right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth();
+            bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight();
+        Log.e("rect",String.format("(%d,%d)(%d,%d)",left,top,right,bottom));
+        photoRect = new Rect(left,top,right,bottom);
+
+        return photoRect;
+    }
+
+    protected Rect getRotateRectWidthPivot(Rect rect){
+         int pivotX = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2;
+         int pivotY = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2;
+        int left,top,right,bottom;
+        rotateDegree %=180;
+        double rad = Math.toRadians(rotateDegree);
+
+        left = (int)((rect.left-pivotX) * Math.cos(rad) - (rect.top-pivotY)*Math.sin(rad))+pivotX;
+        top = (int)((rect.left-pivotX)*Math.sin(rad) + (rect.top-pivotY)*Math.cos(rad))+pivotY;
+        right = (int)((rect.right-pivotX) * Math.cos(rad) - (rect.bottom-pivotY)*Math.sin(rad))+pivotX;
+        bottom = (int)((rect.right-pivotX) *Math.sin(rad) + (rect.bottom-pivotY)*Math.cos(rad))+pivotY;
+
+
+        if(rotateDegree == 0){
+        }else{
+            left = left - mPhotoBitmap.getHeight();
+            right = right + mPhotoBitmap.getHeight();
+        }
+        Log.e("rect",String.format("degree : %d (%d,%d)(%d,%d)",rotateDegree,left,top,right,bottom));
+        return new Rect(left,top,right,bottom);
 
     }
 

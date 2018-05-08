@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph; /**
+package com.bowonlee.dearphotograph.maincamera; /**
  * Created by bowon on 2018-03-29.
  */
 

@@ -14,6 +14,7 @@ public class ModifiedPhoto extends Photo{
 
     private float ratio;
     private Point startXY;
+    private int orientation;
 
     public ModifiedPhoto(Uri thumnail, Uri image) {
         super(thumnail, image);
@@ -25,6 +26,11 @@ public class ModifiedPhoto extends Photo{
     public float getRatio() {
         return ratio;
     }
+
+    public int getOrientation() { return orientation; }
+
+    public void setOrientation(int orientation) { this.orientation = orientation; }
+
     public Point getStartXY() {
         return startXY;
     }
@@ -34,4 +40,6 @@ public class ModifiedPhoto extends Photo{
     public void setStartXY(Point startXY){
         this.startXY = startXY;
     }
+
+
 }
