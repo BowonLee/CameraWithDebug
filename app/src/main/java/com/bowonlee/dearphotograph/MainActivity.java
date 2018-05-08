@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation.setOnOrientationListener(this);
 
         // 가져온 사진이 그려지는 객체
-        mDrawPhotoFrameView = new DrawPhotoFrameView(this);
-        addContentView(mDrawPhotoFrameView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
+   //     mDrawPhotoFrameView = new DrawPhotoFrameView(this);
+    //    addContentView(mDrawPhotoFrameView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
     }
 
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mCameraFragment = CameraFragment.newInstance();
-        mFragmentTransaction.replace(R.id.container,mCameraFragment).commit();
+        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
         mCameraFragment.setTextureSize(3,4);
 
