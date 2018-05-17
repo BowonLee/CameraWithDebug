@@ -20,6 +20,8 @@ public class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClick
         void onItemClick(Photo photo);
     }
 
+
+
     private ImageView photoView;
     private Photo photo;
     private OnItemClickListener listener;

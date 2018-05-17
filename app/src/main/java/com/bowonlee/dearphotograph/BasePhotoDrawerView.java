@@ -48,6 +48,32 @@ public class BasePhotoDrawerView extends View{
     }
 
 
+    /*
+    * 화면의 크기에 맞춰 사진의 크기를 줄일 수 있도록 한다.
+    * 알맞은 사진의 축소비율을 리턴해 준다..
+    * */
+    public double getReductionRatio(Size photoSize,Size viewSize){
+        double result = 1.0;
+
+        Log.e("Reduction Calcul",String.format("photoWH %d,%d",photoSize.getWidth(),photoSize.getHeight()));
+
+
+        if(photoSize.getWidth()>=photoSize.getHeight()){
+            result =((double)viewSize.getWidth()/(double)photoSize.getWidth())/2.0;
+            Log.e("Reduction Calcul",String.format("width %d,%d",viewSize.getWidth(),photoSize.getWidth()));
+        }else{
+
+            result = ((double)viewSize.getHeight()/(double)photoSize.getHeight())/2.0;
+            Log.e("Reduction Calcul",String.format("height %d,%d",viewSize.getHeight(),viewSize.getHeight()));
+        }
+
+        if(result>=1.0){
+            result = 1.0;
+        }
+
+        Log.e("Reduction Calcul",String.format("result %f,",result));
+        return result;
+    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -55,9 +81,9 @@ public class BasePhotoDrawerView extends View{
             Paint paint = new Paint();
             setPhotoBitmap();
 
-            canvas.rotate(rotateDegree,
+            canvas.rotate(getCanvasRotate(),
                     mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
-         //   canvas.rotate(90);
+
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
 
         }else{
@@ -132,7 +158,6 @@ public class BasePhotoDrawerView extends View{
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         result = BitmapFactory.decodeFile(res.getPath(),options);
-
         return result;
 
 

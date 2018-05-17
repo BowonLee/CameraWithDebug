@@ -1,17 +1,19 @@
-package com.bowonlee.dearphotograph.modify;
+package com.bowonlee.dearphotograph.modifier;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
@@ -34,11 +36,14 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
     private Button cropPhotoButton;
     private Button rotatePhotoButton;
 
-    private BasePhotoDrawerView basePhotoDrawerView;
     private ModifyPhotoView mModifyPhotoView;
     private ModifiedPhoto modifiedPhoto;
 
     private FrameLayout mContainer;
+
+    private int photoRotation = 0;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +60,10 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         mContainer = (FrameLayout)findViewById(R.id.container_modifier);
 
         mModifyPhotoView = new ModifyPhotoView(this);
+        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
         addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
-        getExtras();
+      //  getExtras();
+        Log.e("Lifecycle","onCreate");
     }
 
     public void getExtras(){
@@ -66,9 +73,28 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         Log.e("takePhoto",tempPhoto.getImageUri()+"");
         modifiedPhoto = new ModifiedPhoto(tempPhoto);
         modifiedPhoto.setStartXY(new Point(100,100));
-        modifiedPhoto.setRatio((float) 0.5);
+
+        getPhotoSize(modifiedPhoto.getImageUri());
+
+//        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
+        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
+
+        Log.e("ratio"," "+ (float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
 
         mModifyPhotoView.setPhoto(modifiedPhoto);
+        Log.e("Lifecycle","ExtraSet");
+
+    }
+
+    private Size getPhotoSize(Uri photoUri){
+        Size result ;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = false;
+        BitmapFactory.decodeFile(photoUri.getPath(),options);
+
+        result = new Size(options.outWidth,options.outHeight);
+
+        return result;
     }
     //720,1280
     @Override
@@ -77,9 +103,20 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         hideUi();
 
 
-        Log.e("width,height",String.format("(%d,%d)",mContainer.getWidth(),mContainer.getHeight()));
-        mModifyPhotoView.postInvalidate();
+        Log.e("Lifecycle","onResume");
 
+        if(mModifyPhotoView != null) {
+            mModifyPhotoView.postInvalidate();
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.e("mModifyViewWH",String.format("(%d,%d)",mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight()));
+        getExtras();
+        mModifyPhotoView.postInvalidate();
+        Log.e("Lifecycle","onFocusChange");
     }
 
     @Override
@@ -98,6 +135,11 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
     public void rotatePhoto(){
         // 누를 때 마다 시계방향으로 회전
+        photoRotation = (photoRotation +90)%360;
+        mModifyPhotoView.setPhotoRotation(photoRotation);
+        if(mModifyPhotoView != null) {
+            mModifyPhotoView.postInvalidate();
+        }
 
     }
     private void hideUi(){

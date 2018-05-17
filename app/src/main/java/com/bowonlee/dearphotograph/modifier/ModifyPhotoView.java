@@ -30,7 +30,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragL
 
     }
 
-    public void setrotation(int rotate){
+    public void setPhotoRotation(int rotate){
         setCanvasRotate(rotate);
 
     }

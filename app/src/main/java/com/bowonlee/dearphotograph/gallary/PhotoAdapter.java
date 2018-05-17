@@ -14,7 +14,9 @@ import android.view.ViewGroup;
 
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.Photo;
+
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
+
 
 import java.util.ArrayList;
 import java.util.List;
