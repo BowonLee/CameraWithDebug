@@ -55,23 +55,15 @@ public class BasePhotoDrawerView extends View{
     public double getReductionRatio(Size photoSize,Size viewSize){
         double result = 1.0;
 
-        Log.e("Reduction Calcul",String.format("photoWH %d,%d",photoSize.getWidth(),photoSize.getHeight()));
-
-
         if(photoSize.getWidth()>=photoSize.getHeight()){
             result =((double)viewSize.getWidth()/(double)photoSize.getWidth())/2.0;
-            Log.e("Reduction Calcul",String.format("width %d,%d",viewSize.getWidth(),photoSize.getWidth()));
-        }else{
-
+       }else{
             result = ((double)viewSize.getHeight()/(double)photoSize.getHeight())/2.0;
-            Log.e("Reduction Calcul",String.format("height %d,%d",viewSize.getHeight(),viewSize.getHeight()));
         }
-
         if(result>=1.0){
             result = 1.0;
         }
 
-        Log.e("Reduction Calcul",String.format("result %f,",result));
         return result;
     }
     @Override
@@ -108,7 +100,7 @@ public class BasePhotoDrawerView extends View{
             top  = mModifiedPhoto.getStartXY().y;
             right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth();
             bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight();
-        Log.e("rect",String.format("(%d,%d)(%d,%d)",left,top,right,bottom));
+
         photoRect = new Rect(left,top,right,bottom);
 
         return photoRect;
@@ -132,7 +124,7 @@ public class BasePhotoDrawerView extends View{
             left = left - mPhotoBitmap.getHeight();
             right = right + mPhotoBitmap.getHeight();
         }
-        Log.e("rect",String.format("degree : %d (%d,%d)(%d,%d)",rotateDegree,left,top,right,bottom));
+
         return new Rect(left,top,right,bottom);
 
     }
@@ -182,7 +174,7 @@ public class BasePhotoDrawerView extends View{
                 inSampleSize *= 2;
             }
         }
-        Log.e("insampleSize"," is : "+inSampleSize);
+
         return inSampleSize;
     }
 

@@ -13,6 +13,8 @@ import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
@@ -43,12 +45,26 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
     private int photoRotation = 0;
 
+    private RelativeLayout mRelativeLayout;
+    private LinearLayout mLinearLayout;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_modifier);
+
+        mModifyPhotoView = new ModifyPhotoView(this);
+        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
+        mContainer = (FrameLayout)findViewById(R.id.container_modifier);
+
+        addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
+
+
+        mRelativeLayout = (RelativeLayout)findViewById(R.id.relative_modify_activity_main);
+        mLinearLayout = (LinearLayout)findViewById(R.id.linear_modify_group_button);
+
         complteButton = (Button)findViewById(R.id.btn_modify_complete);
         cropPhotoButton = (Button)findViewById(R.id.btn_modify_crop);
         rotatePhotoButton = (Button)findViewById(R.id.btn_modify_rotate);
@@ -57,11 +73,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         cropPhotoButton.setOnClickListener(this);
         rotatePhotoButton.setOnClickListener(this);
 
-        mContainer = (FrameLayout)findViewById(R.id.container_modifier);
 
-        mModifyPhotoView = new ModifyPhotoView(this);
-        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
-        addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
       //  getExtras();
         Log.e("Lifecycle","onCreate");
     }
@@ -108,6 +120,8 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         if(mModifyPhotoView != null) {
             mModifyPhotoView.postInvalidate();
         }
+
+
     }
 
     @Override

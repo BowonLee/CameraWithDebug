@@ -6,24 +6,34 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 
-public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragListener,View.OnTouchListener{
+public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouchListener{
 
     private final int EVENT_INSIDE = 401;
     private final int EVENT_EDGE = 405;
     private final int EVENT_OUTSIDE = 408;
+
+    private int currentEventState = EVENT_OUTSIDE;
+
+    public ModifyPhotoView(Context context) {
+        super(context);
+
+    }
 
 
     //외곽선 자체의 두께
     private float frameWidth = 5f;
     //바깥외곽선과 내부 외곽선 사이의 폭
     private int boarderWidth = 30;
+
 
     public void movePhotoXY(int x, int y){
         mModifiedPhoto.setStartXY(new Point(x,y));
@@ -35,17 +45,16 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragL
 
     }
 
-    public ModifyPhotoView(Context context) {
-        super(context);
-    }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawFrame(canvas);
-        drawBorderRect(canvas);
-
+        try {
+            drawFrame(canvas);
+            drawBorderRect(canvas);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -54,6 +63,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragL
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.BLACK);
         paint.setStrokeWidth(frameWidth);
+
         canvas.drawRect(mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
                 mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth(),mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight(),paint);
 
@@ -78,12 +88,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragL
         canvas.drawRect(new Rect(left,top,right,bottom),paint);
     }
 
-    @Override
-    public boolean onDrag(View v, DragEvent event) {
-        Log.e("InViewdragXY",String.format("(%f,%f)",event.getX(),event.getY()));
 
-        return false;
-    }
 
     private int distinguishEvent(float touchX,float touchY){
         int startX = getRotateRectWidthPivot(getPhotoRect()).left;
@@ -109,17 +114,38 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnDragL
     @Override
     public boolean onTouch(View v, MotionEvent event) {
 
-        switch (distinguishEvent(event.getX(),event.getY())){
-            case EVENT_INSIDE : {
-                Log.e("touchEvent","inside");
-            }break;
-            case EVENT_EDGE : {
-                Log.e("touchEvent","edge");
-            }break;
-            case EVENT_OUTSIDE : {
-                Log.e("touchEvent","outside");
-            }break;
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN : {
+                Log.e("touchEvent","action down");
+                currentEventState = distinguishEvent(event.getX(),event.getY());
+                if(currentEventState == EVENT_OUTSIDE)return false;
+
+
+            }return true;
+            case MotionEvent.ACTION_MOVE : {
+                if(currentEventState == EVENT_INSIDE){movePhotoEvent(event);}
+               if(currentEventState == EVENT_EDGE){zoomInOutEvent(event);}
+
+
+            }return true;
+            case MotionEvent.ACTION_UP  : {
+                Log.e("touchEvent","action up");
+                currentEventState = EVENT_OUTSIDE;
+                return false;
+            }
         }
         return false;
+
     }
+
+    private void movePhotoEvent(MotionEvent event){
+        Log.e("eventOccur",String.format("move %f ,%f",event.getX(),event.getY()));
+
+    }
+    private void zoomInOutEvent(MotionEvent event){
+        Log.e("eventOccur",String.format("size %f %f",event.getX(),event.getY()));
+    }
+
+
+
 }
