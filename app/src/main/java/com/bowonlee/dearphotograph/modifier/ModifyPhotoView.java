@@ -118,7 +118,9 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
+        if(mModifiedPhoto==null){
+            return false;
+        }
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN : {
                 Log.e("touchEvent","action down");

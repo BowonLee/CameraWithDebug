@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bowonlee.dearphotograph.R;
+import com.bowonlee.dearphotograph.maincamera.MainActivity;
 import com.bowonlee.dearphotograph.models.Photo;
 
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
@@ -77,14 +78,15 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     @Override
     public void onItemClick(Photo photo) {
 
-  /*      Intent intent = activity.getIntent();
+        Intent intent = activity.getIntent();
         intent.putExtra("result",photo);
         activity.setResult(MainActivity.RESULT_OK,intent);
-        activity.finish();*/
+        activity.finish();
+  /*
     Intent intent = new Intent(activity, ModifyPhotoActivity.class);
     intent.putExtra(Photo.EXTRA_CODE, photo);
     activity.startActivityForResult(intent,ModifyPhotoActivity.REQUEST_CODE);
-
+*/
 
     }
 }

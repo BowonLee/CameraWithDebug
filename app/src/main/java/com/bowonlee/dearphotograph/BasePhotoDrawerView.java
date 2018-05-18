@@ -47,13 +47,12 @@ public class BasePhotoDrawerView extends View{
         return mModifiedPhoto;
     }
 
-
     /*
     * 화면의 크기에 맞춰 사진의 크기를 줄일 수 있도록 한다.
     * 알맞은 사진의 축소비율을 리턴해 준다..
     * */
     public double getReductionRatio(Size photoSize,Size viewSize){
-        double result = 1.0;
+        double result;
 
         if(photoSize.getWidth()>=photoSize.getHeight()){
             result =((double)viewSize.getWidth()/(double)photoSize.getWidth())/2.0;
@@ -77,8 +76,6 @@ public class BasePhotoDrawerView extends View{
                     mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
 
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
-
-        }else{
         }
     }
 
@@ -110,7 +107,7 @@ public class BasePhotoDrawerView extends View{
          int pivotX = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2;
          int pivotY = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2;
         int left,top,right,bottom;
-        //rotateDegree %=180;
+
         double rad = Math.toRadians((rotateDegree%180));
 
         left = (int)((rect.left-pivotX) * Math.cos(rad) - (rect.top-pivotY)*Math.sin(rad))+pivotX;
@@ -175,7 +172,7 @@ public class BasePhotoDrawerView extends View{
                 inSampleSize *= 2;
             }
         }
-
+        Log.e("sampleSize",inSampleSize+"");
         return inSampleSize;
     }
 

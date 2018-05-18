@@ -76,15 +76,13 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         rotatePhotoButton.setOnClickListener(this);
 
 
-      //  getExtras();
-        Log.e("Lifecycle","onCreate");
     }
 
     public void getExtras(){
         Intent intent = getIntent();
         Photo tempPhoto;
         tempPhoto = intent.getParcelableExtra(Photo.EXTRA_CODE);
-        Log.e("takePhoto",tempPhoto.getImageUri()+"");
+
         modifiedPhoto = new ModifiedPhoto(tempPhoto);
         modifiedPhoto.setStartXY(new Point(100,100));
 
@@ -98,11 +96,9 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
 
 
-        Log.e("ratio"," "+ (float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),
-                new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
 
         mModifyPhotoView.setPhoto(modifiedPhoto);
-        Log.e("Lifecycle","ExtraSet");
+
 
     }
 
@@ -111,9 +107,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = false;
         BitmapFactory.decodeFile(photoUri.getPath(),options);
-
         result = new Size(options.outWidth,options.outHeight);
-
         return result;
     }
     //720,1280
@@ -123,7 +117,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         hideUi();
 
 
-        Log.e("Lifecycle","onResume");
+
 
         if(mModifyPhotoView != null) {
             mModifyPhotoView.postInvalidate();
@@ -135,10 +129,8 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        Log.e("mModifyViewWH",String.format("(%d,%d)",mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight()));
         getExtras();
-        mModifyPhotoView.postInvalidate();
-        Log.e("Lifecycle","onFocusChange");
+
     }
 
     @Override
@@ -173,6 +165,10 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
+    }
+
+    public ModifiedPhoto getModifiedPhotoData(){
+        return this.modifiedPhoto;
     }
 
 }

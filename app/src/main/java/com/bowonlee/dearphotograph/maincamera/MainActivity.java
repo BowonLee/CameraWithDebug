@@ -1,6 +1,7 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,8 +11,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -22,6 +25,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -30,7 +34,9 @@ import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.OrientationHelper;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
+import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface, View.OnClickListener,
@@ -66,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private FragmentTransaction mFragmentTransaction;
 
 
+    //subView for surfacePhoto
+    private ModifyPhotoView mModifyPhotoView;
+    private ModifiedPhoto mModifiedPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +100,13 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
 
+        setModifiedView();
+    }
 
+    private void setModifiedView(){
+        mModifyPhotoView = new ModifyPhotoView(this);
+        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
+        addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
     }
 
     private void hideUi(){
@@ -272,20 +287,29 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
 
-    public void setmImageView(Photo photo){
-
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
-        options.inSampleSize = 2;
-        options.inJustDecodeBounds = false;
+    public void setmImageOnView(Photo photo){
+        mModifiedPhoto = new ModifiedPhoto(photo);
+        mModifiedPhoto.setStartXY(new Point(100,100));
+        mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
 
 
+      //  Log.e("Main SetImage",""+(mModifiedPhoto.getOutSize()==null)+ " " + (mCameraFragment.getPreviewSize()));
 
 
 
+        mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getPreviewSize()));
+       // mModifiedPhoto.setRatio((float) 0.5);
+        mModifyPhotoView.setPhoto(mModifiedPhoto);
+        mModifyPhotoView.postInvalidate();
     }
-
+    private Size getPhotoSize(Uri photoUri){
+        Size result ;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = false;
+        BitmapFactory.decodeFile(photoUri.getPath(),options);
+        result = new Size(options.outWidth,options.outHeight);
+        return result;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -294,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         switch (requestCode){
             case PhotoGallaryActivity.REQUEST_CODE : {if(resultCode == RESULT_OK){
                 Photo photo = data.getParcelableExtra("result");
-                setmImageView(photo); }break;
+                setmImageOnView(photo); }break;
             }
         }
 
