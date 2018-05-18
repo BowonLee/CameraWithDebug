@@ -21,6 +21,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
     private final int EVENT_EDGE = 405;
     private final int EVENT_OUTSIDE = 408;
 
+
     private int currentEventState = EVENT_OUTSIDE;
 
     public ModifyPhotoView(Context context) {
@@ -29,6 +30,12 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
     }
 
 
+    //이동 직전좌표
+    private float touchPastX = 0;
+    private float touchPastY = 0;
+
+    private float mTouchDistanceX=0;
+    private float mTouchDistanceY=0;
     //외곽선 자체의 두께
     private float frameWidth = 5f;
     //바깥외곽선과 내부 외곽선 사이의 폭
@@ -118,6 +125,8 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
             case MotionEvent.ACTION_DOWN : {
                 Log.e("touchEvent","action down");
                 currentEventState = distinguishEvent(event.getX(),event.getY());
+                touchPastX = event.getX();
+                touchPastY = event.getY();
                 if(currentEventState == EVENT_OUTSIDE)return false;
 
 
@@ -129,8 +138,10 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
             }return true;
             case MotionEvent.ACTION_UP  : {
-                Log.e("touchEvent","action up");
                 currentEventState = EVENT_OUTSIDE;
+
+                Log.e("touchEvent",String.format("lastXY(%d,%d)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y));
+
                 return false;
             }
         }
@@ -139,7 +150,17 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
     }
 
     private void movePhotoEvent(MotionEvent event){
-        Log.e("eventOccur",String.format("move %f ,%f",event.getX(),event.getY()));
+
+        mTouchDistanceX = touchPastX - event.getX();
+        mTouchDistanceY = touchPastY - event.getY();
+
+        touchPastX = event.getX();
+        touchPastY = event.getY();
+
+        Log.e("eventOccur",String.format("move (%f,%f) Distance(%f,%f)",event.getX(),event.getY(),mTouchDistanceX,mTouchDistanceY));
+        movePhotoXY((int)( mModifiedPhoto.getStartXY().x - mTouchDistanceX),(int)( mModifiedPhoto.getStartXY().y - mTouchDistanceY));
+        this.postInvalidate();
+
 
     }
     private void zoomInOutEvent(MotionEvent event){
