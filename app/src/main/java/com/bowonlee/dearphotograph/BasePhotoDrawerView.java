@@ -110,8 +110,8 @@ public class BasePhotoDrawerView extends View{
          int pivotX = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2;
          int pivotY = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2;
         int left,top,right,bottom;
-        rotateDegree %=180;
-        double rad = Math.toRadians(rotateDegree);
+        //rotateDegree %=180;
+        double rad = Math.toRadians((rotateDegree%180));
 
         left = (int)((rect.left-pivotX) * Math.cos(rad) - (rect.top-pivotY)*Math.sin(rad))+pivotX;
         top = (int)((rect.left-pivotX)*Math.sin(rad) + (rect.top-pivotY)*Math.cos(rad))+pivotY;
@@ -119,7 +119,7 @@ public class BasePhotoDrawerView extends View{
         bottom = (int)((rect.right-pivotX) *Math.sin(rad) + (rect.bottom-pivotY)*Math.cos(rad))+pivotY;
 
 
-        if(rotateDegree == 0){
+        if(rotateDegree == 0||rotateDegree==180){
         }else{
             left = left - mPhotoBitmap.getHeight();
             right = right + mPhotoBitmap.getHeight();
