@@ -49,6 +49,8 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
     private LinearLayout mLinearLayout;
 
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,9 +91,15 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         getPhotoSize(modifiedPhoto.getImageUri());
 
 //        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
-        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
+        modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
 
-        Log.e("ratio"," "+ (float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
+        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),
+                new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
+
+
+
+        Log.e("ratio"," "+ (float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),
+                new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
 
         mModifyPhotoView.setPhoto(modifiedPhoto);
         Log.e("Lifecycle","ExtraSet");

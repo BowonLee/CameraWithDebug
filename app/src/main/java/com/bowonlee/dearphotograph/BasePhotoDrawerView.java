@@ -148,9 +148,10 @@ public class BasePhotoDrawerView extends View{
 
 
         // Decode bitmap with inSampleSize set
+
         options.inJustDecodeBounds = false;
         result = BitmapFactory.decodeFile(res.getPath(),options);
-        return result;
+        return  Bitmap.createScaledBitmap(result,width,height,false);
 
 
     }

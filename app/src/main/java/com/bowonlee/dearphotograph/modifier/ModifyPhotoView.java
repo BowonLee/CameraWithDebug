@@ -22,13 +22,12 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
     private final int EVENT_OUTSIDE = 408;
 
 
+    private int mFrameZoomX = 0;
+    private int mFrameZoomY = 0;
+
     private int currentEventState = EVENT_OUTSIDE;
 
-    public ModifyPhotoView(Context context) {
-        super(context);
-
-    }
-
+    public ModifyPhotoView(Context context) { super(context); }
 
     //이동 직전좌표
     private float touchPastX = 0;
@@ -49,7 +48,6 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
     public void setPhotoRotation(int rotate){
         setCanvasRotate(rotate);
-
     }
 
 
@@ -72,7 +70,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         paint.setStrokeWidth(frameWidth);
 
         canvas.drawRect(mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
-                mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth(),mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight(),paint);
+                mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY,paint);
 
 
     }
@@ -88,8 +86,8 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
         int left = mModifiedPhoto.getStartXY().x + boarderWidth;
         int top = mModifiedPhoto.getStartXY().y + boarderWidth;
-        int right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth() - boarderWidth;
-        int bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight() - boarderWidth;
+        int right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth() - boarderWidth - mFrameZoomX;
+        int bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight() - boarderWidth - mFrameZoomY;
 
 
         canvas.drawRect(new Rect(left,top,right,bottom),paint);
@@ -157,14 +155,40 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         touchPastX = event.getX();
         touchPastY = event.getY();
 
-        Log.e("eventOccur",String.format("move (%f,%f) Distance(%f,%f)",event.getX(),event.getY(),mTouchDistanceX,mTouchDistanceY));
+     //   Log.e("eventOccur",String.format("move (%f,%f) Distance(%f,%f)",event.getX(),event.getY(),mTouchDistanceX,mTouchDistanceY));
         movePhotoXY((int)( mModifiedPhoto.getStartXY().x - mTouchDistanceX),(int)( mModifiedPhoto.getStartXY().y - mTouchDistanceY));
         this.postInvalidate();
 
 
     }
     private void zoomInOutEvent(MotionEvent event){
-        Log.e("eventOccur",String.format("size %f %f",event.getX(),event.getY()));
+        float ratio;
+        mTouchDistanceX = touchPastX - event.getX();
+        mTouchDistanceY = touchPastY - event.getY();
+
+        touchPastX = event.getX();
+        touchPastY = event.getY();
+
+        if(mTouchDistanceX>=mFrameZoomY){
+            mFrameZoomX += (int)mTouchDistanceX;
+            mFrameZoomY += (int) mTouchDistanceX;
+        }else{
+            mFrameZoomX += (int)mTouchDistanceY;
+            mFrameZoomY += (int) mTouchDistanceY;
+        }
+
+        ratio =  ((float)mPhotoBitmap.getWidth()-mFrameZoomX)/(float)mModifiedPhoto.getOutSize().getWidth();
+
+
+        Log.e("eventOccur",String.format("Ratio(%f,%f) bitSize outSize(%d,%d), ",mModifiedPhoto.getRatio(),ratio,mPhotoBitmap.getWidth(),mModifiedPhoto.getOutSize().getWidth()));
+
+        mModifiedPhoto.setRatio(ratio);
+        Log.e("eventOccur",String.format("edge(%f,%f) %f, ",event.getX(),event.getY(),ratio));
+       mFrameZoomX = 0;
+       mFrameZoomY = 0;
+
+        this.postInvalidate();
+
     }
 
 

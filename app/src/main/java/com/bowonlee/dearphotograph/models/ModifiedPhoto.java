@@ -16,6 +16,11 @@ public class ModifiedPhoto extends Photo{
     private Point startXY;
     private int orientation;
 
+    // 동적인 축소비율계산을 위한 원본사진의 크기
+    private Size outSize;
+
+
+
     public ModifiedPhoto(Uri thumnail, Uri image) {
         super(thumnail, image);
     }
@@ -23,23 +28,24 @@ public class ModifiedPhoto extends Photo{
         super(photo.getThumnailUri(),photo.getImageUri());
     }
 
+    public void setRatio(float ratio){
+        this.ratio = ratio;
+    }
     public float getRatio() {
         return ratio;
     }
 
     public int getOrientation() { return orientation; }
-
     public void setOrientation(int orientation) { this.orientation = orientation; }
 
     public Point getStartXY() {
         return startXY;
     }
-    public void setRatio(float ratio){
-        this.ratio = ratio;
-    }
     public void setStartXY(Point startXY){
         this.startXY = startXY;
     }
 
+    public Size getOutSize() { return outSize; }
 
+    public void setOutSize(Size outSize) { this.outSize = outSize; }
 }
