@@ -35,7 +35,7 @@ public class ModifiedPhoto extends Photo{
         return ratio;
     }
 
-    public int getOrientation() { return orientation; }
+    //public int getOrientation() { return orientation; }
     public void setOrientation(int orientation) { this.orientation = orientation; }
 
     public Point getStartXY() {

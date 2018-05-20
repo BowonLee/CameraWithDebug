@@ -29,6 +29,7 @@ import java.util.List;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
         implements LoaderManager.LoaderCallbacks<List<Photo>>,PhotoHolder.OnItemClickListener {
 
+
     private Activity activity;
     private List<Photo> photos;
 
@@ -79,7 +80,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     public void onItemClick(Photo photo) {
 
         Intent intent = activity.getIntent();
-        intent.putExtra("result",photo);
+        intent.putExtra(PhotoGallaryActivity.PARCELABLE_RESULT,photo);
         activity.setResult(MainActivity.RESULT_OK,intent);
         activity.finish();
   /*

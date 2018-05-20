@@ -55,9 +55,9 @@ public class BasePhotoDrawerView extends View{
         double result;
 
         if(photoSize.getWidth()>=photoSize.getHeight()){
-            result =((double)viewSize.getWidth()/(double)photoSize.getWidth())/2.0;
+            result =(((double)viewSize.getWidth()/2.0)/(double)photoSize.getWidth());
        }else{
-            result = ((double)viewSize.getHeight()/(double)photoSize.getHeight())/2.0;
+            result = (((double)viewSize.getHeight()/2.0)/(double)photoSize.getHeight());
         }
         if(result>=1.0){
             result = 1.0;

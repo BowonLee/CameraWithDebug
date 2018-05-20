@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.Sensor;
@@ -32,11 +33,14 @@ import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.OrientationHelper;
+import com.bowonlee.dearphotograph.PermissionHelper;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
+
+import java.util.ArrayList;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface, View.OnClickListener,
@@ -49,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public static final int RESULT_CANCLE = 9458;
 
 
-
-
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
 
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private Button mOpenGallaryButton;
     private Button mFinishAppButton;
 
+    private Button mRotatePhotoButton;
 
     //Sensor for change orientation
     private Sensor mAcellerometerSensor;
@@ -65,16 +68,25 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private SensorManager mSensorManager;
     private OrientationHelper mSensorOrientation;
 
+    //FileSystem
     private FileIOHelper mFileIOHelper;
 
-    private CameraFragment mCameraFragment;
+    //FragmentControl Camera & ResultPreview
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
+    private CameraFragment mCameraFragment;
+    private PreviewResultFragment mPreviewResultFragment;
 
 
     //subView for surfacePhoto
     private ModifyPhotoView mModifyPhotoView;
     private ModifiedPhoto mModifiedPhoto;
+    private int photoRotation = 0;
+
+    private ArrayList<View> mWidgetListCamera;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,23 +94,37 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         setContentView(R.layout.activity_main);
 
 
+
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
 
-       mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
+        mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
         mOpenGallaryButton = (Button)findViewById(R.id.btn_open_gallary);
         mFinishAppButton = (Button)findViewById(R.id.btn_app_finish);
+        mRotatePhotoButton = (Button)findViewById(R.id.btn_main_rotate);
 
         mTakePictureButton.setOnClickListener(this);
         mOpenGallaryButton.setOnClickListener(this);
         mFinishAppButton.setOnClickListener(this);
+        mRotatePhotoButton.setOnClickListener(this);
+
+        mWidgetListCamera = new ArrayList<>();
+        mWidgetListCamera.add(mTakePictureButton);
+        mWidgetListCamera.add(mOpenGallaryButton);
+        mWidgetListCamera.add(mFinishAppButton);
 
 
+
+        mRotatePhotoButton.setVisibility(View.GONE);
         setRequestCameraPermission();
 
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
+
+        mPreviewResultFragment = new PreviewResultFragment();
+        mCameraFragment = CameraFragment.newInstance();
+
 
         setModifiedView();
     }
@@ -122,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public void startCameraFragment(){
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mCameraFragment = CameraFragment.newInstance();
+
         mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
         mCameraFragment.setTextureSize(3,4);
@@ -169,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private void setRequestCameraPermission(){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
+
         }
     }
 
@@ -184,12 +211,22 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
 
     @Override
-    public void onPostTakePicture() {
-        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_LONG).show();
-        Log.e("Mainactivity","Post Excute In CapturePreview");
+    public void onPostTakePicture(Bitmap captureBitmap) {
+        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
+        Log.e("CaptureBitmap",String.format("size(%d,%d)",captureBitmap.getWidth(),captureBitmap.getHeight()));
+        inVisibleMainItems();
+
+    }
+    private void startResultPreview(Bitmap captureBitmap){
 
     }
 
+    private void inVisibleMainItems(){
+       for(int i=0;i<mWidgetListCamera.size();i++){
+            mWidgetListCamera.get(i).setVisibility(View.GONE);
+        }
+
+    }
     @Override
     public void OnOrientationChanged(int orientation) {
         int itemOrientation = 0;
@@ -229,10 +266,85 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mOpenGallaryButton.setRotation(roation);
         mFinishAppButton.setRotation(roation);
         mTakePictureButton.setRotation(roation);
+    }
+
+
+
+
+    @Override
+    public void onClick(View v) {
+
+
+        switch (v.getId()){
+            case R.id.btn_take_picture  : {takePicture();}break;
+            case R.id.btn_open_gallary  : {openGallary();}break;
+            case R.id.btn_app_finish    : {finishApp();}break;
+            case R.id.btn_main_rotate   : {rotatePhoto();}break;
+        }
+    }
+    private void openGallary(){
+
+        Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
+        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
+
+    }
+
+    private void rotatePhoto(){
+        photoRotation  = (photoRotation + 90)%360;
+        mModifyPhotoView.setPhotoRotation(photoRotation);
+        mModifyPhotoView.postInvalidate();
+
+    }
+    private void takePicture(){
+        /*사진 촬영과 저장*/
+        mCameraFragment.takePicture();
+    }
+    private void finishApp(){
+        finish();
+
 
     }
 
 
+
+    public void setmImageOnView(Photo photo){
+
+        mRotatePhotoButton.setVisibility(View.VISIBLE);
+
+
+        mModifiedPhoto = new ModifiedPhoto(photo);
+        mModifiedPhoto.setStartXY(new Point(100,100));
+        mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
+
+
+
+        mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getReversePreviewSize()));
+
+        mModifyPhotoView.setPhoto(mModifiedPhoto);
+        mModifyPhotoView.postInvalidate();
+    }
+    private Size getPhotoSize(Uri photoUri){
+        Size result ;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = false;
+        BitmapFactory.decodeFile(photoUri.getPath(),options);
+        result = new Size(options.outWidth,options.outHeight);
+        return result;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case PhotoGallaryActivity.REQUEST_CODE : {if(resultCode == RESULT_OK){
+                Photo photo = data.getParcelableExtra(PhotoGallaryActivity.PARCELABLE_RESULT);
+                setmImageOnView(photo); }break;
+            }
+        }
+
+
+    }
 
     //Dialog for Permissions
     public static class ConfirmationDialog extends DialogFragment{
@@ -258,70 +370,4 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         }
     }
 
-    @Override
-    public void onClick(View v) {
-
-
-        switch (v.getId()){
-            case R.id.btn_take_picture  : {takePicture();}break;
-            case R.id.btn_open_gallary  : {openGallary();}break;
-            case R.id.btn_app_finish    : {finishApp();}break;
-        }
-    }
-    private void openGallary(){
-
-        Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
-        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
-
-    }
-
-    private void takePicture(){
-        /*사진 촬영과 저장*/
-        mCameraFragment.takePicture();
-    }
-    private void finishApp(){
-        finish();
-
-
-    }
-
-
-
-    public void setmImageOnView(Photo photo){
-        mModifiedPhoto = new ModifiedPhoto(photo);
-        mModifiedPhoto.setStartXY(new Point(100,100));
-        mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
-
-
-      //  Log.e("Main SetImage",""+(mModifiedPhoto.getOutSize()==null)+ " " + (mCameraFragment.getPreviewSize()));
-
-
-
-        mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getPreviewSize()));
-       // mModifiedPhoto.setRatio((float) 0.5);
-        mModifyPhotoView.setPhoto(mModifiedPhoto);
-        mModifyPhotoView.postInvalidate();
-    }
-    private Size getPhotoSize(Uri photoUri){
-        Size result ;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = false;
-        BitmapFactory.decodeFile(photoUri.getPath(),options);
-        result = new Size(options.outWidth,options.outHeight);
-        return result;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode){
-            case PhotoGallaryActivity.REQUEST_CODE : {if(resultCode == RESULT_OK){
-                Photo photo = data.getParcelableExtra("result");
-                setmImageOnView(photo); }break;
-            }
-        }
-
-
-    }
 }

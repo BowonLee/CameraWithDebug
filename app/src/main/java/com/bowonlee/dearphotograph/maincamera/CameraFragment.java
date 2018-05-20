@@ -5,6 +5,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -20,6 +22,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,6 +43,7 @@ import android.view.ViewGroup;
 
 import com.bowonlee.dearphotograph.R;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,9 +66,11 @@ public class CameraFragment extends Fragment{
 
 
     interface CameraInterface{
-        void onPostTakePicture();
+        void onPostTakePicture(Bitmap bitmap);
+
     }
-    private CameraFragment.CameraInterface anInterface;
+    private CameraFragment.CameraInterface cameraInterface;
+
     private static final String TAG = "Camera2Preview";
 
 
@@ -109,14 +115,30 @@ public class CameraFragment extends Fragment{
     private ImageReader mImageReader;
 
 
+    /*
+    * image capture callback
+    * */
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
-            mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),getActivity()));
+            //mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),getActivity()));
+
+
+            captureImageToBitmap(imageReader.acquireNextImage());
 
         }
     };
+    private void captureImageToBitmap(Image image){
 
+        Bitmap result;
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+
+        result = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+
+        cameraInterface.onPostTakePicture(result);
+    }
 
     /*Callback Method*/
     /*SurfaceTexture 관련 콜벡 Surface가 생성되면 호출되어 프리뷰세션을 생성한다.*/
@@ -314,6 +336,7 @@ public class CameraFragment extends Fragment{
                             try {
                                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON);
                                 setAutoFlash(mPreviewRequestBuilder);
 
                                 mPreviewRequest = mPreviewRequestBuilder.build();
@@ -565,6 +588,7 @@ public class CameraFragment extends Fragment{
     public void startBackgroundThread(){
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
+
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
 
     }
@@ -616,12 +640,14 @@ public class CameraFragment extends Fragment{
             if(null == activity || null == mCameraDevice){
                 return;
             }
-            /* 촬영한 사진은 여기서 CaptureRequest의 builder를 이용하여 사진을 저장한다. */
+
             final CaptureRequest.Builder captureBuilder =
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
 
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON);
+
             setAutoFlash(captureBuilder);
 
 
@@ -632,11 +658,11 @@ public class CameraFragment extends Fragment{
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
                     // 캡쳐가 완료되면 작업이 수행됨을 알려주거나, 후처리를 한다.
-                    anInterface.onPostTakePicture();
+                    Log.e("totalresult",result.toString());
 
                     unlockFocus();
-
                 }
+
             };
 
             mCaptureSession.stopRepeating();
@@ -710,12 +736,15 @@ public class CameraFragment extends Fragment{
     public Size getPreviewSize(){
         return mPreviewSize;
     }
+    public Size getReversePreviewSize(){
+        return new Size(mPreviewSize.getHeight(),mPreviewSize.getWidth());
+    }
 
 
 
     public static CameraFragment newInstance(){return new CameraFragment();}
     public void setOnCameraInterface(CameraInterface cameraInterface){
-        anInterface = cameraInterface;
+        this.cameraInterface = cameraInterface;
     }
 
     public void refreshFragment(){

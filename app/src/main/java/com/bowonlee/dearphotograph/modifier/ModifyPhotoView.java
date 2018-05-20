@@ -53,6 +53,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
     @Override
     protected void onDraw(Canvas canvas) {
+
         super.onDraw(canvas);
         try {
             drawFrame(canvas);

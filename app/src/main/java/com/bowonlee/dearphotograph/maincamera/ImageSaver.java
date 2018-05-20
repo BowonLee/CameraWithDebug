@@ -51,12 +51,10 @@ public class ImageSaver implements Runnable {
     ImageSaver(Image image, Context context) {
         mImage = image;
         mContext = context;
+
     }
 
 
-    void setOnImageSaveListenr(Context context){
-        mImageSaveListener = (OnMImageSaveListener)context;
-    }
 
     @Override
     public void run() {
@@ -105,8 +103,7 @@ public class ImageSaver implements Runnable {
                     }
                 }
         );
-
-
-
     }
+
+
 }

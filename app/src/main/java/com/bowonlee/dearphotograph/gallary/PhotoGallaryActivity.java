@@ -19,7 +19,8 @@ import com.bowonlee.dearphotograph.R;
 
 public class PhotoGallaryActivity extends AppCompatActivity{
 
-    private static String TAG = "PhotoGallary";
+    public static final String PARCELABLE_RESULT = "result_parcelable";
+    private static final String TAG = "PhotoGallary";
     public static final int REQUEST_CODE = 4001;
 
     private RecyclerView mGridPhotoGallary;

@@ -88,8 +88,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
 
         getPhotoSize(modifiedPhoto.getImageUri());
 
-//        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
-        modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
+     modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
 
         modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(getPhotoSize(modifiedPhoto.getImageUri()),
                 new Size(mModifyPhotoView.getWidth(),mModifyPhotoView.getHeight())));
