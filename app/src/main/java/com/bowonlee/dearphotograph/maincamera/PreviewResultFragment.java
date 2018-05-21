@@ -49,6 +49,8 @@ public class PreviewResultFragment extends Fragment {
 
 
 
+        //mPreviewResultView.setZ((float) -0.1);
+
 
         mPreviewResultView.postInvalidate();
         settingButtons();
@@ -64,6 +66,7 @@ public class PreviewResultFragment extends Fragment {
         mButtonGruop.add(mButtonCancel);
 
         for(Button btn : mButtonGruop){
+            btn.setZ((float) 0.1);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -93,7 +96,7 @@ public class PreviewResultFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-      //
+
         super.onDestroy();
 
     }

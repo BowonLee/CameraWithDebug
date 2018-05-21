@@ -143,7 +143,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
         buffer.get(bytes);
         BitmapFactory.Options options = new BitmapFactory.Options();
 
-        options.inSampleSize = 4;
+        options.inSampleSize = 2;
 
         result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
         Log.e(TAG,"createBitmap");

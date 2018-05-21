@@ -26,7 +26,8 @@ public class PreviewResultView extends View{
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
-        canvas.drawBitmap(mCapturedBitmap,mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight(),null);
+       // canvas.rotate(90,mCapturedBitmap.getWidth()/2,mCapturedBitmap.getHeight()/2);
+        canvas.drawBitmap(mCapturedBitmap,0,0,null);
 
         Log.e("BitmapDraw",String.format("draw %d,%d",mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight()));
     }
