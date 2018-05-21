@@ -54,8 +54,6 @@ public class ImageSaver implements Runnable {
 
     }
 
-
-
     @Override
     public void run() {
 

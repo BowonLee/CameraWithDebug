@@ -146,6 +146,7 @@ public class ModifyPhotoActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+
     public void rotatePhoto(){
         // 누를 때 마다 시계방향으로 회전
         photoRotation = (photoRotation +90)%360;

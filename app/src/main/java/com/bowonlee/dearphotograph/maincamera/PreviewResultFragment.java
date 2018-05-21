@@ -1,6 +1,8 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.app.ActionBar;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,9 @@ public class PreviewResultFragment extends Fragment {
         public void onCancelPreviewResult();
     }
 
+
+
+
     private PreviewResultInterface mPreviewResultInterface;
 
     private final String TAG = "PreviewResultFragment";
@@ -29,20 +34,29 @@ public class PreviewResultFragment extends Fragment {
     private Button mButtonSaveImage;
     private Button mButtonCancel;
     private PreviewResultView mPreviewResultView;
-
+    private Bitmap mCapturedBitmap;
 
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPreviewResultView = new PreviewResultView(getContext());
-        getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
 
+        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap);
+        getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
 
+
+
+
+
+        mPreviewResultView.postInvalidate();
         settingButtons();
     }
+    public void setCapturedBitmap(Bitmap capturedBitmap){
+        this.mCapturedBitmap = capturedBitmap;
+    }
+
     private void settingButtons(){
 
         mButtonGruop = new ArrayList<>();
@@ -54,12 +68,16 @@ public class PreviewResultFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     switch (v.getId()){
-                        case R.id.btn_fragment_preview_result_cancel :{onDestroy();}break;
+                        case R.id.btn_fragment_preview_result_cancel :{
+                            mPreviewResultInterface.onCancelPreviewResult();
+                            onDestroy();}break;
                         case R.id.btn_fragment_preview_result_save : {}break;
                     }
                 }
             });
         }
+
+
 
     }
 
@@ -75,7 +93,7 @@ public class PreviewResultFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        mPreviewResultInterface.onCancelPreviewResult();
+      //
         super.onDestroy();
 
     }

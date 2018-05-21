@@ -29,6 +29,8 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.FileIOHelper;
@@ -80,10 +82,17 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
 
+
+    private FrameLayout mContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
 
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
@@ -93,9 +102,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
 
-        mPreviewResultFragment = new PreviewResultFragment();
 
-        mCameraFragment = CameraFragment.newInstance();
 
         setModifiedView();
 
@@ -105,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private void setModifiedView(){
         mModifyPhotoView = new ModifyPhotoView(this);
         mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
+
+
         addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
     }
 
@@ -178,10 +187,21 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @Override
     public void onPostTakePicture(Bitmap captureBitmap) {
-    //    Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
+
+       // temp.setImageBitmap(captureBitmap);
+        startPreviewResultFragment(captureBitmap);
+
+      //  mFragmentManager = getSupportFragmentManager();
+      //  mFragmentTransaction = mFragmentManager.beginTransaction();
+
+        //mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
+     //   mFragmentTransaction.remove(mCameraFragment).commit();
+
+       // mModifyPhotoView.setTemp(captureBitmap);
+      //  mModifyPhotoView.postInvalidate();
 
 
-        startPreviewResultFragment(captureBitmap );
     }
 
 
@@ -191,17 +211,22 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
 
     public void startCameraFragment(){
+
+        mCameraFragment = CameraFragment.newInstance();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
         mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
         //   mCameraFragment.setTextureSize(3,4);
-
     }
+
     private void startPreviewResultFragment(Bitmap captureBitmap){
+
+        mPreviewResultFragment = new PreviewResultFragment();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
+        mPreviewResultFragment.setCapturedBitmap(captureBitmap);
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
 
@@ -269,8 +294,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
     public void setmImageOnView(Photo photo){
-
-
         mModifiedPhoto = new ModifiedPhoto(photo);
         mModifiedPhoto.setStartXY(new Point(100,100));
         mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));

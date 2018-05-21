@@ -1,6 +1,8 @@
 package com.bowonlee.dearphotograph.modifier;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -50,19 +52,27 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         setCanvasRotate(rotate);
     }
 
+    private Bitmap tempBit;
+    public void setTemp(Bitmap temp){
+        this.tempBit = temp;
+
+        //mPhotoBitmap = temp;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
+
 
         super.onDraw(canvas);
         try {
             drawFrame(canvas);
             drawBorderRect(canvas);
+
         }catch (NullPointerException e){
             e.printStackTrace();
         }
 
-    }
+        }
 
     private void drawFrame(Canvas canvas){
         Paint paint = new Paint();

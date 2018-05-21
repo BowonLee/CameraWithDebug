@@ -16,10 +16,10 @@
             android:layout_height="match_parent"
             android:id="@+id/main_container"
             android:background="#000"
+
             >
 
         </FrameLayout>
-
 
     </FrameLayout>
 

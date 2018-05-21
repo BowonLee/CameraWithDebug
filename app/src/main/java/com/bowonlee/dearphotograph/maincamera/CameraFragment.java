@@ -24,6 +24,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +42,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.bowonlee.dearphotograph.R;
 
@@ -50,6 +52,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -113,6 +116,7 @@ public class CameraFragment extends Fragment{
 
 
 
+
     /*
     * image capture callback
     * */
@@ -120,19 +124,58 @@ public class CameraFragment extends Fragment{
         @Override
         public void onImageAvailable(ImageReader imageReader) {
 
-            captureImageToBitmap(imageReader.acquireNextImage());
+            new ImageToBitmap().execute(imageReader.acquireNextImage());
+
+      //      mBackgroundHandler.post();
+
+            //captureImageToBitmap(imageReader.acquireNextImage());
 
         }
     };
+private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
+
+    @Override
+    protected Bitmap doInBackground(Image... images) {
+
+        Bitmap result;
+        ByteBuffer buffer = images[0].getPlanes()[0].getBuffer();
+        byte[] bytes = new byte[buffer.capacity()];
+        buffer.get(bytes);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        options.inSampleSize = 4;
+
+        result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
+        Log.e(TAG,"createBitmap");
+
+        return result;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+        super.onPostExecute(bitmap);
+
+        cameraInterface.onPostTakePicture(bitmap);
+    }
+}
+
+
+
+
     private void captureImageToBitmap(Image image){
 
         Bitmap result;
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-        byte[] bytes = new byte[buffer.remaining()];
+        byte[] bytes = new byte[buffer.capacity()];
         buffer.get(bytes);
+        BitmapFactory.Options options = new BitmapFactory.Options();
 
-        result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
+
+        result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
+        Log.e(TAG,"createBitmap");
+
         cameraInterface.onPostTakePicture(result);
+
     }
 
     /*Callback Method*/
@@ -276,6 +319,8 @@ public class CameraFragment extends Fragment{
 
         mButtonOpenGallary = (Button)view.findViewById(R.id.btn_fragment_camera_open_gallary);
         mButtonTakePicture = (Button)view.findViewById(R.id.btn_fragment_camera_takepicture);
+
+
         settingButtons();
 
 
@@ -465,7 +510,7 @@ public class CameraFragment extends Fragment{
                 }
                 Point displaySize = new Point();
                 Size largest = chooseOptimalResolution(map.getOutputSizes(ImageFormat.JPEG),new Size(16,9));
-
+                largest = new Size(MAX_PREVIEW_WIDTH,MAX_PREVIEW_HEIGHT);
                 /*
                  * 화면 비율 별 최대 해상도
                  * 16 : 9 4160 2340
@@ -475,8 +520,8 @@ public class CameraFragment extends Fragment{
                 // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
                 // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
                 mImageReader = ImageReader.newInstance(largest.getWidth(),largest.getHeight(), ImageFormat.JPEG, 2);
-                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
-               // mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+              //  mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
 
