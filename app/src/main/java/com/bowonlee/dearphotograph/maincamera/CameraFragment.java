@@ -40,6 +40,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.bowonlee.dearphotograph.R;
 
@@ -55,24 +56,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by bowon on 2018-04-18.
  */
-/*
-* 구성 - 18 .4 .18
-* 상단 - 사진설정변경 + 미디어 페이지
-* 중단(전체) -카메라 프리뷰
-* 하단 - 사진촬영버튼
-*
-* */
 public class CameraFragment extends Fragment{
-
-
-    interface CameraInterface{
-        void onPostTakePicture(Bitmap bitmap);
-
-    }
-    private CameraFragment.CameraInterface cameraInterface;
 
     private static final String TAG = "Camera2Preview";
 
+    interface CameraInterface{
+        void onPostTakePicture(Bitmap bitmap);
+        void onTakePhotoFromGallary();
+    }
+    private CameraFragment.CameraInterface cameraInterface;
+
+    /*Fragment's UI*/
+    private ArrayList<Button> mButtonGroup;
+    private Button mButtonOpenGallary;
+    private Button mButtonTakePicture;
 
     /*camera orientation*/
     int mOrientation = 90;
@@ -115,14 +112,13 @@ public class CameraFragment extends Fragment{
     private ImageReader mImageReader;
 
 
+
     /*
     * image capture callback
     * */
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
-            //mBackgroundHandler.post(new ImageSaver(imageReader.acquireNextImage(),getActivity()));
-
 
             captureImageToBitmap(imageReader.acquireNextImage());
 
@@ -135,8 +131,7 @@ public class CameraFragment extends Fragment{
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
 
-        result = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-
+        result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
         cameraInterface.onPostTakePicture(result);
     }
 
@@ -278,7 +273,34 @@ public class CameraFragment extends Fragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView)view.findViewById(R.id.texture_camera);
+
+        mButtonOpenGallary = (Button)view.findViewById(R.id.btn_fragment_camera_open_gallary);
+        mButtonTakePicture = (Button)view.findViewById(R.id.btn_fragment_camera_takepicture);
+        settingButtons();
+
+
+
     }
+
+    private void settingButtons(){
+        mButtonGroup = new ArrayList<>();
+
+        mButtonGroup.add(mButtonOpenGallary);
+        mButtonGroup.add(mButtonTakePicture);
+
+        for(Button btn : mButtonGroup){
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()){
+                        case R.id.btn_fragment_camera_open_gallary : {cameraInterface.onTakePhotoFromGallary();}break;
+                        case R.id.btn_fragment_camera_takepicture  : {takePicture();}break;
+                    }
+                }
+            });
+        }
+    }
+
 
     @Nullable
     @Override
@@ -453,7 +475,8 @@ public class CameraFragment extends Fragment{
                 // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
                 // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
                 mImageReader = ImageReader.newInstance(largest.getWidth(),largest.getHeight(), ImageFormat.JPEG, 2);
-                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+               // mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
 
@@ -627,8 +650,12 @@ public class CameraFragment extends Fragment{
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-
+        Log.e(TAG,"destroy");
+    }
 
     /*
      * 디바이스의 사전 셋팅이 모두 끝난 뒤 captureBuilder를 호출하여 이미지를 저장하는 메서드이다.
@@ -661,6 +688,7 @@ public class CameraFragment extends Fragment{
                     Log.e("totalresult",result.toString());
 
                     unlockFocus();
+
                 }
 
             };
@@ -678,13 +706,19 @@ public class CameraFragment extends Fragment{
     public void setOrientation(int orientation){
         mOrientation = orientation;
     }
+    public void setItemOrientation(float itemOrientation){
+        for(Button button : mButtonGroup){
+            button.setRotation(itemOrientation);
+        }
+    }
+
     public void setTextureSize(int textureWidth,int textureHeight){
         mTextureSize = new Size(textureWidth,textureHeight);
     }
     /* 사진의 저장을 위해 현제 화면의 상태를려준다*/
 
     /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
-    public void takePicture(){
+    private void takePicture(){
         lockFocus();
     }
     /*사진활영을 위한 화면 고정설정
@@ -757,4 +791,7 @@ public class CameraFragment extends Fragment{
             return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
         }
     }
+
+
+
 }

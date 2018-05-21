@@ -43,8 +43,8 @@ import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
 import java.util.ArrayList;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface, View.OnClickListener,
-        OrientationHelper.OrientationChangeListener {
+public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface,
+        OrientationHelper.OrientationChangeListener, PreviewResultFragment.PreviewResultInterface {
 
 
     private static final String ALBUMNAME = "DearPhotograph";
@@ -54,13 +54,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
+    private long mBackPressedTime = 0;
 
-
-    private Button mTakePictureButton;
-    private Button mOpenGallaryButton;
-    private Button mFinishAppButton;
-
-    private Button mRotatePhotoButton;
 
     //Sensor for change orientation
     private Sensor mAcellerometerSensor;
@@ -83,9 +78,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private ModifiedPhoto mModifiedPhoto;
     private int photoRotation = 0;
 
-    private ArrayList<View> mWidgetListCamera;
-
-
 
 
     @Override
@@ -93,40 +85,21 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
 
-        mTakePictureButton = (Button)findViewById(R.id.btn_take_picture);
-        mOpenGallaryButton = (Button)findViewById(R.id.btn_open_gallary);
-        mFinishAppButton = (Button)findViewById(R.id.btn_app_finish);
-        mRotatePhotoButton = (Button)findViewById(R.id.btn_main_rotate);
-
-        mTakePictureButton.setOnClickListener(this);
-        mOpenGallaryButton.setOnClickListener(this);
-        mFinishAppButton.setOnClickListener(this);
-        mRotatePhotoButton.setOnClickListener(this);
-
-        mWidgetListCamera = new ArrayList<>();
-        mWidgetListCamera.add(mTakePictureButton);
-        mWidgetListCamera.add(mOpenGallaryButton);
-        mWidgetListCamera.add(mFinishAppButton);
-
-
-
-        mRotatePhotoButton.setVisibility(View.GONE);
         setRequestCameraPermission();
-
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
 
         mPreviewResultFragment = new PreviewResultFragment();
+
         mCameraFragment = CameraFragment.newInstance();
 
-
         setModifiedView();
+
+
     }
 
     private void setModifiedView(){
@@ -145,15 +118,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
     }
-    public void startCameraFragment(){
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
 
-        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
-        mCameraFragment.setOnCameraInterface(this);
-        mCameraFragment.setTextureSize(3,4);
 
-    }
 
     @Override
     protected void onResume() {
@@ -212,21 +178,43 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @Override
     public void onPostTakePicture(Bitmap captureBitmap) {
-        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
-        Log.e("CaptureBitmap",String.format("size(%d,%d)",captureBitmap.getWidth(),captureBitmap.getHeight()));
-        inVisibleMainItems();
+    //    Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
 
-    }
-    private void startResultPreview(Bitmap captureBitmap){
 
+        startPreviewResultFragment(captureBitmap );
     }
 
-    private void inVisibleMainItems(){
-       for(int i=0;i<mWidgetListCamera.size();i++){
-            mWidgetListCamera.get(i).setVisibility(View.GONE);
-        }
+
+    @Override
+    public void onCancelPreviewResult() {
+        startCameraFragment();
+    }
+
+    public void startCameraFragment(){
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+
+        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
+        mCameraFragment.setOnCameraInterface(this);
+        //   mCameraFragment.setTextureSize(3,4);
 
     }
+    private void startPreviewResultFragment(Bitmap captureBitmap){
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
+        mPreviewResultFragment.setPreviewResultInterface(this);
+
+    }
+
+    @Override
+    public void onTakePhotoFromGallary() {
+        Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
+        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
+    }
+
+
+
     @Override
     public void OnOrientationChanged(int orientation) {
         int itemOrientation = 0;
@@ -263,31 +251,14 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
     public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
-        mOpenGallaryButton.setRotation(roation);
-        mFinishAppButton.setRotation(roation);
-        mTakePictureButton.setRotation(roation);
-    }
-
-
-
-
-    @Override
-    public void onClick(View v) {
-
-
-        switch (v.getId()){
-            case R.id.btn_take_picture  : {takePicture();}break;
-            case R.id.btn_open_gallary  : {openGallary();}break;
-            case R.id.btn_app_finish    : {finishApp();}break;
-            case R.id.btn_main_rotate   : {rotatePhoto();}break;
+        if(mCameraFragment.isVisible()){
+          mCameraFragment.setItemOrientation(roation);
         }
     }
-    private void openGallary(){
 
-        Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
-        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
 
-    }
+
+
 
     private void rotatePhoto(){
         photoRotation  = (photoRotation + 90)%360;
@@ -295,28 +266,14 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mModifyPhotoView.postInvalidate();
 
     }
-    private void takePicture(){
-        /*사진 촬영과 저장*/
-        mCameraFragment.takePicture();
-    }
-    private void finishApp(){
-        finish();
-
-
-    }
-
 
 
     public void setmImageOnView(Photo photo){
-
-        mRotatePhotoButton.setVisibility(View.VISIBLE);
 
 
         mModifiedPhoto = new ModifiedPhoto(photo);
         mModifiedPhoto.setStartXY(new Point(100,100));
         mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
-
-
 
         mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getReversePreviewSize()));
 
@@ -345,6 +302,25 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+     //   super.onBackPressed();
+
+
+        if(System.currentTimeMillis()>mBackPressedTime+2000){
+                mBackPressedTime = System.currentTimeMillis();
+                Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT).show();
+                return;
+        }
+        if(System.currentTimeMillis()<=mBackPressedTime+2000){
+            //Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT);
+            this.finish();
+        }
+
+
+    }
+
 
     //Dialog for Permissions
     public static class ConfirmationDialog extends DialogFragment{
