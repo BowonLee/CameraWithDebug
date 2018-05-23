@@ -76,14 +76,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
     //subView for surfacePhoto
-    private ModifyPhotoView mModifyPhotoView;
-    private ModifiedPhoto mModifiedPhoto;
-    private int photoRotation = 0;
-
-
-
-
-    private FrameLayout mContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,19 +96,12 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
 
-        setModifiedView();
+
 
 
     }
 
-    private void setModifiedView(){
-        mModifyPhotoView = new ModifyPhotoView(this);
-        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
 
-        mContainer = (FrameLayout)findViewById(R.id.dummy_container);
-        mContainer.addView(mModifyPhotoView);
-        //addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
-    }
 
     private void hideUi(){
                     getWindow().getDecorView().setSystemUiVisibility(
@@ -187,20 +172,12 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
 
     @Override
-    public void onPostTakePicture(Bitmap captureBitmap) {
+    public void onPostTakePicture(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto) {
         Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
 
-       // temp.setImageBitmap(captureBitmap);
-        startPreviewResultFragment(captureBitmap);
 
-      //  mFragmentManager = getSupportFragmentManager();
-      //  mFragmentTransaction = mFragmentManager.beginTransaction();
+        startPreviewResultFragment(captureBitmap,modifiedPhoto);
 
-        //mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
-     //   mFragmentTransaction.remove(mCameraFragment).commit();
-
-       // mModifyPhotoView.setTemp(captureBitmap);
-      //  mModifyPhotoView.postInvalidate();
 
 
     }
@@ -222,23 +199,18 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         //   mCameraFragment.setTextureSize(3,4);
     }
 
-    private void startPreviewResultFragment(Bitmap captureBitmap){
+    private void startPreviewResultFragment(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto){
 
         mPreviewResultFragment = new PreviewResultFragment();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mPreviewResultFragment.setCapturedBitmap(captureBitmap);
+
         mPreviewResultFragment.setCapturedBitmap(captureBitmap);
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
 
     }
 
-    @Override
-    public void onTakePhotoFromGallary() {
-        Intent intent = new Intent(MainActivity.this, PhotoGallaryActivity.class);
-        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
-    }
 
 
 
@@ -282,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
         if(mCameraFragment.isVisible()){
-          mCameraFragment.setItemOrientation(roation);
+          //mCameraFragment.setItemOrientation(roation);
         }
     }
 
@@ -290,45 +262,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
 
-    private void rotatePhoto(){
-        photoRotation  = (photoRotation + 90)%360;
-        mModifyPhotoView.setPhotoRotation(photoRotation);
-        mModifyPhotoView.postInvalidate();
 
-    }
-
-
-    public void setmImageOnView(Photo photo){
-        mModifiedPhoto = new ModifiedPhoto(photo);
-        mModifiedPhoto.setStartXY(new Point(100,100));
-        mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
-        mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getReversePreviewSize()));
-        mModifyPhotoView.setPhoto(mModifiedPhoto);
-        mModifyPhotoView.postInvalidate();
-    }
-
-    private Size getPhotoSize(Uri photoUri){
-        Size result ;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = false;
-        BitmapFactory.decodeFile(photoUri.getPath(),options);
-        result = new Size(options.outWidth,options.outHeight);
-        return result;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode){
-            case PhotoGallaryActivity.REQUEST_CODE : {if(resultCode == RESULT_OK){
-                Photo photo = data.getParcelableExtra(PhotoGallaryActivity.PARCELABLE_RESULT);
-                setmImageOnView(photo); }break;
-            }
-        }
-
-
-    }
 
     @Override
     public void onBackPressed() {

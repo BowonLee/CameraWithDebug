@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.R;
+import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,6 @@ public class PreviewResultFragment extends Fragment {
 
         public void onCancelPreviewResult();
     }
-
 
 
 
@@ -38,7 +38,7 @@ public class PreviewResultFragment extends Fragment {
     private PreviewResultView mPreviewResultView;
     private Bitmap mCapturedBitmap;
     private RelativeLayout mParentLayout;
-    private LayoutInflater inflater;
+    private ModifiedPhoto mModifiedPhoto;
 
 
     @Override
@@ -58,7 +58,7 @@ public class PreviewResultFragment extends Fragment {
 
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
-
+        mPreviewResultView.setPhoto(mModifiedPhoto);
         settingButtons();
         mPreviewResultView.postInvalidate();
 
@@ -71,6 +71,9 @@ public class PreviewResultFragment extends Fragment {
         mButtonSaveImage.bringToFront();
         mButtonCancel.bringToFront();
 
+    }
+    public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
+        mModifiedPhoto = modifiedPhoto;
     }
 
     public void setCapturedBitmap(Bitmap capturedBitmap){
@@ -99,9 +102,8 @@ public class PreviewResultFragment extends Fragment {
             });
         }
 
-
-
     }
+
 
 
     @Nullable

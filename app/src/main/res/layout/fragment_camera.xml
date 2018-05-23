@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/layout_camera_root"
+    >
 
 
     <com.bowonlee.dearphotograph.maincamera.AutoFitTextureView
@@ -12,6 +14,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/texture_camera"/>
 
+    <RelativeLayout
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+    >
     <Button
         android:id="@+id/btn_fragment_camera_open_gallary"
         android:layout_width="wrap_content"
@@ -32,6 +38,9 @@
         android:layout_marginBottom="50dp"
         android:gravity="bottom|center_vertical"
         android:text="picture" />
+
+</RelativeLayout>
+
 
 
 

@@ -45,8 +45,15 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-public class CameraDummyName {
+public class CameraFunction {
 
+    public static final String TAG = "CameraFunction";
+
+    interface CameraFunctionInterface{
+        void onTakePicture(Bitmap bitmap);
+    }
+
+    CameraFunctionInterface mCameraFunctionInterface;
     /*camera orientation*/
     int mOrientation = 90;
 
@@ -98,13 +105,9 @@ public class CameraDummyName {
         public void onImageAvailable(ImageReader imageReader) {
 
             new ImageToBitmap().execute(imageReader.acquireNextImage());
-
-            //      mBackgroundHandler.post();
-
-            //captureImageToBitmap(imageReader.acquireNextImage());
-
         }
     };
+
     private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap> {
 
         @Override
@@ -115,12 +118,8 @@ public class CameraDummyName {
             byte[] bytes = new byte[buffer.capacity()];
             buffer.get(bytes);
             BitmapFactory.Options options = new BitmapFactory.Options();
-
             options.inSampleSize = 2;
-
             result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
-
-
 
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
@@ -136,8 +135,8 @@ public class CameraDummyName {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
-      //      cameraInterface.onPostTakePicture(bitmap);
-        }
+            mCameraFunctionInterface.onTakePicture(bitmap);
+          }
     }
 
 
@@ -194,10 +193,10 @@ public class CameraDummyName {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-            Activity activity = getActivity();
 
-            if(activity != null){
-                activity.finish();
+
+            if(mActivity != null){
+                mActivity.finish();
             }
 
         }
@@ -388,8 +387,8 @@ public class CameraDummyName {
      * open, close, setupoutput
      * */
     private void setUpCameraOutputs(int width, int height) {
-        Activity activity = getActivity();
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+        CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
 
         try {
             for (String cameraId : manager.getCameraIdList()) {
@@ -423,7 +422,7 @@ public class CameraDummyName {
                 //  mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
-                activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+                mActivity.getWindowManager().getDefaultDisplay().getSize(displaySize);
 
 
 
@@ -470,8 +469,8 @@ public class CameraDummyName {
     }
 
 
-    private void configureTransform(int viewWidth, int viewHeight) {
-        Activity activity = getActivity();
+    public void configureTransform(int viewWidth, int viewHeight) {
+        Activity activity = mActivity;
         if (null == mTextureView || null == mPreviewSize || null == activity) {
             return;
         }
@@ -506,12 +505,11 @@ public class CameraDummyName {
      * */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void openCamera(int width, int height) {
-        Activity activity = getActivity();
+        Activity activity = mActivity;
 
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
 
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
@@ -601,7 +599,7 @@ public class CameraDummyName {
      * */
     private void captureStillPicture(){
         try{
-            final Activity activity = getActivity();
+            final Activity activity = mActivity;
             if(null == activity || null == mCameraDevice){
                 return;
             }
@@ -641,14 +639,6 @@ public class CameraDummyName {
         }
     }
 
-    public void setOrientation(int orientation){
-        mOrientation = orientation;
-    }
-    public void setItemOrientation(float itemOrientation){
-        for(Button button : mButtonGroup){
-            button.setRotation(itemOrientation);
-        }
-    }
 
     public void setTextureSize(int textureWidth,int textureHeight){
         mTextureSize = new Size(textureWidth,textureHeight);
@@ -656,7 +646,7 @@ public class CameraDummyName {
     /* 사진의 저장을 위해 현제 화면의 상태를려준다*/
 
     /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
-    private void takePicture(){
+    public void takePicture(){
         lockFocus();
     }
     /*사진활영을 위한 화면 고정설정
@@ -698,20 +688,9 @@ public class CameraDummyName {
     public Size getPreviewSize(){
         return mPreviewSize;
     }
-    public Size getReversePreviewSize(){
-        return new Size(mPreviewSize.getHeight(),mPreviewSize.getWidth());
-    }
 
 
 
-    public static CameraFragment newInstance(){return new CameraFragment();}
-    public void setOnCameraInterface(CameraFragment.CameraInterface cameraInterface){
-        this.cameraInterface = cameraInterface;
-    }
-
-    public void refreshFragment(){
-        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-    }
 
     static class CompareSizeByArea implements Comparator<Size> {
         @Override
@@ -719,6 +698,19 @@ public class CameraDummyName {
             return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
         }
     }
+
+    private Activity mActivity;
+
+    CameraFunction(Activity activity,AutoFitTextureView textureView){
+        this.mActivity = activity;
+        this.mTextureView = textureView;
+
+    }
+    public void setCameraFunctionInterface(CameraFunctionInterface anInterface){
+        this.mCameraFunctionInterface = anInterface;
+
+    }
+
 
 
 }

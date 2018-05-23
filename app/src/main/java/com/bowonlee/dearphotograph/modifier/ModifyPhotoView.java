@@ -20,6 +20,7 @@ import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouchListener{
 
 
+    public static final String TAG = "ModifyPhotoView";
 
     private final int EVENT_INSIDE = 401;
     private final int EVENT_EDGE = 405;
@@ -86,7 +87,8 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
         canvas.drawRect(mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
                 mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY,paint);
-
+        Log.e(TAG,String.format("%d,%d,%d,%d",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
+                mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY));
 
     }
 

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bowonlee.dearphotograph.R;
+import com.bowonlee.dearphotograph.maincamera.CameraFragment;
 import com.bowonlee.dearphotograph.maincamera.MainActivity;
 import com.bowonlee.dearphotograph.models.Photo;
 
@@ -81,7 +82,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
 
         Intent intent = activity.getIntent();
         intent.putExtra(PhotoGallaryActivity.PARCELABLE_RESULT,photo);
-        activity.setResult(MainActivity.RESULT_OK,intent);
+        activity.setResult(CameraFragment.RESULT_OK,intent);
         activity.finish();
   /*
     Intent intent = new Intent(activity, ModifyPhotoActivity.class);

@@ -13,7 +13,7 @@ import android.view.View;
 import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
-public class PreviewResultView extends View{
+public class PreviewResultView extends BasePhotoDrawerView{
 
     private Bitmap mCapturedBitmap;
 
@@ -34,13 +34,13 @@ public class PreviewResultView extends View{
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if(mCapturedBitmap!=null) {
+            canvas.drawBitmap(mCapturedBitmap, 0, 0, null);
 
+            Log.e("BitmapDraw", String.format("draw %d,%d", mCapturedBitmap.getWidth(), mCapturedBitmap.getHeight()));
+        }
         super.onDraw(canvas);
       //  canvas.rotate(90,260,540);
-       if(mCapturedBitmap!=null) {
-           canvas.drawBitmap(mCapturedBitmap, 0, 0, null);
 
-           Log.e("BitmapDraw", String.format("draw %d,%d", mCapturedBitmap.getWidth(), mCapturedBitmap.getHeight()));
-       }
     }
 }
