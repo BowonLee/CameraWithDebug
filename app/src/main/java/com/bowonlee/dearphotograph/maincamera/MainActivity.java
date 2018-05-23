@@ -113,8 +113,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mModifyPhotoView = new ModifyPhotoView(this);
         mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
 
-
-        addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
+        mContainer = (FrameLayout)findViewById(R.id.dummy_container);
+        mContainer.addView(mModifyPhotoView);
+        //addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
     }
 
     private void hideUi(){
@@ -227,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mPreviewResultFragment.setCapturedBitmap(captureBitmap);
+        mPreviewResultFragment.setCapturedBitmap(captureBitmap);
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
 
@@ -273,6 +275,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         }
         rotateItemsByOrientation(itemOrientation);
+
+
+
     }
     public void rotateItemsByOrientation(float roation){
         // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
@@ -297,12 +302,11 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mModifiedPhoto = new ModifiedPhoto(photo);
         mModifiedPhoto.setStartXY(new Point(100,100));
         mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
-
         mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),mCameraFragment.getReversePreviewSize()));
-
         mModifyPhotoView.setPhoto(mModifiedPhoto);
         mModifyPhotoView.postInvalidate();
     }
+
     private Size getPhotoSize(Uri photoUri){
         Size result ;
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -330,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public void onBackPressed() {
      //   super.onBackPressed();
 
-
         if(System.currentTimeMillis()>mBackPressedTime+2000){
                 mBackPressedTime = System.currentTimeMillis();
                 Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT).show();
@@ -340,8 +343,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
             //Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT);
             this.finish();
         }
-
-
     }
 
 

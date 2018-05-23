@@ -1,10 +1,8 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,25 +25,16 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-
-import com.bowonlee.dearphotograph.R;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -53,32 +42,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by bowon on 2018-04-18.
- */
-public class CameraFragment extends Fragment{
-
-    private static final String TAG = "Camera2Preview";
-
-    public static final int RESULT_OK = 6001;
-
-
-
-
-    interface CameraInterface{
-        void onPostTakePicture(Bitmap bitmap);
-        void onTakePhotoFromGallary();
-    }
-    private CameraFragment.CameraInterface cameraInterface;
-
-    /*Fragment's UI*/
-    private ArrayList<Button> mButtonGroup;
-    private Button mButtonOpenGallary;
-    private Button mButtonTakePicture;
+public class CameraDummyName {
 
     /*camera orientation*/
     int mOrientation = 90;
@@ -124,54 +91,55 @@ public class CameraFragment extends Fragment{
 
 
     /*
-    * image capture callback
-    * */
+     * image capture callback
+     * */
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
 
             new ImageToBitmap().execute(imageReader.acquireNextImage());
 
-      //      mBackgroundHandler.post();
+            //      mBackgroundHandler.post();
 
             //captureImageToBitmap(imageReader.acquireNextImage());
 
         }
     };
-private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
+    private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap> {
 
-    @Override
-    protected Bitmap doInBackground(Image... images) {
+        @Override
+        protected Bitmap doInBackground(Image... images) {
 
-        Bitmap result;
-        ByteBuffer buffer = images[0].getPlanes()[0].getBuffer();
-        byte[] bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-        BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap result;
+            ByteBuffer buffer = images[0].getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[buffer.capacity()];
+            buffer.get(bytes);
+            BitmapFactory.Options options = new BitmapFactory.Options();
 
-        options.inSampleSize = 2;
+            options.inSampleSize = 2;
 
-        result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
-        Log.e(TAG,"createBitmap");
+            result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
 
 
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
 
-        result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
 
-       // result.recycle();
+            result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
 
-        return result;
+            // result.recycle();
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+      //      cameraInterface.onPostTakePicture(bitmap);
+        }
     }
 
-    @Override
-    protected void onPostExecute(Bitmap bitmap) {
-        super.onPostExecute(bitmap);
-
-        cameraInterface.onPostTakePicture(bitmap);
-    }
-}
 
 
 
@@ -307,68 +275,6 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
     /*CurrentState Parameter*/
     private int mState = STATE_PREVIEW;
 
-    /*변수 선언과 Callback 설정 종료*/
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mTextureView = (AutoFitTextureView)view.findViewById(R.id.texture_camera);
-
-        mButtonOpenGallary = (Button)view.findViewById(R.id.btn_fragment_camera_open_gallary);
-        mButtonTakePicture = (Button)view.findViewById(R.id.btn_fragment_camera_takepicture);
-
-
-        settingButtons();
-
-    }
-
-    private void settingButtons(){
-        mButtonGroup = new ArrayList<>();
-
-        mButtonGroup.add(mButtonOpenGallary);
-        mButtonGroup.add(mButtonTakePicture);
-
-        for(Button btn : mButtonGroup){
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switch (v.getId()){
-                        case R.id.btn_fragment_camera_open_gallary : {cameraInterface.onTakePhotoFromGallary();}break;
-                        case R.id.btn_fragment_camera_takepicture  : {takePicture();}break;
-                    }
-                }
-            });
-        }
-    }
-
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera,container,false);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        startBackgroundThread();
-        if (mTextureView.isAvailable()){
-            openCamera(mTextureView.getWidth(),mTextureView.getHeight());
-            Log.e("Fragment WH",mTextureView.getWidth()+mTextureView.getHeight()+"");
-        }else{
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        closeCamera();
-        stopBackgroundThread();
-        super.onPause();
-
-    }
-
     /*Camera Preview Session의 생성 관련 메소드*/
     private void createCameraPreviewSession() {
         try {
@@ -422,19 +328,19 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
 
     }
     /*
-    * 적절한 해상도를 찾는다. (저장되는 사진과 연관)
-    * 최고해상도를 찾아야만 하는지는 추후 고려해 보아야 한다.
-    *
-    * */
+     * 적절한 해상도를 찾는다. (저장되는 사진과 연관)
+     * 최고해상도를 찾아야만 하는지는 추후 고려해 보아야 한다.
+     *
+     * */
     private Size chooseOptimalResolution(Size[] jpegSizes,Size ratio){
 
         List<Size> result = new ArrayList<>();
         int w = ratio.getWidth();
         int h = ratio.getHeight();
         for(Size resolution : jpegSizes){
-                if(resolution.getHeight() == resolution.getWidth() * h/w){
-                    result.add(resolution);
-                }
+            if(resolution.getHeight() == resolution.getWidth() * h/w){
+                result.add(resolution);
+            }
         }
         if(result.size()>0){
             return Collections.max(result,new CameraFragment.CompareSizeByArea());
@@ -443,8 +349,8 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
         }
     }
     /*
-    * 현재 상태에 맞추어 적절한 프리뷰사이즈를 리턴해준다. ( 프리뷰와 연관)
-    * */
+     * 현재 상태에 맞추어 적절한 프리뷰사이즈를 리턴해준다. ( 프리뷰와 연관)
+     * */
     private static Size chooseOptimalSize(Size[] choice, int textureViewWidth, int textureViewHeight
             , int maxWidth, int maxHeight, Size aspectRatio) {
         List<Size> bigEnough = new ArrayList<>();
@@ -514,7 +420,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
                 // 앞의 두 인자를 통해 출력 될 데이터의  해상도를 결정한다.
                 // 프리뷰 자체에는 영향이 없으면 출력 데이터에 영향을 끼친다.
                 mImageReader = ImageReader.newInstance(largest.getWidth(),largest.getHeight(), ImageFormat.JPEG, 2);
-              //  mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+                //  mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
@@ -540,7 +446,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
                         maxPreviewWidth, largest);
                 Log.e("PreviewSize", mPreviewSize.getWidth()+""+mPreviewSize.getHeight());
                 // 여기서의 프리뷰 사이즈가 실제로 카메라 상에 출력되는 프리뷰 사이즈에 영향을 끼친다. 현제는 테스트 기기의 전체 화면 사이즈에 맞게 하드코딩 하였다.
-               // mPreviewSize = new Size(854,480);
+                // mPreviewSize = new Size(854,480);
 
 
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(),mPreviewSize.getWidth());
@@ -689,13 +595,6 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        Log.e(TAG,"destroy");
-    }
-
     /*
      * 디바이스의 사전 셋팅이 모두 끝난 뒤 captureBuilder를 호출하여 이미지를 저장하는 메서드이다.
      * CaptureBuilder의 호출 뒤에는 사진이 저장됨을 알리고, 촬영을 위한 셋팅을 모두 초기화시킨다.
@@ -806,7 +705,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
 
 
     public static CameraFragment newInstance(){return new CameraFragment();}
-    public void setOnCameraInterface(CameraInterface cameraInterface){
+    public void setOnCameraInterface(CameraFragment.CameraInterface cameraInterface){
         this.cameraInterface = cameraInterface;
     }
 
@@ -814,7 +713,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
         getFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 
-    static class CompareSizeByArea implements Comparator<Size>{
+    static class CompareSizeByArea implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs) {
             return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
@@ -822,8 +721,7 @@ private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap>{
     }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }
+
+
+

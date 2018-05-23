@@ -19,6 +19,8 @@ import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 
 public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouchListener{
 
+
+
     private final int EVENT_INSIDE = 401;
     private final int EVENT_EDGE = 405;
     private final int EVENT_OUTSIDE = 408;
@@ -68,6 +70,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
             drawFrame(canvas);
             drawBorderRect(canvas);
 
+
         }catch (NullPointerException e){
             e.printStackTrace();
         }
@@ -79,6 +82,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.BLACK);
         paint.setStrokeWidth(frameWidth);
+
 
         canvas.drawRect(mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
                 mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY,paint);

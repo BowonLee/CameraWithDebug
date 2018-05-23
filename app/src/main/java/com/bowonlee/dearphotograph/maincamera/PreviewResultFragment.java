@@ -1,6 +1,7 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.R;
 
@@ -35,30 +37,45 @@ public class PreviewResultFragment extends Fragment {
     private Button mButtonCancel;
     private PreviewResultView mPreviewResultView;
     private Bitmap mCapturedBitmap;
+    private RelativeLayout mParentLayout;
+    private LayoutInflater inflater;
 
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap);
+
+        mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
+
+        //inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+
+        mParentLayout.addView(mPreviewResultView);
+        //getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
+
+
+
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
 
-        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap);
-        getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
-
-
-
-
-        //mPreviewResultView.setZ((float) -0.1);
-
-
-        mPreviewResultView.postInvalidate();
         settingButtons();
+        mPreviewResultView.postInvalidate();
+
+
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mButtonSaveImage.bringToFront();
+        mButtonCancel.bringToFront();
+
+    }
+
     public void setCapturedBitmap(Bitmap capturedBitmap){
         this.mCapturedBitmap = capturedBitmap;
     }
-
     private void settingButtons(){
 
         mButtonGruop = new ArrayList<>();
@@ -66,7 +83,7 @@ public class PreviewResultFragment extends Fragment {
         mButtonGruop.add(mButtonCancel);
 
         for(Button btn : mButtonGruop){
-            btn.setZ((float) 0.1);
+            mParentLayout.bringChildToFront(btn);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -74,7 +91,9 @@ public class PreviewResultFragment extends Fragment {
                         case R.id.btn_fragment_preview_result_cancel :{
                             mPreviewResultInterface.onCancelPreviewResult();
                             onDestroy();}break;
-                        case R.id.btn_fragment_preview_result_save : {}break;
+                        case R.id.btn_fragment_preview_result_save : {
+
+                        }break;
                     }
                 }
             });

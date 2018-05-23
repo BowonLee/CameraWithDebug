@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
@@ -19,16 +20,27 @@ public class PreviewResultView extends View{
     public PreviewResultView(Context context,Bitmap capturedBitmap){
         super(context);
         this.mCapturedBitmap = capturedBitmap;
+    }
 
+    public PreviewResultView(Context context) {
+        super(context);
+    }
+
+
+
+    public void setCapturedBitmap(Bitmap bitmap){
+        mCapturedBitmap =bitmap;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
-       // canvas.rotate(90,mCapturedBitmap.getWidth()/2,mCapturedBitmap.getHeight()/2);
-        canvas.drawBitmap(mCapturedBitmap,0,0,null);
+      //  canvas.rotate(90,260,540);
+       if(mCapturedBitmap!=null) {
+           canvas.drawBitmap(mCapturedBitmap, 0, 0, null);
 
-        Log.e("BitmapDraw",String.format("draw %d,%d",mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight()));
+           Log.e("BitmapDraw", String.format("draw %d,%d", mCapturedBitmap.getWidth(), mCapturedBitmap.getHeight()));
+       }
     }
 }
