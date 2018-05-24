@@ -24,6 +24,15 @@ import java.io.IOException;
 
 public class BasePhotoDrawerView extends View{
 
+    public interface onPhotoModifiedListener{
+        void onPhotoModified(ModifiedPhoto photo);
+    }
+
+    onPhotoModifiedListener listener;
+    public void setOnPhotoModifiedListener(onPhotoModifiedListener listener){
+        this.listener  = listener;
+    }
+
     protected ModifiedPhoto mModifiedPhoto;
     protected Bitmap mPhotoBitmap;
     private Rect photoRect;
@@ -44,7 +53,7 @@ public class BasePhotoDrawerView extends View{
     }
 
     public ModifiedPhoto getModifiedPhoto(){
-        return mModifiedPhoto;
+        return this.mModifiedPhoto;
     }
 
     /*
@@ -76,6 +85,9 @@ public class BasePhotoDrawerView extends View{
                     mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
 
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
+            if(listener != null) {
+                listener.onPhotoModified(this.mModifiedPhoto);
+            }
         }
     }
 

@@ -34,7 +34,8 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
-import android.widget.Button;
+
+import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -100,13 +101,17 @@ public class CameraFunction {
     /*
      * image capture callback
      * */
+
+
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader imageReader) {
 
             new ImageToBitmap().execute(imageReader.acquireNextImage());
+
         }
     };
+
 
     private class ImageToBitmap extends AsyncTask<Image,Integer,Bitmap> {
 
@@ -118,7 +123,7 @@ public class CameraFunction {
             byte[] bytes = new byte[buffer.capacity()];
             buffer.get(bytes);
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
+            options.inSampleSize = 1;
             result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(bytes,0,bytes.length,options),mPreviewSize.getWidth(),mPreviewSize.getHeight(),false);
 
             Matrix matrix = new Matrix();
@@ -134,8 +139,8 @@ public class CameraFunction {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-
             mCameraFunctionInterface.onTakePicture(bitmap);
+
           }
     }
 
@@ -302,7 +307,9 @@ public class CameraFunction {
                             try {
                                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
                                         CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON);
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_OFF);
+                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,CaptureRequest.CONTROL_SCENE_MODE_NIGHT);
+
                                 setAutoFlash(mPreviewRequestBuilder);
 
                                 mPreviewRequest = mPreviewRequestBuilder.build();
@@ -609,9 +616,11 @@ public class CameraFunction {
             captureBuilder.addTarget(mImageReader.getSurface());
 
             captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON);
+            captureBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,CaptureRequest.CONTROL_MODE_USE_SCENE_MODE);
 
-            setAutoFlash(captureBuilder);
+            captureBuilder.set(CaptureRequest.CONTROL_SCENE_MODE,CaptureRequest.CONTROL_SCENE_MODE_NIGHT);
+
+            //setAutoFlash(captureBuilder);
 
 
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, mOrientation);
@@ -647,6 +656,7 @@ public class CameraFunction {
 
     /*외부에서 사진 촬영요청이 오면 호출되어 state를 바꾸고 callback을 호출할 수 있게 해준다.*/
     public void takePicture(){
+
         lockFocus();
     }
     /*사진활영을 위한 화면 고정설정

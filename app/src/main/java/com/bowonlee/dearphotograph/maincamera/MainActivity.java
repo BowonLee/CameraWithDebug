@@ -206,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
         mPreviewResultFragment.setCapturedBitmap(captureBitmap);
+
+        mPreviewResultFragment.setModifiedPhoto(modifiedPhoto);
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
 

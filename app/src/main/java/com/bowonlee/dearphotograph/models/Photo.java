@@ -37,6 +37,11 @@ public class Photo implements Parcelable{
         imageUri = image;
     }
 
+    public Photo(){}
+    public void setPhoto(Photo photo){
+        this.imageUri = photo.imageUri;
+        this.thumnailUri = photo.thumnailUri;
+    }
     @Override
     public int describeContents() {return 0;}
     @Override

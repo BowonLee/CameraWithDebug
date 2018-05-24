@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.bowonlee.dearphotograph.BitmapSaver;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
@@ -44,21 +46,21 @@ public class PreviewResultFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap);
+        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap,mModifiedPhoto);
 
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
         //inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
-        mParentLayout.addView(mPreviewResultView);
         //getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
-
-
+        mPreviewResultView.setPhoto(mModifiedPhoto);
+//        Log.e("Result",mModifiedPhoto.getImageUri().getPath());
+        mParentLayout.addView(mPreviewResultView);
 
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
-        mPreviewResultView.setPhoto(mModifiedPhoto);
+
         settingButtons();
         mPreviewResultView.postInvalidate();
 
@@ -73,7 +75,8 @@ public class PreviewResultFragment extends Fragment {
 
     }
     public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
-        mModifiedPhoto = modifiedPhoto;
+        this.mModifiedPhoto = modifiedPhoto;
+
     }
 
     public void setCapturedBitmap(Bitmap capturedBitmap){
@@ -95,7 +98,7 @@ public class PreviewResultFragment extends Fragment {
                             mPreviewResultInterface.onCancelPreviewResult();
                             onDestroy();}break;
                         case R.id.btn_fragment_preview_result_save : {
-
+                            saveView(mPreviewResultView);
                         }break;
                     }
                 }
@@ -104,6 +107,14 @@ public class PreviewResultFragment extends Fragment {
 
     }
 
+    private void saveView(View view){
+        Bitmap b = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        view.draw(c);
+        new BitmapSaver(b,getContext()).run();
+
+
+    }
 
 
     @Nullable

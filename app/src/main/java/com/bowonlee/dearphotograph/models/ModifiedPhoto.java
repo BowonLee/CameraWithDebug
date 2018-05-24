@@ -27,6 +27,7 @@ public class ModifiedPhoto extends Photo{
     public ModifiedPhoto(Photo photo){
         super(photo.getThumnailUri(),photo.getImageUri());
     }
+    public ModifiedPhoto(){}
 
     public void setRatio(float ratio){
         this.ratio = ratio;

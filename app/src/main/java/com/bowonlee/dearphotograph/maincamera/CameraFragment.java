@@ -20,9 +20,9 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
@@ -59,9 +59,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     int mOrientation = 90;
 
     private CameraFunction mCameraFunction;
-    private ModifiedPhoto mModifiedPhoto;
 
     private ModifyPhotoView mModifyPhotoView;
+
+   private static ModifiedPhoto currentPhoto;
+
+    String temp;
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,6 +81,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private void setModifiedView(){
         mModifyPhotoView = new ModifyPhotoView(getContext());
         mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
+        mModifyPhotoView.setOnPhotoModifiedListener(new BasePhotoDrawerView.onPhotoModifiedListener() {
+            @Override
+            public void onPhotoModified(ModifiedPhoto photo) {
+                currentPhoto = photo;
+            }
+        });
+
 
 
 
@@ -91,6 +102,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         mButtonGroup.add(mButtonOpenGallary);
         mButtonGroup.add(mButtonTakePicture);
+
         for(Button button : mButtonGroup){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -98,8 +110,10 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                     switch (v.getId()){
                         case R.id.btn_fragment_camera_open_gallary : {openGallary();}break;
                         case R.id.btn_fragment_camera_takepicture : {takePicture();}break;
+
                     }
                 }
+
             });
         }
 
@@ -111,12 +125,17 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     }
     private void takePicture(){
-        mCameraFunction.takePicture();
+
+      //  Log.e("123123",currentPhoto.getImageUri().getPath());
+       mCameraFunction.takePicture();
+        //mModifiedPhoto = mModifyPhotoView.getModifiedPhoto();
+
     }
 
     @Override
     public void onTakePicture(Bitmap bitmap) {
-        cameraInterface.onPostTakePicture(bitmap,mModifiedPhoto);
+        cameraInterface.onPostTakePicture(bitmap,currentPhoto);
+
     }
 
     @Nullable
@@ -200,16 +219,21 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
 
 
-    public void setmImageOnView(Photo photo){
+     void setmImageOnView(Photo photo){
 
-        mModifiedPhoto = new ModifiedPhoto(photo);
-        mModifiedPhoto.setStartXY(new Point(100,100));
-        mModifiedPhoto.setOutSize(getPhotoSize(mModifiedPhoto.getImageUri()));
-        mModifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(mModifiedPhoto.getOutSize(),getReversePreviewSize()));
-        mModifyPhotoView.setPhoto(mModifiedPhoto);
+        ModifiedPhoto modifiedPhoto = new ModifiedPhoto(photo);
 
-        Log.e("photo",String.format("%s",mModifiedPhoto.getImageUri()));
+        modifiedPhoto.setStartXY(new Point(100,100));
+        modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
+        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getReversePreviewSize()));
+        mModifyPhotoView.setPhoto(modifiedPhoto);
+
+        Log.e("photo",mModifyPhotoView.getModifiedPhoto().getImageUri()+"");
+        temp = mModifyPhotoView.getModifiedPhoto().getImageUri().getPath();
+        Log.e("temp",temp);
         mModifyPhotoView.postInvalidate();
+
+
     }
 
     private Size getPhotoSize(Uri photoUri){

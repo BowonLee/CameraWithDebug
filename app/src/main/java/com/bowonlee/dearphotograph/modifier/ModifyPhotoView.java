@@ -16,8 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.bowonlee.dearphotograph.BasePhotoDrawerView;
+import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
 public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouchListener{
+
 
 
     public static final String TAG = "ModifyPhotoView";
@@ -55,12 +57,6 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         setCanvasRotate(rotate);
     }
 
-    private Bitmap tempBit;
-    public void setTemp(Bitmap temp){
-        this.tempBit = temp;
-
-        //mPhotoBitmap = temp;
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -84,11 +80,8 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         paint.setColor(Color.BLACK);
         paint.setStrokeWidth(frameWidth);
 
-
         canvas.drawRect(mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
                 mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY,paint);
-        Log.e(TAG,String.format("%d,%d,%d,%d",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,
-                mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-mFrameZoomX,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-mFrameZoomY));
 
     }
 
@@ -205,11 +198,13 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         Log.e("eventOccur",String.format("edge(%f,%f) %f, ",event.getX(),event.getY(),ratio));
        mFrameZoomX = 0;
        mFrameZoomY = 0;
-
         this.postInvalidate();
 
     }
 
 
-
+    @Override
+    public ModifiedPhoto getModifiedPhoto() {
+       return super.getModifiedPhoto();
+    }
 }
