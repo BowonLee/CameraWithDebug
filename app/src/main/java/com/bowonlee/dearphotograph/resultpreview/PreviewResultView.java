@@ -17,14 +17,11 @@ public class PreviewResultView extends BasePhotoDrawerView{
 
     private Bitmap mCapturedBitmap;
 
-    private Bitmap mResultBitmap;
+
     public PreviewResultView(Context context, Bitmap capturedBitmap, ModifiedPhoto mModifiedPhoto){
 
         super(context);
         this.mCapturedBitmap = capturedBitmap;
-
-
-        mResultBitmap = mCapturedBitmap;
     }
 
     public PreviewResultView(Context context) {

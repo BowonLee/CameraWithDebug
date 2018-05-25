@@ -19,9 +19,10 @@ import java.util.ArrayList;
 
 public class PreviewResultFragment extends Fragment {
 
-    interface PreviewResultInterface{
+    public interface PreviewResultInterface{
 
         public void onCancelPreviewResult();
+
     }
 
 
@@ -46,18 +47,18 @@ public class PreviewResultFragment extends Fragment {
 
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
-        //inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
-        //getActivity().addContentView(mPreviewResultView, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,ActionBar.LayoutParams.WRAP_CONTENT));
         mPreviewResultView.setPhoto(mModifiedPhoto);
-//        Log.e("Result",mModifiedPhoto.getImageUri().getPath());
+
         mParentLayout.addView(mPreviewResultView);
 
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
 
         settingButtons();
+
+
         mPreviewResultView.postInvalidate();
 
 
@@ -71,7 +72,8 @@ public class PreviewResultFragment extends Fragment {
 
     }
     public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
-        this.mModifiedPhoto = modifiedPhoto;
+        //this.mModifiedPhoto = modifiedPhoto;
+        this.mModifiedPhoto = new ModifiedPhoto(modifiedPhoto);
 
     }
 
@@ -109,6 +111,9 @@ public class PreviewResultFragment extends Fragment {
         view.draw(c);
 
         new BitmapSaver(b,getContext()).run();
+        mPreviewResultView = null;
+        mPreviewResultInterface.onCancelPreviewResult();
+
 
 
     }

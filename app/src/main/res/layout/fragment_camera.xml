@@ -5,22 +5,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/layout_camera_root"
+
     >
 
 
-
     <com.otaliastudios.cameraview.CameraView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:keepScreenOn="true"
+        app:cameraPictureSizeAspectRatio="9:16"
+        app:cameraSessionType="picture"
+        app:cameraGrid="off"
+        app:cameraFlash="auto"
+        app:cameraJpegQuality="100"
+        app:cameraWhiteBalance="auto"
         android:id="@+id/cameraview_fragment_camera"
         >
-
     </com.otaliastudios.cameraview.CameraView>
 
     <RelativeLayout
      android:layout_width="match_parent"
      android:layout_height="match_parent"
+        android:id="@+id/layout_camera_root"
     >
     <Button
         android:id="@+id/btn_fragment_camera_open_gallary"

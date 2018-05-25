@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
@@ -40,10 +41,9 @@ import java.util.Comparator;
  */
 public class CameraFragment extends Fragment {
 
-    private static final String TAG = "Camera2Preview";
+    private static final String TAG = "Camera2PreviewFragment";
 
     public static final int RESULT_OK = 6001;
-
 
     private RelativeLayout mRootLayout;
 
@@ -69,6 +69,7 @@ public class CameraFragment extends Fragment {
 
     String temp;
 
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,29 +78,48 @@ public class CameraFragment extends Fragment {
 
         setButtons(view);
         setModifiedView();
-
         mCameraView.addCameraListener(new CameraListener() {
             @Override
             public void onPictureTaken(byte[] jpeg) {
                 super.onPictureTaken(jpeg);
+                Bitmap result;
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 1;
+
+                result = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(jpeg,0,jpeg.length,options),
+                        mCameraView.getHeight(),mCameraView.getWidth(),false);
+
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+
+                result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
+
+                cameraInterface.onPostTakePicture(result,mModifyPhotoView.getModifiedPhoto());
 
             }
         });
     }
+
+
+
     private void setModifiedView(){
+
+
         mModifyPhotoView = new ModifyPhotoView(getContext());
+
         mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
+
         mModifyPhotoView.setOnPhotoModifiedListener(new BasePhotoDrawerView.onPhotoModifiedListener() {
             @Override
             public void onPhotoModified(ModifiedPhoto photo) {
                 currentPhoto = photo;
             }
         });
-    //    mRootLayout.addView(mModifyPhotoView);
 
 
-
-        getActivity().addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
+        mRootLayout.addView(mModifyPhotoView);
+        Log.e(TAG,"addview");
+       //getActivity().addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
     }
 
@@ -129,7 +149,8 @@ public class CameraFragment extends Fragment {
 
     private void openGallary(){
         Intent intent = new Intent(getActivity(), PhotoGallaryActivity.class);
-        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
+
+        this.startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
 
     }
     private void takePicture(){
@@ -149,13 +170,10 @@ public class CameraFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mCameraView.start();
-
-
     }
 
     @Override
     public void onPause() {
-
         super.onPause();
         mCameraView.stop();
 }
@@ -192,21 +210,26 @@ public class CameraFragment extends Fragment {
         mOrientation = orientation;
     }
 
-    /*
-    public Size getReversePreviewSize(){
-        return new Size(mCameraFunction.getPreviewSize().getHeight(),mCameraFunction.getPreviewSize().getWidth());
+
+    public Size getCameraPreviewSize(){
+        //return new Size(mCameraView.getWidth(),mCameraView.getHeight());
+        return new Size(720,1280);
     }
-*/
+
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Log.e("result",String.format("%d,%d",requestCode,resultCode));
         switch (requestCode){
             case PhotoGallaryActivity.REQUEST_CODE : {
-                Photo photo = data.getParcelableExtra(PhotoGallaryActivity.PARCELABLE_RESULT);
-                setmImageOnView(photo);}break;
+                if(resultCode == RESULT_OK){
+                    Photo photo = data.getParcelableExtra(PhotoGallaryActivity.PARCELABLE_RESULT);
+                    setmImageOnView(photo);
+                }break;
+            }
         }
     }
 
@@ -220,13 +243,14 @@ public class CameraFragment extends Fragment {
 
         modifiedPhoto.setStartXY(new Point(100,100));
         modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
-      //  modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getReversePreviewSize()));
-        mModifyPhotoView.setPhoto(modifiedPhoto);
+        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getCameraPreviewSize()));
 
-        Log.e("photo",mModifyPhotoView.getModifiedPhoto().getImageUri()+"");
-        temp = mModifyPhotoView.getModifiedPhoto().getImageUri().getPath();
-        Log.e("temp",temp);
-        mModifyPhotoView.postInvalidate();
+
+        this.mModifyPhotoView.setPhoto(modifiedPhoto);
+        Log.e("dummy",String.format("%s , %s",modifiedPhoto.getImageUri(),modifiedPhoto.getThumnailUri()));
+
+        this.mModifyPhotoView.postInvalidate();
+
 
 
     }

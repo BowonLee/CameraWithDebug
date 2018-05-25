@@ -51,6 +51,7 @@ public class PhotoGallaryActivity extends AppCompatActivity{
     @Override
     protected void onPause() {
         super.onPause();
+
     }
 
     /*

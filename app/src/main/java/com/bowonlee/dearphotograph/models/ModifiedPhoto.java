@@ -20,14 +20,20 @@ public class ModifiedPhoto extends Photo{
     private Size outSize;
 
 
-
     public ModifiedPhoto(Uri thumnail, Uri image) {
         super(thumnail, image);
     }
     public ModifiedPhoto(Photo photo){
         super(photo.getThumnailUri(),photo.getImageUri());
     }
-    public ModifiedPhoto(){}
+
+    public ModifiedPhoto(ModifiedPhoto modifiedPhoto){
+        super(modifiedPhoto.getThumnailUri(),modifiedPhoto.getImageUri());
+        this.ratio = modifiedPhoto.getRatio();
+        this.startXY = modifiedPhoto.getStartXY();
+
+
+    }
 
     public void setRatio(float ratio){
         this.ratio = ratio;

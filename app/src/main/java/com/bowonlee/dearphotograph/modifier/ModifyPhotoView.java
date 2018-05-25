@@ -60,14 +60,10 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
     @Override
     protected void onDraw(Canvas canvas) {
-
-
         super.onDraw(canvas);
         try {
             drawFrame(canvas);
             drawBorderRect(canvas);
-
-
         }catch (NullPointerException e){
             e.printStackTrace();
         }
@@ -88,8 +84,6 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
     private void drawBorderRect(Canvas canvas){
 
         Paint paint = new Paint();
-
-
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.RED);
         paint.setStrokeWidth(frameWidth);
@@ -120,10 +114,6 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
         }else{
             return EVENT_OUTSIDE;
         }
-
-
-
-
     }
 
     @Override

@@ -28,6 +28,7 @@ import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.OrientationHelper;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
+import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
 import com.bowonlee.dearphotograph.resultpreview.PreviewResultFragment;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -60,17 +61,16 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private CameraFragment mCameraFragment;
     private PreviewResultFragment mPreviewResultFragment;
 
+    private ModifyPhotoView temp;
 
     //subView for surfacePhoto
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.e("MainActivity","onCreate");
         setContentView(R.layout.activity_main);
-
-
-
-
 
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
@@ -79,10 +79,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         setRequestCameraPermission();
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
-
-
-
-
+        startCameraFragment();
 
 
     }
@@ -106,11 +103,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     protected void onResume() {
         super.onResume();
         hideUi();
-        startCameraFragment();
         setSensors();
         setSensorListener();
-
-
 
     }
 
