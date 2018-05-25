@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,9 +58,10 @@ public class BitmapSaver implements Runnable{
                     public void onScanCompleted(String path, Uri uri) {
                         Log.i("ExternalStorage","Scanned : " + path);
                         Log.i("ExternalStorage","URI : " + uri);
-
                     }
                 }
         );
+
+        Toast.makeText(mContext,String.format("Complete Save File : %s",mFile.toURI().getPath()),Toast.LENGTH_SHORT).show();
     }
 }

@@ -111,6 +111,7 @@ public class PreviewResultFragment extends Fragment {
         Bitmap b = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
         view.draw(c);
+
         new BitmapSaver(b,getContext()).run();
 
 
