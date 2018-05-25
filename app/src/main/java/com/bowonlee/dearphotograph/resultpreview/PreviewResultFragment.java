@@ -1,14 +1,10 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotograph.resultpreview;
 
-import android.app.ActionBar;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

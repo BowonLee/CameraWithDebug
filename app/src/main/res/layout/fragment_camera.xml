@@ -9,10 +9,14 @@
     >
 
 
-    <com.bowonlee.dearphotograph.maincamera.AutoFitTextureView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/texture_camera"/>
+
+    <com.otaliastudios.cameraview.CameraView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/cameraview_fragment_camera"
+        >
+
+    </com.otaliastudios.cameraview.CameraView>
 
     <RelativeLayout
      android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotograph.resultpreview;
 
 import android.app.Fragment;
 import android.content.Context;

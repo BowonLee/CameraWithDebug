@@ -28,6 +28,9 @@ import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
+import com.otaliastudios.cameraview.CameraListener;
+import com.otaliastudios.cameraview.CameraUtils;
+import com.otaliastudios.cameraview.CameraView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,12 +38,12 @@ import java.util.Comparator;
 /**
  * Created by bowon on 2018-04-18.
  */
-public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener, CameraFunction.CameraFunctionInterface {
+public class CameraFragment extends Fragment {
 
     private static final String TAG = "Camera2Preview";
 
     public static final int RESULT_OK = 6001;
-    private AutoFitTextureView mTextureView;
+
 
     private RelativeLayout mRootLayout;
 
@@ -54,11 +57,11 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     private ArrayList<Button> mButtonGroup;
     private Button mButtonOpenGallary;
     private Button mButtonTakePicture;
-
+    private CameraView mCameraView;
     /*camera orientation*/
     int mOrientation = 90;
 
-    private CameraFunction mCameraFunction;
+
 
     private ModifyPhotoView mModifyPhotoView;
 
@@ -70,13 +73,18 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRootLayout = (RelativeLayout)view.findViewById(R.id.layout_camera_root);
-        mTextureView = (AutoFitTextureView)view.findViewById(R.id.texture_camera);
-        mCameraFunction = new CameraFunction(getActivity(),mTextureView);
-        mCameraFunction.setCameraFunctionInterface(this);
+        mCameraView = (CameraView)view.findViewById(R.id.cameraview_fragment_camera);
 
         setButtons(view);
         setModifiedView();
 
+        mCameraView.addCameraListener(new CameraListener() {
+            @Override
+            public void onPictureTaken(byte[] jpeg) {
+                super.onPictureTaken(jpeg);
+
+            }
+        });
     }
     private void setModifiedView(){
         mModifyPhotoView = new ModifyPhotoView(getContext());
@@ -87,7 +95,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 currentPhoto = photo;
             }
         });
-
+    //    mRootLayout.addView(mModifyPhotoView);
 
 
 
@@ -125,18 +133,10 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
     }
     private void takePicture(){
-
-      //  Log.e("123123",currentPhoto.getImageUri().getPath());
-       mCameraFunction.takePicture();
-        //mModifiedPhoto = mModifyPhotoView.getModifiedPhoto();
+        mCameraView.capturePicture();
 
     }
 
-    @Override
-    public void onTakePicture(Bitmap bitmap) {
-        cameraInterface.onPostTakePicture(bitmap,currentPhoto);
-
-    }
 
     @Nullable
     @Override
@@ -148,23 +148,17 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     @Override
     public void onResume() {
         super.onResume();
+        mCameraView.start();
 
-        mCameraFunction.startBackgroundThread();
-        if (mTextureView.isAvailable()){
-            mCameraFunction.openCamera(mTextureView.getWidth(),mTextureView.getHeight());
-            Log.e("Fragment WH",mTextureView.getWidth()+mTextureView.getHeight()+"");
-        }else{
-            mTextureView.setSurfaceTextureListener(this);
-        }
+
     }
 
     @Override
     public void onPause() {
-        mCameraFunction.closeCamera();
-        mCameraFunction.stopBackgroundThread();
-        super.onPause();
 
-    }
+        super.onPause();
+        mCameraView.stop();
+}
 
 
 
@@ -172,7 +166,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        mCameraView.destroy();
         Log.e(TAG,"destroy");
     }
 
@@ -198,10 +192,11 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
         mOrientation = orientation;
     }
 
+    /*
     public Size getReversePreviewSize(){
         return new Size(mCameraFunction.getPreviewSize().getHeight(),mCameraFunction.getPreviewSize().getWidth());
     }
-
+*/
 
 
     @Override
@@ -225,7 +220,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         modifiedPhoto.setStartXY(new Point(100,100));
         modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
-        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getReversePreviewSize()));
+      //  modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getReversePreviewSize()));
         mModifyPhotoView.setPhoto(modifiedPhoto);
 
         Log.e("photo",mModifyPhotoView.getModifiedPhoto().getImageUri()+"");
@@ -252,26 +247,6 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
 
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        mCameraFunction.openCamera(width,height);
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        mCameraFunction.configureTransform(width,height);
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-    }
 
 
 }

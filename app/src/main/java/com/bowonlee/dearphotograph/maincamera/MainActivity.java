@@ -1,21 +1,16 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -26,23 +21,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Size;
 import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.OrientationHelper;
-import com.bowonlee.dearphotograph.PermissionHelper;
 import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.models.Photo;
-import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
-
-import java.util.ArrayList;
+import com.bowonlee.dearphotograph.resultpreview.PreviewResultFragment;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface,
