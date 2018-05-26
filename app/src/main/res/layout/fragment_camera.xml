@@ -19,6 +19,8 @@
         app:cameraFlash="auto"
         app:cameraJpegQuality="100"
         app:cameraWhiteBalance="auto"
+        app:cameraGesturePinch="zoom"
+        app:cameraGestureTap="focusWithMarker"
         android:id="@+id/cameraview_fragment_camera"
         >
     </com.otaliastudios.cameraview.CameraView>

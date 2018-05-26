@@ -42,7 +42,7 @@ public class PhotoLoader extends AsyncTaskLoader<List<Photo>>{
         selection = null ;// return all row
         selectionArgs = null;
 
-        Cursor imageCursor = contentResolver.query(tableUri,projection,selection,selectionArgs,null);
+        Cursor imageCursor = contentResolver.query(tableUri,projection,selection,selectionArgs, MediaStore.MediaColumns.DATE_ADDED + " desc");
         ArrayList<Photo> result = new ArrayList<>(imageCursor.getCount());
         int dataColumnIndex = imageCursor.getColumnIndex(projection[0]);
         int idColumIndex = imageCursor.getColumnIndex(projection[1]);

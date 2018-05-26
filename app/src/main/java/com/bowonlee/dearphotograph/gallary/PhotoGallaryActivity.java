@@ -6,11 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.R;
 
 /**
@@ -29,7 +25,7 @@ public class PhotoGallaryActivity extends AppCompatActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gally);
+        setContentView(R.layout.activity_gallary);
 
 
         mGridPhotoGallary = (RecyclerView) findViewById(R.id.gallary_recyclerview);
@@ -38,8 +34,6 @@ public class PhotoGallaryActivity extends AppCompatActivity{
         getLoaderManager().initLoader(0,null,mPhotoAdapter);
         mGridPhotoGallary.setLayoutManager(new GridLayoutManager(null,3, LinearLayoutManager.VERTICAL,false));
         mGridPhotoGallary.setAdapter(mPhotoAdapter);
-
-
 
 
     }
@@ -53,10 +47,5 @@ public class PhotoGallaryActivity extends AppCompatActivity{
         super.onPause();
 
     }
-
-    /*
-    * 갤러리로부터 이미지 가져오기 + gridview로 가져온 이미지 리스트 보내주기
-    *
-    * */
 
 }

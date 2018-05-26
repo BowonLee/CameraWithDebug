@@ -11,9 +11,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.bowonlee.dearphotograph.BasePhotoDrawerView;
+import com.bowonlee.dearphotograph.maincamera.MainPhotoDrawerView;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
-public class PreviewResultView extends BasePhotoDrawerView{
+public class PreviewResultView extends MainPhotoDrawerView{
 
     private Bitmap mCapturedBitmap;
 
@@ -22,6 +23,7 @@ public class PreviewResultView extends BasePhotoDrawerView{
 
         super(context);
         this.mCapturedBitmap = capturedBitmap;
+
     }
 
     public PreviewResultView(Context context) {

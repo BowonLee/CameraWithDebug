@@ -24,14 +24,6 @@ import java.io.IOException;
 
 public class BasePhotoDrawerView extends View{
 
-    public interface onPhotoModifiedListener{
-        void onPhotoModified(ModifiedPhoto photo);
-    }
-
-    onPhotoModifiedListener listener;
-    public void setOnPhotoModifiedListener(onPhotoModifiedListener listener){
-        this.listener  = listener;
-    }
 
     protected ModifiedPhoto mModifiedPhoto;
     protected Bitmap mPhotoBitmap;
@@ -85,9 +77,7 @@ public class BasePhotoDrawerView extends View{
                     mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
 
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
-            if(listener != null) {
-                listener.onPhotoModified(this.mModifiedPhoto);
-            }
+
         }
     }
 
@@ -176,7 +166,6 @@ public class BasePhotoDrawerView extends View{
 
             final int halfHeight = height / 2;
             final int halfWidth = width / 2;
-
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
             while ((halfHeight / inSampleSize) >= reqHeight
@@ -184,7 +173,6 @@ public class BasePhotoDrawerView extends View{
                 inSampleSize *= 2;
             }
         }
-        Log.e("sampleSize",inSampleSize+"");
         return inSampleSize;
     }
 

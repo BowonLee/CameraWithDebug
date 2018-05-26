@@ -43,14 +43,14 @@ public class PreviewResultFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPreviewResultView = new PreviewResultView(getContext(),mCapturedBitmap,mModifiedPhoto);
+        mPreviewResultView = new PreviewResultView(getActivity(),mCapturedBitmap,mModifiedPhoto);
 
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
 
 
         mPreviewResultView.setPhoto(mModifiedPhoto);
-
+        mPreviewResultView.setOnTouchListener(mPreviewResultView);
         mParentLayout.addView(mPreviewResultView);
 
         mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
@@ -110,7 +110,7 @@ public class PreviewResultFragment extends Fragment {
         Canvas c = new Canvas(b);
         view.draw(c);
 
-        new BitmapSaver(b,getContext()).run();
+        new BitmapSaver(b,getActivity()).run();
         mPreviewResultView = null;
         mPreviewResultInterface.onCancelPreviewResult();
 

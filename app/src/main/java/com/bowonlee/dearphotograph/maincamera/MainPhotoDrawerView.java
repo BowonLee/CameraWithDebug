@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.modifier;
+package com.bowonlee.dearphotograph.maincamera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,7 +18,7 @@ import android.view.View;
 import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
-public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouchListener{
+public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnTouchListener{
 
 
 
@@ -34,7 +34,7 @@ public class ModifyPhotoView extends BasePhotoDrawerView implements View.OnTouch
 
     private int currentEventState = EVENT_OUTSIDE;
 
-    public ModifyPhotoView(Context context) { super(context); }
+    public MainPhotoDrawerView(Context context) { super(context); }
 
     //이동 직전좌표
     private float touchPastX = 0;

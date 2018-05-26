@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,8 +29,8 @@ import com.bowonlee.dearphotograph.FileIOHelper;
 import com.bowonlee.dearphotograph.OrientationHelper;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
 import com.bowonlee.dearphotograph.resultpreview.PreviewResultFragment;
+
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements CameraFragment.CameraInterface,
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private CameraFragment mCameraFragment;
     private PreviewResultFragment mPreviewResultFragment;
 
-    private ModifyPhotoView temp;
+    private MainPhotoDrawerView temp;
+
 
     //subView for surfacePhoto
 
@@ -134,9 +136,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void setRequestCameraPermission(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
 
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
         }
     }
 

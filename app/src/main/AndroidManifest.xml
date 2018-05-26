@@ -33,8 +33,11 @@
             android:name=".modifier.ModifyPhotoActivity"
             android:screenOrientation="portrait"
             >
-
         </activity>
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
 
     </application>

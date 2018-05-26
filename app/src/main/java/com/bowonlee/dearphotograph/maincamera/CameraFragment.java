@@ -1,36 +1,29 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
-import com.bowonlee.dearphotograph.modifier.ModifyPhotoView;
 import com.otaliastudios.cameraview.CameraListener;
-import com.otaliastudios.cameraview.CameraUtils;
 import com.otaliastudios.cameraview.CameraView;
 
 import java.util.ArrayList;
@@ -61,14 +54,7 @@ public class CameraFragment extends Fragment {
     /*camera orientation*/
     int mOrientation = 90;
 
-
-
-    private ModifyPhotoView mModifyPhotoView;
-
-   private static ModifiedPhoto currentPhoto;
-
-    String temp;
-
+    private MainPhotoDrawerView mMainPhotoDrawerView;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -94,7 +80,7 @@ public class CameraFragment extends Fragment {
 
                 result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
 
-                cameraInterface.onPostTakePicture(result,mModifyPhotoView.getModifiedPhoto());
+                cameraInterface.onPostTakePicture(result, mMainPhotoDrawerView.getModifiedPhoto());
 
             }
         });
@@ -105,19 +91,13 @@ public class CameraFragment extends Fragment {
     private void setModifiedView(){
 
 
-        mModifyPhotoView = new ModifyPhotoView(getContext());
+        mMainPhotoDrawerView = new MainPhotoDrawerView(getActivity());
 
-        mModifyPhotoView.setOnTouchListener(mModifyPhotoView);
-
-        mModifyPhotoView.setOnPhotoModifiedListener(new BasePhotoDrawerView.onPhotoModifiedListener() {
-            @Override
-            public void onPhotoModified(ModifiedPhoto photo) {
-                currentPhoto = photo;
-            }
-        });
+        mMainPhotoDrawerView.setOnTouchListener(mMainPhotoDrawerView);
 
 
-        mRootLayout.addView(mModifyPhotoView);
+
+        mRootLayout.addView(mMainPhotoDrawerView);
         Log.e(TAG,"addview");
        //getActivity().addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
@@ -243,13 +223,13 @@ public class CameraFragment extends Fragment {
 
         modifiedPhoto.setStartXY(new Point(100,100));
         modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
-        modifiedPhoto.setRatio((float) mModifyPhotoView.getReductionRatio(modifiedPhoto.getOutSize(),getCameraPreviewSize()));
+        modifiedPhoto.setRatio((float) mMainPhotoDrawerView.getReductionRatio(modifiedPhoto.getOutSize(),getCameraPreviewSize()));
 
 
-        this.mModifyPhotoView.setPhoto(modifiedPhoto);
+        this.mMainPhotoDrawerView.setPhoto(modifiedPhoto);
         Log.e("dummy",String.format("%s , %s",modifiedPhoto.getImageUri(),modifiedPhoto.getThumnailUri()));
 
-        this.mModifyPhotoView.postInvalidate();
+        this.mMainPhotoDrawerView.postInvalidate();
 
 
 
