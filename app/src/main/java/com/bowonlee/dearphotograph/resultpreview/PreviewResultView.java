@@ -41,6 +41,7 @@ public class PreviewResultView extends MainPhotoDrawerView{
       //  canvas = new Canvas(mResultBitmap);
 
         if(mCapturedBitmap!=null) {
+            canvas.rotate(0);
             canvas.drawBitmap(mCapturedBitmap, 0, 0, null);
         }
         super.onDraw(canvas);

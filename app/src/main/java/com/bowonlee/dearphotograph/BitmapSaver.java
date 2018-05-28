@@ -44,6 +44,7 @@ public class BitmapSaver implements Runnable{
 
         FileOutputStream output = null;
 
+
         try {
             output = new FileOutputStream(mFile);
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,output);
@@ -51,7 +52,6 @@ public class BitmapSaver implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         MediaScannerConnection.scanFile(mContext, new String[]{mFile.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
                     @Override

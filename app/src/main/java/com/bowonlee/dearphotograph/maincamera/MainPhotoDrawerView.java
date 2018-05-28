@@ -7,7 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.DragEvent;
@@ -49,12 +51,14 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
 
 
     public void movePhotoXY(int x, int y){
-        mModifiedPhoto.setStartXY(new Point(x,y));
+        mModifiedPhoto.setStartXY(new PointF(x,y));
 
     }
 
     public void setPhotoRotation(int rotate){
+        mModifiedPhoto.setRotation(rotate);
         setCanvasRotate(rotate);
+        this.postInvalidate();
     }
 
 
@@ -63,7 +67,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         super.onDraw(canvas);
         try {
             drawFrame(canvas);
-            drawBorderRect(canvas);
+            //drawBorderRect(canvas);
         }catch (NullPointerException e){
             e.printStackTrace();
         }
@@ -88,22 +92,22 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         paint.setColor(Color.RED);
         paint.setStrokeWidth(frameWidth);
 
-        int left = mModifiedPhoto.getStartXY().x + boarderWidth;
-        int top = mModifiedPhoto.getStartXY().y + boarderWidth;
-        int right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth() - boarderWidth - mFrameZoomX;
-        int bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight() - boarderWidth - mFrameZoomY;
+        float left = mModifiedPhoto.getStartXY().x + boarderWidth;
+        float top = mModifiedPhoto.getStartXY().y + boarderWidth;
+        float right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth() - boarderWidth - mFrameZoomX;
+        float bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight() - boarderWidth - mFrameZoomY;
 
 
-        canvas.drawRect(new Rect(left,top,right,bottom),paint);
+        canvas.drawRect(new RectF(left,top,right,bottom),paint);
     }
 
 
 
     private int distinguishEvent(float touchX,float touchY){
-        int startX = getRotateRectWidthPivot(getPhotoRect()).left;
-        int startY = getRotateRectWidthPivot(getPhotoRect()).top;
-        int endX = getRotateRectWidthPivot(getPhotoRect()).right;
-        int endY =getRotateRectWidthPivot(getPhotoRect()).bottom;
+        float startX = getRotateRectWidthPivot(getPhotoRect()).left;
+        float startY = getRotateRectWidthPivot(getPhotoRect()).top;
+        float endX = getRotateRectWidthPivot(getPhotoRect()).right;
+        float endY =getRotateRectWidthPivot(getPhotoRect()).bottom;
         if(touchX>=startX&&touchX<endX&&touchY>=startY&&touchY<endY){
             if(touchX>=startX+boarderWidth&&touchX<endX-boarderWidth&&touchY>=startX-boarderWidth&&touchY<endY-boarderWidth) {
                 return EVENT_INSIDE;
@@ -140,7 +144,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
             case MotionEvent.ACTION_UP  : {
                 currentEventState = EVENT_OUTSIDE;
 
-                Log.e("touchEvent",String.format("lastXY(%d,%d)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y));
+//                Log.e("touchEvent",String.format("lastXY(%d,%d)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y));
 
                 return false;
             }

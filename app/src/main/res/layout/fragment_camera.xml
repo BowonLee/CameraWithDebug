@@ -26,32 +26,50 @@
     </com.otaliastudios.cameraview.CameraView>
 
     <RelativeLayout
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
         android:id="@+id/layout_camera_root"
-    >
-    <Button
-        android:id="@+id/btn_fragment_camera_open_gallary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="50dp"
-        android:gravity="bottom|left"
+        android:layout_alignParentTop="true">
 
-        android:text="gallary" />
+        <Button
+            android:id="@+id/btn_fragment_camera_open_gallary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="50dp"
+            android:gravity="bottom|left"
 
-    <Button
-        android:id="@+id/btn_fragment_camera_takepicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
-        android:gravity="bottom|center_vertical"
-        android:text="picture" />
+            android:text="gallary" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/btn_fragment_camera_takepicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            android:gravity="bottom|center_vertical"
+            android:text="picture" />
+
+        <CheckBox
+            android:id="@+id/checkbox_fragment_camera_facing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="CameraBack" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="rotate->"
+            android:id="@+id/btn_fragment_camera_rotate_picture"
+            />
+
+
+    </RelativeLayout>
 
 
 

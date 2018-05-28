@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,17 +18,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
+import com.otaliastudios.cameraview.Facing;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by bowon on 2018-04-18.
@@ -36,7 +43,6 @@ public class CameraFragment extends Fragment {
 
     private static final String TAG = "Camera2PreviewFragment";
 
-    public static final int RESULT_OK = 6001;
 
     private RelativeLayout mRootLayout;
 
@@ -50,11 +56,21 @@ public class CameraFragment extends Fragment {
     private ArrayList<Button> mButtonGroup;
     private Button mButtonOpenGallary;
     private Button mButtonTakePicture;
-    private CameraView mCameraView;
-    /*camera orientation*/
-    int mOrientation = 90;
+    private Button mButtonRotatePicture;
+    private CheckBox mCheckBoxCameraFacing;
 
+    /*Fragment's UI - DrawerLayout*/
+
+    private CameraView mCameraView;
+
+
+    /*camera orientation*/
+    private int mOrientation = 90;
+
+    private int mPhotoRotation = 0;
     private MainPhotoDrawerView mMainPhotoDrawerView;
+
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -63,7 +79,32 @@ public class CameraFragment extends Fragment {
         mCameraView = (CameraView)view.findViewById(R.id.cameraview_fragment_camera);
 
         setButtons(view);
+        setCheckbox(view);
         setModifiedView();
+        setCameraView();
+    }
+
+    private void setCheckbox(View view){
+        mCheckBoxCameraFacing = (CheckBox)view.findViewById(R.id.checkbox_fragment_camera_facing);
+        mCheckBoxCameraFacing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                switch (buttonView.getId()){
+                    case R.id.checkbox_fragment_camera_facing : { setCameraFacing(isChecked);}
+                }
+            }
+        });
+    }
+    private void setCameraFacing(boolean checked_state){
+        if(checked_state){
+            mCameraView.setFacing(Facing.FRONT);
+        }else{
+            mCameraView.setFacing(Facing.BACK);
+        }
+    }
+
+    private void setCameraView(){
+
         mCameraView.addCameraListener(new CameraListener() {
             @Override
             public void onPictureTaken(byte[] jpeg) {
@@ -76,30 +117,32 @@ public class CameraFragment extends Fragment {
                         mCameraView.getHeight(),mCameraView.getWidth(),false);
 
                 Matrix matrix = new Matrix();
-                matrix.postRotate(90);
 
+
+                if(mCameraView.getFacing() == Facing.FRONT){
+                    matrix.postRotate(270);
+                    matrix.postScale(-1,1);
+
+                }else{
+                    matrix.postRotate(90);
+                }
                 result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
 
+                Log.e("rotate",""+mMainPhotoDrawerView.getModifiedPhoto().getRotation());
                 cameraInterface.onPostTakePicture(result, mMainPhotoDrawerView.getModifiedPhoto());
 
             }
         });
+
+
+
     }
 
 
-
     private void setModifiedView(){
-
-
         mMainPhotoDrawerView = new MainPhotoDrawerView(getActivity());
-
         mMainPhotoDrawerView.setOnTouchListener(mMainPhotoDrawerView);
-
-
-
         mRootLayout.addView(mMainPhotoDrawerView);
-        Log.e(TAG,"addview");
-       //getActivity().addContentView(mModifyPhotoView,new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));
 
     }
 
@@ -107,9 +150,11 @@ public class CameraFragment extends Fragment {
         mButtonGroup = new ArrayList<>();
         mButtonTakePicture = (Button)view.findViewById(R.id.btn_fragment_camera_takepicture);
         mButtonOpenGallary= (Button)view.findViewById(R.id.btn_fragment_camera_open_gallary);
+        mButtonRotatePicture = (Button)view.findViewById(R.id.btn_fragment_camera_rotate_picture);
 
         mButtonGroup.add(mButtonOpenGallary);
         mButtonGroup.add(mButtonTakePicture);
+        mButtonGroup.add(mButtonRotatePicture);
 
         for(Button button : mButtonGroup){
             button.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +163,7 @@ public class CameraFragment extends Fragment {
                     switch (v.getId()){
                         case R.id.btn_fragment_camera_open_gallary : {openGallary();}break;
                         case R.id.btn_fragment_camera_takepicture : {takePicture();}break;
-
+                        case R.id.btn_fragment_camera_rotate_picture : {rotatePicture();};break;
                     }
                 }
 
@@ -127,15 +172,21 @@ public class CameraFragment extends Fragment {
 
     }
 
+
     private void openGallary(){
-        Intent intent = new Intent(getActivity(), PhotoGallaryActivity.class);
-
-        this.startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
-
+        Intent intent = new Intent(getActivity(), ModifyPhotoActivity.class);
+        this.startActivityForResult(intent,ModifyPhotoActivity.REQUEST_CODE);
     }
     private void takePicture(){
         mCameraView.capturePicture();
 
+    }
+    private void rotatePicture(){
+        if(mMainPhotoDrawerView!=null) {
+            mPhotoRotation = (mPhotoRotation + 90)%360;
+            mMainPhotoDrawerView.setPhotoRotation(mPhotoRotation);
+
+        }
     }
 
 
@@ -158,9 +209,6 @@ public class CameraFragment extends Fragment {
         mCameraView.stop();
 }
 
-
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -179,12 +227,6 @@ public class CameraFragment extends Fragment {
         getFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 
-    static class CompareSizeByArea implements Comparator<Size>{
-        @Override
-        public int compare(Size lhs, Size rhs) {
-            return Long.signum((long)lhs.getWidth() * lhs.getHeight() - (long)rhs.getWidth() * rhs.getHeight());
-        }
-    }
 
     public void setOrientation(int orientation){
         mOrientation = orientation;
@@ -204,9 +246,9 @@ public class CameraFragment extends Fragment {
 
         Log.e("result",String.format("%d,%d",requestCode,resultCode));
         switch (requestCode){
-            case PhotoGallaryActivity.REQUEST_CODE : {
+            case ModifyPhotoActivity.REQUEST_CODE : {
                 if(resultCode == RESULT_OK){
-                    Photo photo = data.getParcelableExtra(PhotoGallaryActivity.PARCELABLE_RESULT);
+                    Photo photo = data.getParcelableExtra(String.valueOf(R.string.parcelable_result));
                     setmImageOnView(photo);
                 }break;
             }
@@ -221,7 +263,7 @@ public class CameraFragment extends Fragment {
 
         ModifiedPhoto modifiedPhoto = new ModifiedPhoto(photo);
 
-        modifiedPhoto.setStartXY(new Point(100,100));
+        modifiedPhoto.setStartXY(new PointF(100,100));
         modifiedPhoto.setOutSize(getPhotoSize(modifiedPhoto.getImageUri()));
         modifiedPhoto.setRatio((float) mMainPhotoDrawerView.getReductionRatio(modifiedPhoto.getOutSize(),getCameraPreviewSize()));
 

@@ -7,10 +7,12 @@
     <!-- Crop Drawer navigator -->
     <string name="crop_drawer_open">Open navigation drawer</string>
     <string name="crop_drawer_close">Close navigation drawer</string>
-
-
     <string name="crop_drawer_option_aspectratio">Aspect ratio is</string>
 
+
+
+    <!-- StringValues for intent-->
+    <string name ="parcelable_result">parcelable result</string>
 
 
 </resources>

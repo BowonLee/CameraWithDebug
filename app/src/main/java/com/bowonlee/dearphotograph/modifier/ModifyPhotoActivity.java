@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.BuildConfig;
 import com.bowonlee.dearphotograph.R;
+import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
 import com.bowonlee.dearphotograph.maincamera.MainPhotoDrawerView;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
@@ -44,12 +45,16 @@ import java.util.ArrayList;
 public class ModifyPhotoActivity extends AppCompatActivity  {
 
     public static final int REQUEST_CODE = 3001;
+    public static final int PARCELABLE_MODIFIY_RESULT = 3002;
 
     private Button mButtonComplete;
-    private Button mButtonCrop;
+    private Button mButtonGallary;
+
     private ArrayList<Button> mButtonGroup;
 
-    private Photo photo;
+    private Photo resultPhoto;
+    private ImageView mImageView;
+
 
 
     @Override
@@ -57,69 +62,73 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modifier);
         mButtonComplete = (Button)findViewById(R.id.btn_modifier_complete);
-        mButtonCrop = (Button)findViewById(R.id.btn_modifier_crop);
+        mButtonGallary = (Button)findViewById(R.id.btn_modifier_gallary);
+        mImageView = (ImageView)findViewById(R.id.imageView_modifier_result);
 
         setButtons();
-        getPhotoFromGallary();
-       //  pickFromGallery();
+        //getPhotoFromGallary();
+        openGallary();
     }
 
-    private void pickFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
-                .setType("image/*")
-                .addCategory(Intent.CATEGORY_OPENABLE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            String[] mimeTypes = {"image/jpeg", "image/png"};
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        }
-
-        startActivityForResult(Intent.createChooser(intent,"Select Picture" ),123);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    private void getPhotoFromGallary(){
-        photo = getIntent().getParcelableExtra(Photo.EXTRA_CODE);
-       //Log.e("URI",);
-        Uri uri = Uri.fromFile(new File(photo.getImageUri().getPath()));
-        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), "pic.jpg"))).start(this);
-
-    }
     private void setButtons(){
         mButtonGroup = new ArrayList<>();
         mButtonGroup.add(mButtonComplete);
-        mButtonGroup.add(mButtonCrop);
+        mButtonGroup.add(mButtonGallary);
 
         for(Button button : mButtonGroup){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     switch (v.getId()){
-                        case R.id.btn_modifier_complete : {}break;
-                        case R.id.btn_modifier_crop : {}break;
+                        case R.id.btn_modifier_complete : {completeModify();}break;
+                        case R.id.btn_modifier_gallary : {openGallary();}break;
                     }
                 }
             });
         }
 
+    }
+
+    private void openGallary(){
+        Intent intent = new Intent(this,PhotoGallaryActivity.class);
+        startActivityForResult(intent,PhotoGallaryActivity.REQUEST_CODE);
+
+    }
+
+    private void getPhotoFromGallary(){
+
+        Uri uri = Uri.fromFile(new File(resultPhoto.getImageUri().getPath()));
+        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), "temp.jpg"))).start(this);
 
     }
 
 
+    private void completeModify(){
+        Intent intent = getIntent();
+        intent.putExtra(String.valueOf(R.string.parcelable_result),resultPhoto);
+        setResult(RESULT_OK,intent);
+        finish();
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        final Uri resultUri;
         if(resultCode == RESULT_OK){
-            if(requestCode == 123){
-             final Uri uri = data.getData();
-             if(uri !=null){
-                 Log.e("Log",uri.getPath());
-                 UCrop.of(uri, Uri.fromFile(new File(getCacheDir(),"pic.jpg"))).start(this);
-             }
+
+            if(requestCode == UCrop.REQUEST_CROP){
+                resultUri = UCrop.getOutput(data);
+                mImageView.setImageURI(resultUri);
+                resultPhoto = new Photo(null,resultUri);
+/*                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(resultUri.getPath(), options);
+*/
+            }
+            if(requestCode == PhotoGallaryActivity.REQUEST_CODE){
+                resultPhoto = data.getParcelableExtra(String.valueOf(R.string.parcelable_result));
+                getPhotoFromGallary();
             }
         }
 

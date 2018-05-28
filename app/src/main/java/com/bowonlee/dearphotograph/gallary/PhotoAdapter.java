@@ -79,16 +79,16 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onItemClick(Photo photo) {
-/*
-        Intent intent = activity.getIntent();
-        intent.putExtra(PhotoGallaryActivity.PARCELABLE_RESULT,photo);
-        activity.setResult(CameraFragment.RESULT_OK,intent);
-        activity.finish();*/
 
+        Intent intent = activity.getIntent();
+        intent.putExtra(String.valueOf(R.string.parcelable_result),photo);
+        activity.setResult(Activity.RESULT_OK,intent);
+        activity.finish();
+/*
     Intent intent = new Intent(activity, ModifyPhotoActivity.class);
     intent.putExtra(Photo.EXTRA_CODE, photo);
     activity.startActivityForResult(intent,ModifyPhotoActivity.REQUEST_CODE);
 
-
+*/
     }
 }
