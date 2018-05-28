@@ -17,7 +17,7 @@ import android.os.Parcelable;
 * */
 public class Photo implements Parcelable{
 
-    public static final String EXTRA_CODE = "Pure Photo";
+    public static final String EXTRA_CODE = "PurePhoto";
     public static final Creator<Photo> CREATOR = new Creator<Photo>() {
         @Override
         public Photo createFromParcel(Parcel in) {

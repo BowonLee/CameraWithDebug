@@ -8,20 +8,25 @@
     android:id="@+id/layout_preview_result"
     >
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_fragment_preview_result_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="cancel" />
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/selector_btn_circle_background"
+        android:elevation="10dp"
+        android:src="@drawable/baseline_close_white_36" />
 
-    <Button
+    <ImageButton
         android:id="@+id/btn_fragment_preview_result_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="save"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/selector_btn_circle_background"
+        android:elevation="10dp"
+        android:src="@drawable/baseline_save_alt_white_48" />
 
 
 </RelativeLayout>

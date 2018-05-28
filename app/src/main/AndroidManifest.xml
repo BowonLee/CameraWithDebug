@@ -38,8 +38,6 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-
-
     </application>
-
+    <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
 </manifest>

@@ -17,59 +17,59 @@ import java.util.List;
  */
 
 /*
-* 쿼리를 요청하여 이미지 파일들을 가져오는 비동기 콜백 클레스이다.
-* leafpic에서는 반응형자바로 구성되어 있어 콜벡이 없었지만
-* 비동기식으로 구현할 것이 아니라면 필요하다.
-* */
-public class PhotoLoader extends AsyncTaskLoader<List<Photo>>{
-    private List<Photo> photos;
+ * 쿼리를 요청하여 이미지 파일들을 가져오는 비동기 콜백 클레스이다.
+ * leafpic에서는 반응형자바로 구성되어 있어 콜벡이 없었지만
+ * 비동기식으로 구현할 것이 아니라면 필요하다.
+ * */
+public class RecentPhotoLoader extends android.support.v4.content.AsyncTaskLoader<Photo>{
+
     private ContentResolver contentResolver;
 
     private Uri tableUri;
     private String[] projection ;
     private String selection ;
     private String[] selectionArgs ;
-
-    public PhotoLoader(Context context) {
+    Photo photo;
+    public RecentPhotoLoader(Context context) {
         super(context);
         contentResolver = context.getContentResolver();
+       // this.contentResolver = contentResolver;
     }
 
     @Override
-    public List<Photo> loadInBackground() {
+    public Photo loadInBackground() {
         tableUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         projection = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
         selection = null ;// return all row
         selectionArgs = null;
 
         Cursor imageCursor = contentResolver.query(tableUri,projection,selection,selectionArgs, MediaStore.MediaColumns.DATE_ADDED + " desc");
-        ArrayList<Photo> result = new ArrayList<>(imageCursor.getCount());
         int dataColumnIndex = imageCursor.getColumnIndex(projection[0]);
         int idColumIndex = imageCursor.getColumnIndex(projection[1]);
 
         if(imageCursor.moveToFirst()){
-            do {
+
 
                 String filePath = imageCursor.getString(dataColumnIndex);
                 String imageId = imageCursor.getString(idColumIndex);
 
                 Uri fullImageUri = Uri.parse(filePath);
                 Uri thumnailUri = uriTothumnail(imageId);
-                Photo photo = new Photo(thumnailUri, fullImageUri);
-                result.add(photo);
-            }while (imageCursor.moveToNext());
+                photo = new Photo(thumnailUri, fullImageUri);
+
+
         }
         imageCursor.close();
 
-        return result;
+        return photo;
     }
 
     /*
-    * ImageId를 통해 해당 Image의 썸네일을 받아오은 메소드이다.
-    * 마지막 부분의 재귀 함수 부분은 썸네일이 아직 생성되지 않은 경우 요청을 다시 해주는 것이다.
-    * 이미지가 생성된지 얼마 되지 않는경우 썸네일이 생성되어있지 않을 수 있다.
-    *
-    * */
+     * ImageId를 통해 해당 Image의 썸네일을 받아오은 메소드이다.
+     * 마지막 부분의 재귀 함수 부분은 썸네일이 아직 생성되지 않은 경우 요청을 다시 해주는 것이다.
+     * 이미지가 생성된지 얼마 되지 않는경우 썸네일이 생성되어있지 않을 수 있다.
+     *
+     * */
     private  Uri uriTothumnail(String imageId){
         tableUri = MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI;
         projection = new String[]{MediaStore.Images.Thumbnails.DATA};
@@ -93,32 +93,29 @@ public class PhotoLoader extends AsyncTaskLoader<List<Photo>>{
     }
 
     @Override
-    public void deliverResult(List<Photo> photos) {
+    public void deliverResult(Photo photo) {
         if(isReset()){
-            if (photos!=null){
+            if (photo!=null){
                 // 로더가 종료된 후 퀴리가 들어온 경우 비정상적인 상황
 
-                onReleaseResources(photos);
+
             }
         }
-        List<Photo> oldPhotos = this.photos;
-        this.photos = photos;
+
+        this.photo = photo;
 
         if (isStarted()){
             //로더가 작동 중 이라면 결과를 보내주도록 한다.
-            super.deliverResult(photos);
+            super.deliverResult(photo);
         }
-        if (oldPhotos!=null){
-            // 이전의 사진 파일정보들은 모두 릴리즈시키도록 한다.
-            onReleaseResources(oldPhotos);
-        }
-        super.deliverResult(photos);
+
+        super.deliverResult(photo);
     }
 
     @Override
     protected void onStartLoading() {
-        if (photos != null){
-            deliverResult(photos);
+        if (photo != null){
+            deliverResult(photo);
         }else{
             forceLoad();
         }
@@ -128,24 +125,20 @@ public class PhotoLoader extends AsyncTaskLoader<List<Photo>>{
     protected void onStopLoading() {cancelLoad();}
 
     @Override
-    public void onCanceled(List<Photo> photos) {
-        super.onCanceled(photos);
-        onReleaseResources(photos);
+    public void onCanceled(Photo photo) {
+        super.onCanceled(photo);
+
     }
 
     @Override
     protected void onReset() {
         super.onReset();
         onStopLoading();
-        if (photos != null){
-            onReleaseResources(photos);
-            photos = null;
+        if (photo != null){
+
+            photo = null;
         }
     }
 
-    protected void onReleaseResources(List<Photo> photos){
-        //더이상 사용하지 않는 리소스들을 해제시켜준다. 현제 구현되어있지 않다.
-        //List<Photo>자료형 만으로 구성된 자료는 따로 해제시킬 필요는 없다.
-        //추후 직접 릴리즈해야 하는 경우가 생긴다면 이곳에서 처리하도록 한다.
-    }
+
 }

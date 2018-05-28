@@ -15,7 +15,7 @@ import com.bowonlee.dearphotograph.R;
 
 public class PhotoGallaryActivity extends AppCompatActivity{
 
-    public static final String PARCELABLE_RESULT = "result_parcelable";
+
     private static final String TAG = "PhotoGallary";
     public static final int REQUEST_CODE = 4001;
 

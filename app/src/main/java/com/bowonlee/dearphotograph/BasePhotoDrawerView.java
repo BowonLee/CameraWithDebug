@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Xfermode;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -27,7 +29,7 @@ public class BasePhotoDrawerView extends View{
 
     protected ModifiedPhoto mModifiedPhoto;
     protected Bitmap mPhotoBitmap;
-    private Rect photoRect;
+    private RectF photoRect;
 
     private int rotateDegree = 0;
 
@@ -89,33 +91,33 @@ public class BasePhotoDrawerView extends View{
     protected int getCanvasRotate(){return rotateDegree;}
     protected void setPhotoBitmap(){
         mPhotoBitmap = resizedBitmapFromUri(mModifiedPhoto.getImageUri(),mModifiedPhoto.getRatio());
-
+        rotateDegree = mModifiedPhoto.getRotation();
     }
 
-    protected Rect getPhotoRect(){
-        int top,left,bottom,right;
+    protected RectF getPhotoRect(){
+        float top,left,bottom,right;
          //사진의 원래 영역
             left = mModifiedPhoto.getStartXY().x;
             top  = mModifiedPhoto.getStartXY().y;
             right = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth();
             bottom = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight();
 
-        photoRect = new Rect(left,top,right,bottom);
+        photoRect = new RectF(left,top,right,bottom);
 
         return photoRect;
     }
 
-    protected Rect getRotateRectWidthPivot(Rect rect){
-         int pivotX = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2;
-         int pivotY = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2;
-        int left,top,right,bottom;
+    protected RectF getRotateRectWidthPivot(RectF rect){
+         float pivotX = mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2;
+         float pivotY = mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2;
+        float left,top,right,bottom;
 
         double rad = Math.toRadians((rotateDegree%180));
 
-        left = (int)((rect.left-pivotX) * Math.cos(rad) - (rect.top-pivotY)*Math.sin(rad))+pivotX;
-        top = (int)((rect.left-pivotX)*Math.sin(rad) + (rect.top-pivotY)*Math.cos(rad))+pivotY;
-        right = (int)((rect.right-pivotX) * Math.cos(rad) - (rect.bottom-pivotY)*Math.sin(rad))+pivotX;
-        bottom = (int)((rect.right-pivotX) *Math.sin(rad) + (rect.bottom-pivotY)*Math.cos(rad))+pivotY;
+        left = (float)((rect.left-pivotX) * Math.cos(rad) - (rect.top-pivotY)*Math.sin(rad))+pivotX;
+        top = (float)((rect.left-pivotX)*Math.sin(rad) + (rect.top-pivotY)*Math.cos(rad))+pivotY;
+        right = (float)((rect.right-pivotX) * Math.cos(rad) - (rect.bottom-pivotY)*Math.sin(rad))+pivotX;
+        bottom = (float)((rect.right-pivotX) *Math.sin(rad) + (rect.bottom-pivotY)*Math.cos(rad))+pivotY;
 
 
         if(rotateDegree == 0||rotateDegree==180){
@@ -124,7 +126,7 @@ public class BasePhotoDrawerView extends View{
             right = right + mPhotoBitmap.getHeight();
         }
 
-        return new Rect(left,top,right,bottom);
+        return new RectF(left,top,right,bottom);
 
     }
 
@@ -150,6 +152,7 @@ public class BasePhotoDrawerView extends View{
 
         options.inJustDecodeBounds = false;
         result = BitmapFactory.decodeFile(res.getPath(),options);
+
         return  Bitmap.createScaledBitmap(result,width,height,false);
 
 

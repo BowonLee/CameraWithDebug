@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:id="@+id/coordinator_fragment_camera_root"
     >
 
 
@@ -21,40 +21,85 @@
         app:cameraWhiteBalance="auto"
         app:cameraGesturePinch="zoom"
         app:cameraGestureTap="focusWithMarker"
+        app:cameraHdr="on"
         android:id="@+id/cameraview_fragment_camera"
         >
     </com.otaliastudios.cameraview.CameraView>
 
     <RelativeLayout
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
         android:id="@+id/layout_camera_root"
-    >
-    <Button
-        android:id="@+id/btn_fragment_camera_open_gallary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="50dp"
-        android:gravity="bottom|left"
+        android:layout_alignParentTop="true">
 
-        android:text="gallary" />
+        <ImageButton
+            android:id="@+id/btn_fragment_camera_open_gallary"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/btn_fragment_camera_takepicture"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp"
+            android:adjustViewBounds="true"
+            android:cropToPadding="true"
+            android:background="@drawable/selector_btn_circle_background"
+            android:elevation="10dp"
+            android:gravity="bottom|left"
 
-    <Button
-        android:id="@+id/btn_fragment_camera_takepicture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
-        android:gravity="bottom|center_vertical"
-        android:text="picture" />
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:text="G" />
 
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/btn_fragment_camera_takepicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="60dp"
+            android:background="@drawable/selector_btn_circle_background"
+            android:elevation="10dp"
+            android:gravity="bottom|center_vertical"
+            android:src="@drawable/baseline_camera_white_48" />
+
+        <CheckBox
+            android:id="@+id/checkbox_fragment_camera_facing"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/selector_btn_circle_background"
+            android:button="@drawable/selector_fragment_camera_facing"
+            android:elevation="10dp"
+
+            />
+
+        <ImageButton
+            android:id="@+id/btn_fragment_camera_rotate_picture"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/selector_btn_circle_background"
+            android:elevation="20dp"
+            android:src="@drawable/sharp_rotate_right_white_36" />
+
+        <ImageButton
+            android:id="@+id/btn_fragment_camera_flash"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/checkbox_fragment_camera_facing"
+            android:layout_marginEnd="59dp"
+            android:background="@drawable/selector_btn_circle_background"
+            android:src="@drawable/baseline_flash_auto_white_18" />
+
+    </RelativeLayout>
+    <!-- Camera Editor-->
 
 
 
-
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

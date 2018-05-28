@@ -1,21 +1,36 @@
 package com.bowonlee.dearphotograph.resultpreview;
 
+import android.app.ActionBar;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import com.bowonlee.dearphotograph.BitmapSaver;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
+import com.otaliastudios.cameraview.CameraView;
+import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCropFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class PreviewResultFragment extends Fragment {
 
@@ -25,15 +40,15 @@ public class PreviewResultFragment extends Fragment {
 
     }
 
-
-
     private PreviewResultInterface mPreviewResultInterface;
 
     private final String TAG = "PreviewResultFragment";
 
-    private ArrayList<Button> mButtonGruop;
-    private Button mButtonSaveImage;
-    private Button mButtonCancel;
+    /*UI*/
+    private ArrayList<ImageButton> mButtonGruop;
+    private ImageButton mButtonSaveImage;
+    private ImageButton mButtonCancel;
+
     private PreviewResultView mPreviewResultView;
     private Bitmap mCapturedBitmap;
     private RelativeLayout mParentLayout;
@@ -51,10 +66,11 @@ public class PreviewResultFragment extends Fragment {
 
         mPreviewResultView.setPhoto(mModifiedPhoto);
         mPreviewResultView.setOnTouchListener(mPreviewResultView);
-        mParentLayout.addView(mPreviewResultView);
 
-        mButtonSaveImage = (Button)view.findViewById(R.id.btn_fragment_preview_result_save);
-        mButtonCancel = (Button)view.findViewById(R.id.btn_fragment_preview_result_cancel);
+        mParentLayout.addView(mPreviewResultView);
+        //this.getActivity().addContentView(mPreviewResultView,new ActionBar.LayoutParams(1080,1920));
+        mButtonSaveImage = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_save);
+        mButtonCancel = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_cancel);
 
         settingButtons();
 
@@ -74,7 +90,8 @@ public class PreviewResultFragment extends Fragment {
     public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
         //this.mModifiedPhoto = modifiedPhoto;
         this.mModifiedPhoto = new ModifiedPhoto(modifiedPhoto);
-
+     //   mModifiedPhoto.setOutSize(mModifiedPhoto.getOutSize());
+    //    mModifiedPhoto.setRotation(modifiedPhoto.getRotation());
     }
 
     public void setCapturedBitmap(Bitmap capturedBitmap){
@@ -86,7 +103,7 @@ public class PreviewResultFragment extends Fragment {
         mButtonGruop.add(mButtonSaveImage);
         mButtonGruop.add(mButtonCancel);
 
-        for(Button btn : mButtonGruop){
+        for(ImageButton btn : mButtonGruop){
             mParentLayout.bringChildToFront(btn);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -106,14 +123,30 @@ public class PreviewResultFragment extends Fragment {
     }
 
     private void saveView(View view){
-        Bitmap b = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
+
+        ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
+        float resizeRatio = (float) (1080.0/720.0);
+        Log.e("resize",resizeRatio+"");
+        tempphoto.setRatio((tempphoto.getRatio()*resizeRatio));
+        tempphoto.setStartXY(new PointF(mModifiedPhoto.getStartXY().x*resizeRatio,mModifiedPhoto.getStartXY().y*resizeRatio));
+        Log.e("Result XY",String.format("(%f,%f),(%f,%f)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,tempphoto.getStartXY().x,tempphoto.getStartXY().y));
+        PreviewResultView tempview = new PreviewResultView(getActivity(),Bitmap.createScaledBitmap(mCapturedBitmap,1080,1920,false),tempphoto);
+        tempview.setPhoto(tempphoto);
+        tempview.setPhotoRotation(tempphoto.getRotation());
+        tempview.postInvalidate();
+
+
+        //Bitmap b = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
+        Bitmap b = Bitmap.createBitmap(1080,1920,Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
-        view.draw(c);
-
+        //view.draw(c);
+        tempview.draw(c);
         new BitmapSaver(b,getActivity()).run();
-        mPreviewResultView = null;
-        mPreviewResultInterface.onCancelPreviewResult();
+//        new BitmapSaver(Bitmap.createScaledBitmap(b,1080,1920,false),getActivity()).run();
 
+        mPreviewResultView = null;
+
+        mPreviewResultInterface.onCancelPreviewResult();
 
 
     }
@@ -133,5 +166,13 @@ public class PreviewResultFragment extends Fragment {
 
         super.onDestroy();
 
+    }
+
+
+    private Size getLargestSize(){
+
+
+
+        return null;
     }
 }

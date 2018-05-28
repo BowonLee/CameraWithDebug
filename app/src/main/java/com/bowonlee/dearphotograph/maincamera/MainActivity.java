@@ -30,6 +30,10 @@ import com.bowonlee.dearphotograph.OrientationHelper;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.resultpreview.PreviewResultFragment;
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import io.fabric.sdk.android.Fabric;
 
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -39,13 +43,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     private static final String ALBUMNAME = "DearPhotograph";
 
-    public static final int RESULT_OK = 9456;
-    public static final int RESULT_CANCLE = 9458;
-
-
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private long mBackPressedTime = 0;
-
 
     //Sensor for change orientation
     private Sensor mAcellerometerSensor;
@@ -62,18 +61,15 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private CameraFragment mCameraFragment;
     private PreviewResultFragment mPreviewResultFragment;
 
-    private MainPhotoDrawerView temp;
-
-
-    //subView for surfacePhoto
+    //For FireBaseSet
+    FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.e("MainActivity","onCreate");
         setContentView(R.layout.activity_main);
-
+        Fabric.with(this, new Crashlytics());
         mFileIOHelper = new FileIOHelper();
         mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
 
@@ -82,10 +78,12 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
         startCameraFragment();
-
-
+        setFireBase();
     }
 
+    private void setFireBase(){
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
 
 
     private void hideUi(){
@@ -93,13 +91,9 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
     }
-
-
 
     @Override
     protected void onResume() {
@@ -146,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                //퍼미션이 거부되었음,
+                //권한 요청이 거부당함
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -156,8 +150,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     @Override
     public void onPostTakePicture(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto) {
         Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
-
-
+        Log.e("main rotate",modifiedPhoto.getRotation()+"");
         startPreviewResultFragment(captureBitmap,modifiedPhoto);
 
 
@@ -173,11 +166,13 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     public void startCameraFragment(){
 
         mCameraFragment = CameraFragment.newInstance();
+
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
         mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
+      ;
         //   mCameraFragment.setTextureSize(3,4);
     }
 
@@ -188,8 +183,8 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
         mPreviewResultFragment.setCapturedBitmap(captureBitmap);
-
         mPreviewResultFragment.setModifiedPhoto(modifiedPhoto);
+
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
 

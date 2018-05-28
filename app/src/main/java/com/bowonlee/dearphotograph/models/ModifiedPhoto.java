@@ -1,6 +1,7 @@
 package com.bowonlee.dearphotograph.models;
 
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.util.Size;
 
@@ -13,8 +14,8 @@ public class ModifiedPhoto extends Photo{
     public static final String EXTRA_CODE = "Modified Photo";
 
     private float ratio;
-    private Point startXY;
-    private int orientation;
+    private PointF startXY;
+    private int rotation;
 
     // 동적인 축소비율계산을 위한 원본사진의 크기
     private Size outSize;
@@ -31,6 +32,8 @@ public class ModifiedPhoto extends Photo{
         super(modifiedPhoto.getThumnailUri(),modifiedPhoto.getImageUri());
         this.ratio = modifiedPhoto.getRatio();
         this.startXY = modifiedPhoto.getStartXY();
+        this.outSize = modifiedPhoto.getOutSize();
+        this.rotation = modifiedPhoto.getRotation();
 
 
     }
@@ -42,13 +45,13 @@ public class ModifiedPhoto extends Photo{
         return ratio;
     }
 
-    //public int getOrientation() { return orientation; }
-    public void setOrientation(int orientation) { this.orientation = orientation; }
+    public int getRotation() { return rotation; }
+    public void setRotation(int rotation) { this.rotation = rotation; }
 
-    public Point getStartXY() {
+    public PointF getStartXY() {
         return startXY;
     }
-    public void setStartXY(Point startXY){
+    public void setStartXY(PointF startXY){
         this.startXY = startXY;
     }
 
