@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "196406889553",
+    "firebase_url": "https://dearphotograph-f0ef3.firebaseio.com",
+    "project_id": "dearphotograph-f0ef3",
+    "storage_bucket": "dearphotograph-f0ef3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196406889553:android:01869c7d66f8d7ca",
+        "android_client_info": {
+          "package_name": "com.bowonlee.dearphotograph"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196406889553-3lftq0ijtevem27v4issjjg1njfitobp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bowonlee.dearphotograph",
+            "certificate_hash": "5ff4fc4ebef59968e10958a2cd0fc63fc4edfb37"
+          }
+        },
+        {
+          "client_id": "196406889553-tlq6m7plfacho2c0arl62ph26g4qjc3c.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "196406889553-tlq6m7plfacho2c0arl62ph26g4qjc3c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBB_EIz9AYRmvispdcoN1YZsT0Zi_yncSE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196406889553-tlq6m7plfacho2c0arl62ph26g4qjc3c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
