@@ -23,6 +23,7 @@
         app:cameraGestureTap="focusWithMarker"
         app:cameraHdr="on"
         android:id="@+id/cameraview_fragment_camera"
+        android:layout_gravity="center"
         >
     </com.otaliastudios.cameraview.CameraView>
 
@@ -35,14 +36,14 @@
 
         <ImageButton
             android:id="@+id/btn_fragment_camera_open_gallary"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_alignBottom="@+id/btn_fragment_camera_takepicture"
             android:layout_alignParentEnd="true"
             android:layout_marginRight="10dp"
             android:adjustViewBounds="true"
-            android:cropToPadding="true"
             android:background="@drawable/selector_btn_circle_background"
+            android:cropToPadding="true"
             android:elevation="10dp"
             android:gravity="bottom|left"
 
@@ -70,10 +71,9 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_margin="10dp"
-            android:background="@drawable/selector_btn_circle_background"
             android:button="@drawable/selector_fragment_camera_facing"
             android:elevation="10dp"
-
+            android:background="@drawable/selector_btn_circle_background"
             />
 
         <ImageButton

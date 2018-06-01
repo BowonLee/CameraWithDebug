@@ -3,6 +3,7 @@ package com.bowonlee.dearphotograph.resultpreview;
 import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -126,10 +127,13 @@ public class PreviewResultFragment extends Fragment {
 
         ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
         float resizeRatio = (float) (1080.0/720.0);
+
         Log.e("resize",resizeRatio+"");
+
         tempphoto.setRatio((tempphoto.getRatio()*resizeRatio));
         tempphoto.setStartXY(new PointF(mModifiedPhoto.getStartXY().x*resizeRatio,mModifiedPhoto.getStartXY().y*resizeRatio));
         Log.e("Result XY",String.format("(%f,%f),(%f,%f)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,tempphoto.getStartXY().x,tempphoto.getStartXY().y));
+
         PreviewResultView tempview = new PreviewResultView(getActivity(),Bitmap.createScaledBitmap(mCapturedBitmap,1080,1920,false),tempphoto);
         tempview.setPhoto(tempphoto);
         tempview.setPhotoRotation(tempphoto.getRotation());

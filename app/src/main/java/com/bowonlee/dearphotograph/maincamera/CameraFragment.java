@@ -91,6 +91,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mRootLayout = (RelativeLayout)view.findViewById(R.id.layout_camera_root);
         mCameraView = (CameraView)view.findViewById(R.id.cameraview_fragment_camera);
 
+
         setButtons(view);
         setCheckbox(view);
         setModifiedView();

@@ -1,10 +1,12 @@
 package com.bowonlee.dearphotograph.modifier;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -95,10 +97,20 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
 
     }
 
+    @SuppressLint("ResourceAsColor")
     private void getPhotoFromGallary(){
 
         Uri uri = Uri.fromFile(new File(resultPhoto.getImageUri().getPath()));
-        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), "temp.jpg"))).start(this);
+        UCrop.Options options = new UCrop.Options();
+        options.setFreeStyleCropEnabled(true);
+        options.setToolbarColor(Color.WHITE);
+        options.setToolbarWidgetColor(Color.BLACK);
+        options.setActiveWidgetColor(Color.BLACK);
+        options.setDimmedLayerColor(Color.TRANSPARENT);
+        options.setStatusBarColor(Color.parseColor("#03dac5"));
+        options.setCircleDimmedLayer(true);
+        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), "temp.jpg"))).withOptions(options).start(this);
+
 
     }
 

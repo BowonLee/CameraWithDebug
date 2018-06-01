@@ -79,7 +79,6 @@ public class BasePhotoDrawerView extends View{
                     mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()/2,mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()/2);
 
             canvas.drawBitmap(mPhotoBitmap,mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,paint);
-
         }
     }
 
