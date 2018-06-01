@@ -133,15 +133,14 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
                 resultUri = UCrop.getOutput(data);
                 mImageView.setImageURI(resultUri);
                 resultPhoto = new Photo(null,resultUri);
-/*                final BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(resultUri.getPath(), options);
-*/
+                completeModify();
             }
             if(requestCode == PhotoGallaryActivity.REQUEST_CODE){
                 resultPhoto = data.getParcelableExtra(String.valueOf(R.string.parcelable_result));
                 getPhotoFromGallary();
             }
+        }else{
+            finish();
         }
 
     }

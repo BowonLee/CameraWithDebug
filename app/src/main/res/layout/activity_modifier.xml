@@ -30,13 +30,12 @@
         android:id="@+id/imageView_modifier_result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:adjustViewBounds="true"
         android:background="@drawable/image_border"
-
         android:cropToPadding="true"
         android:padding="30dp"
-        android:scaleType="centerCrop"
-        app:srcCompat="?attr/colorControlHighlight" />
+        android:scaleType="centerInside" />
 
 
 </LinearLayout>

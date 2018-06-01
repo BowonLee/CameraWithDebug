@@ -95,7 +95,34 @@
             android:layout_alignTop="@+id/checkbox_fragment_camera_facing"
             android:layout_marginEnd="59dp"
             android:background="@drawable/selector_btn_circle_background"
+            android:elevation="10dp"
             android:src="@drawable/baseline_flash_auto_white_18" />
+
+        <CheckBox
+            android:id="@+id/checkbox_fragment_timer_activate"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/checkbox_fragment_camera_facing"
+            android:layout_marginEnd="110dp"
+            android:background="@drawable/selector_btn_circle_background"
+            android:button="@drawable/selector_checkbox_timer_activate"
+            android:checked="true"
+            android:elevation="10dp" />
+
+        <TextView
+            android:id="@+id/textview_fragment_camera_timertext"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/selector_btn_circle_background"
+            android:elevation="10dp"
+            android:text="8"
+            android:textAlignment="center"
+            android:textColor="@android:color/background_light"
+            android:textSize="40sp"
+            android:visibility="gone"
+            />
 
     </RelativeLayout>
     <!-- Camera Editor-->

@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -24,6 +25,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bowonlee.dearphotograph.R;
@@ -54,6 +56,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private final int FLASH_ON = 1;
     private final int FLASH_OFF = 0;
 
+    private long mTimerSet = 0;
 
     interface CameraInterface{
         void onPostTakePicture(Bitmap bitmap,ModifiedPhoto modifiedPhoto);
@@ -67,7 +70,11 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private ImageButton mButtonTakePicture;
     private ImageButton mButtonRotatePicture;
     private CheckBox mCheckBoxCameraFacing;
+    private CheckBox mCheckBoxTimerActivate;
     private ImageButton mButtonFlashState;
+
+    private TextView mTextviewCountDown;
+
     private int mStateFlash = 0;
     /*CameraSetting - BottomSheetBehavior with NestedScrollView*/
     BottomSheetBehavior mBottomSheetBehavior;
@@ -136,6 +143,20 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
                 }
             }
         });
+
+        mTextviewCountDown = (TextView)view.findViewById(R.id.textview_fragment_camera_timertext);
+        mCheckBoxTimerActivate = (CheckBox)view.findViewById(R.id.checkbox_fragment_timer_activate);
+        mCheckBoxTimerActivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mTimerSet = 0;
+                }else{
+                    mTimerSet = 6000;
+                }
+            }
+        });
+
     }
     private void setCameraFacing(boolean checked_state){
         if(checked_state){
@@ -220,12 +241,34 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
     private void takePicture(){
         if(mMainPhotoDrawerView.getModifiedPhoto() != null){
-        mCameraView.capturePicture();
+
+            CountDownTimer timer = new CountDownTimer(mTimerSet,1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    mTextviewCountDown.setVisibility(View.VISIBLE);
+                    mTextviewCountDown.setText(
+                                String.valueOf((millisUntilFinished)/1000)
+                            );
+
+                }
+                @Override
+                public void onFinish() {
+                    mTextviewCountDown.setVisibility(View.GONE);
+                    mCameraView.capturePicture();
+                }
+            };
+
+            timer.start();
         }else{
             Toast.makeText(getActivity(),"Not Placed Photo" , Toast.LENGTH_SHORT).show();
         }
 
     }
+
+
+
+
+
     private void rotatePicture(){
         if(mMainPhotoDrawerView.getModifiedPhoto()!=null) {
             mPhotoRotation = (mPhotoRotation + 90)%360;

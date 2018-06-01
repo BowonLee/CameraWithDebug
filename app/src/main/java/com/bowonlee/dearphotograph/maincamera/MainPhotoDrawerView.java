@@ -124,11 +124,17 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         float endX = getRotateRectWidthPivot(getPhotoRect()).right;
         float endY =getRotateRectWidthPivot(getPhotoRect()).bottom;
 
-        if(touchX>=startX&&touchX<endX&&touchY>=startY&&touchY<endY){
-            if(touchX>=startX+boarderWidth&&touchX<endX-boarderWidth&&touchY>=startX-boarderWidth&&touchY<endY-boarderWidth) {
+        if(     touchX>=startX&&
+                touchX<endX&&
+                touchY>=startY&&
+                touchY<endY){
+
+            if(     touchX>=startX+boarderWidth&&
+                    touchX<endX-boarderWidth&&
+                    touchY>=startY+boarderWidth&&
+                    touchY<endY-boarderWidth) {
                 return EVENT_INSIDE;
             }
-
 
             return EVENT_EDGE;
 
@@ -188,7 +194,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
     private void zoomInOutEvent(MotionEvent event){
 
         int state = 0;
-        float ratio;
 
         if(isEdgeTop(event)&&isEdgeLeft(event)){
             state = EVENT_EDGE_CORNER_TOP_LEFT;
@@ -210,12 +215,13 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
 
 
         switch (state){
-            case EVENT_EDGE_LEFT :break;
-            case EVENT_EDGE_TOP :break;
+
             case EVENT_EDGE_CORNER_TOP_RIGHT : {zoomEventTopRight(event);}break;
             case EVENT_EDGE_CORNER_BOTTOM_LEFT : {zoomEventBottonLeft(event);}break;
-
+            case EVENT_EDGE_LEFT :break;
+            case EVENT_EDGE_TOP :break;
             case EVENT_EDGE_CORNER_TOP_LEFT : {zoomEventTopLeft(event);}break;
+
             case EVENT_EDGE_BOTTOM :break;
             case EVENT_EDGE_RIGHT :break;
             case EVENT_EDGE_CORNER_BOTTON_RIGHT : {zoomEventBottomRight(event);}break;
@@ -238,7 +244,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         if(mTouchDistanceX>=mTouchDistanceY){
             mFrameZoomX += mTouchDistanceX;
             mFrameZoomY +=  mTouchDistanceY;
-            Log.e("distance",mFrameZoomX+"");
 
             ratio =  ((float)mPhotoBitmap.getWidth()+mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
 
@@ -250,8 +255,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         }else{
             mFrameZoomX += (int)mTouchDistanceX;
             mFrameZoomY += (int) mTouchDistanceY;
-            Log.e("distance",mFrameZoomY+"");
-            ratio =  ((float)mPhotoBitmap.getHeight()+mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
+           ratio =  ((float)mPhotoBitmap.getHeight()+mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
 
             movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX ,mModifiedPhoto.getStartXY().y-mFrameZoomY);
 
@@ -276,9 +280,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         if(mTouchDistanceX>=mTouchDistanceY){
             mFrameZoomX += mTouchDistanceX;
             mFrameZoomY +=  mTouchDistanceY;
-            Log.e("distance",mFrameZoomX+"");
-
-            ratio =  ((float)mPhotoBitmap.getWidth()-mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
+       ratio =  ((float)mPhotoBitmap.getWidth()-mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
 
             movePhotoXY(mModifiedPhoto.getStartXY().x, mModifiedPhoto.getStartXY().y-mFrameZoomY);
             mModifiedPhoto.setRatio(ratio);
@@ -287,7 +289,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         }else{
             mFrameZoomX += (int)mTouchDistanceX;
             mFrameZoomY += (int) mTouchDistanceY;
-            Log.e("distance",mFrameZoomY+"");
             ratio =  ((float)mPhotoBitmap.getHeight()+mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
 
             movePhotoXY(mModifiedPhoto.getStartXY().x ,mModifiedPhoto.getStartXY().y-mFrameZoomY);
@@ -310,7 +311,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         if(mTouchDistanceX>=mTouchDistanceY){
             mFrameZoomX += mTouchDistanceX;
             mFrameZoomY +=  mTouchDistanceY;
-            Log.e("distance",mFrameZoomX+"");
 
             ratio =  ((float)mPhotoBitmap.getWidth()+mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
             movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX , mModifiedPhoto.getStartXY().y);
@@ -321,7 +321,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         }else{
             mFrameZoomX += (int)mTouchDistanceX;
             mFrameZoomY += (int) mTouchDistanceY;
-            Log.e("distance",mFrameZoomY+"");
 
             ratio =  ((float)mPhotoBitmap.getHeight()-mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
             movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX ,mModifiedPhoto.getStartXY().y);
