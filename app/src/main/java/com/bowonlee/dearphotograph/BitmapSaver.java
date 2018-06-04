@@ -3,6 +3,8 @@ package com.bowonlee.dearphotograph;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
@@ -43,15 +45,22 @@ public class BitmapSaver implements Runnable{
         mFile = new File(mFileIOHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
 
         FileOutputStream output = null;
-
-
+/*
+        Matrix tempMatrix = new Matrix();
+        tempMatrix.setRotate(-90);
+        bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),tempMatrix,false);
+*/
         try {
             output = new FileOutputStream(mFile);
+
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,output);
+
+
             output.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         MediaScannerConnection.scanFile(mContext, new String[]{mFile.toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
                     @Override

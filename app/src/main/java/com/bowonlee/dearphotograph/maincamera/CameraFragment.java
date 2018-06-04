@@ -33,12 +33,18 @@ import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
+import com.otaliastudios.cameraview.AspectRatio;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
+import com.otaliastudios.cameraview.Control;
 import com.otaliastudios.cameraview.Facing;
 import com.otaliastudios.cameraview.Flash;
+import com.otaliastudios.cameraview.GestureAction;
+import com.otaliastudios.cameraview.SizeSelector;
+import com.otaliastudios.cameraview.SizeSelectors;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -105,6 +111,8 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         setCameraView();
         setAutoFlashButton(view);
         getLoaderManager().initLoader(0,null,this);
+
+
     }
 
 
@@ -194,10 +202,38 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
                 cameraInterface.onPostTakePicture(result, mMainPhotoDrawerView.getModifiedPhoto());
 
+
             }
+
         });
 
+/*        SizeSelector width = SizeSelectors.minWidth(100);
+        SizeSelector height = SizeSelectors.minWidth(100);
+        SizeSelector dimensions = SizeSelectors.and(width,height);
+        SizeSelector ratio = SizeSelectors.aspectRatio(AspectRatio.of(1,1),0);
 
+        SizeSelector result = SizeSelectors.or(SizeSelectors.and(ratio,dimensions),ratio
+        );
+
+        mCameraView.setPictureSize(result);
+*/
+        mCameraView.getLayoutParams().width = (int)720;
+        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+        mCameraView.getLayoutParams().height = (int)720;
+        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+
+    }
+
+    private void chagePreviewSize(){
+
+        int width = 0;
+        int height = 0;
+
+
+        mCameraView.getLayoutParams().width = (int)720;
+        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+        mCameraView.getLayoutParams().height = (int)720;
+        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
 
     }
 

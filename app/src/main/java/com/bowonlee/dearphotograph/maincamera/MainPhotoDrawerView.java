@@ -31,19 +31,13 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
     private final int EVENT_INSIDE = 401;
     private final int EVENT_EDGE = 405;
     private final int EVENT_OUTSIDE = 408;
-    private final int EVENT_EDGE_TOP = 411;
-    private final int EVENT_EDGE_BOTTOM = 412;
-    private final int EVENT_EDGE_LEFT = 413;
-    private final int EVENT_EDGE_RIGHT = 414;
-    private final int EVENT_EDGE_CORNER_TOP_LEFT = 415;
-    private final int EVENT_EDGE_CORNER_TOP_RIGHT = 416;
-    private final int EVENT_EDGE_CORNER_BOTTOM_LEFT = 417;
-    private final int EVENT_EDGE_CORNER_BOTTON_RIGHT = 418;
-
 
 
     private float mFrameZoomX = 0;
     private float mFrameZoomY = 0;
+
+    private float mDistanceRateChange = 0;
+    private float mPastDistance = 0;
 
     private int currentEventState = EVENT_OUTSIDE;
 
@@ -149,88 +143,74 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         if(mModifiedPhoto==null){
             return false;
         }
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN : {
-                Log.e("touchEvent","action down");
-                currentEventState = distinguishEvent(event.getX(),event.getY());
-                touchPastX = event.getX();
-                touchPastY = event.getY();
-                if(currentEventState == EVENT_OUTSIDE)return false;
+
+        if(event.getPointerCount()==1) {
+            switch (event.getAction()&MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN: {
+                    Log.e("touchEvent", "single down");
+                    currentEventState = distinguishEvent(event.getX(), event.getY());
+                    touchPastX = event.getX();
+                    touchPastY = event.getY();
+                    if (currentEventState == EVENT_OUTSIDE) return false;
 
 
-            }return true;
-            case MotionEvent.ACTION_MOVE : {
-                if(currentEventState == EVENT_INSIDE){movePhotoEvent(event);}
-               if(currentEventState == EVENT_EDGE){zoomInOutEvent(event);}
-
-
-            }return true;
-            case MotionEvent.ACTION_UP  : {
-                currentEventState = EVENT_OUTSIDE;
-
-//                Log.e("touchEvent",String.format("lastXY(%d,%d)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y));
-
-                return false;
+                }
+                return true;
+                case MotionEvent.ACTION_MOVE: {
+                    if (currentEventState == EVENT_INSIDE) {
+                        movePhotoEvent(event);
+                    }
+                    //if(currentEventState == EVENT_EDGE){zoomInOutEvent(event);}
+                }
+                return true;
+                case MotionEvent.ACTION_UP: {
+                    currentEventState = EVENT_OUTSIDE;
+                    return false;
+                }
             }
-        }
-        return false;
+            return false;
+        }else{
 
-    }
+            float touchX1 = event.getX(0);
+            float touchY1 = event.getY(0);
+            float touchX2 = event.getX(1);
+            float touchY2 = event.getY(1);
 
-    private void movePhotoEvent(MotionEvent event){
+            if(distinguishEvent(touchX1,touchY1)==EVENT_OUTSIDE||
+                    distinguishEvent(touchX2,touchY2)==EVENT_OUTSIDE){ return false; }
+            // 멀티터치 이벤트
 
-        mTouchDistanceX = touchPastX - event.getX();
-        mTouchDistanceY = touchPastY - event.getY();
+            switch (event.getAction()&MotionEvent.ACTION_MASK){
+                case MotionEvent.ACTION_POINTER_DOWN : {
+                        mPastDistance = (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
+                        return true;
+                    }
+                case MotionEvent.ACTION_MOVE :{
 
-        touchPastX = event.getX();
-        touchPastY = event.getY();
-
-        movePhotoXY((int)( mModifiedPhoto.getStartXY().x - mTouchDistanceX),(int)( mModifiedPhoto.getStartXY().y - mTouchDistanceY));
-
-        this.postInvalidate();
-
-
-    }
-    private void zoomInOutEvent(MotionEvent event){
-
-        int state = 0;
-
-        if(isEdgeTop(event)&&isEdgeLeft(event)){
-            state = EVENT_EDGE_CORNER_TOP_LEFT;
-        }else if(isEdgeTop(event)&&isEdgeRight(event)){
-            state = EVENT_EDGE_CORNER_TOP_RIGHT;
-        }else if(isEdgeBottom(event)&&isEdgeLeft(event)){
-            state = EVENT_EDGE_CORNER_BOTTOM_LEFT;
-        }else if(isEdgeBottom(event)&&isEdgeRight(event)){
-            state = EVENT_EDGE_CORNER_BOTTON_RIGHT;
-        }else if(isEdgeTop(event)){
-            state = EVENT_EDGE_TOP;
-        }else if(isEdgeBottom(event)){
-            state = EVENT_EDGE_BOTTOM;
-        }else if(isEdgeLeft(event)){
-            state = EVENT_EDGE_LEFT;
-        }else if(isEdgeRight(event)){
-            state = EVENT_EDGE_RIGHT;
-        }
+                    mDistanceRateChange = mPastDistance - (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
+                    mPastDistance = (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
+                    Log.e("RateChage",mDistanceRateChange+"");
 
 
-        switch (state){
+                    if(Math.abs(mDistanceRateChange)>8) {
+                        float ratio = ((float) mPhotoBitmap.getWidth() - mDistanceRateChange / 2) / mModifiedPhoto.getOutSize().getWidth();
+                        mModifiedPhoto.setRatio(ratio);
+                        this.postInvalidate();
+                    }
 
-            case EVENT_EDGE_CORNER_TOP_RIGHT : {zoomEventTopRight(event);}break;
-            case EVENT_EDGE_CORNER_BOTTOM_LEFT : {zoomEventBottonLeft(event);}break;
-            case EVENT_EDGE_LEFT :break;
-            case EVENT_EDGE_TOP :break;
-            case EVENT_EDGE_CORNER_TOP_LEFT : {zoomEventTopLeft(event);}break;
-
-            case EVENT_EDGE_BOTTOM :break;
-            case EVENT_EDGE_RIGHT :break;
-            case EVENT_EDGE_CORNER_BOTTON_RIGHT : {zoomEventBottomRight(event);}break;
-
+                    return true;
+                }
+                case MotionEvent.ACTION_POINTER_UP : {
+                    currentEventState = EVENT_OUTSIDE;
+                    return false;
+                }
+            }
+            return false;
         }
 
 
-
     }
+
 
     private void zoomEventTopLeft(MotionEvent event){
         float ratio;
@@ -268,8 +248,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
 
     }
 
-    private void zoomEventTopRight(MotionEvent event){
-        float ratio;
+    private void movePhotoEvent(MotionEvent event){
 
         mTouchDistanceX = touchPastX - event.getX();
         mTouchDistanceY = touchPastY - event.getY();
@@ -277,122 +256,10 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
         touchPastX = event.getX();
         touchPastY = event.getY();
 
-        if(mTouchDistanceX>=mTouchDistanceY){
-            mFrameZoomX += mTouchDistanceX;
-            mFrameZoomY +=  mTouchDistanceY;
-       ratio =  ((float)mPhotoBitmap.getWidth()-mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
-
-            movePhotoXY(mModifiedPhoto.getStartXY().x, mModifiedPhoto.getStartXY().y-mFrameZoomY);
-            mModifiedPhoto.setRatio(ratio);
-
-
-        }else{
-            mFrameZoomX += (int)mTouchDistanceX;
-            mFrameZoomY += (int) mTouchDistanceY;
-            ratio =  ((float)mPhotoBitmap.getHeight()+mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
-
-            movePhotoXY(mModifiedPhoto.getStartXY().x ,mModifiedPhoto.getStartXY().y-mFrameZoomY);
-            mModifiedPhoto.setRatio(ratio);}
-
-        this.postInvalidate();
-
-        mFrameZoomX = 0;
-        mFrameZoomY = 0;
-    }
-    private void zoomEventBottonLeft(MotionEvent event){
-        float ratio;
-
-        mTouchDistanceX = touchPastX - event.getX();
-        mTouchDistanceY = touchPastY - event.getY();
-
-        touchPastX = event.getX();
-        touchPastY = event.getY();
-
-        if(mTouchDistanceX>=mTouchDistanceY){
-            mFrameZoomX += mTouchDistanceX;
-            mFrameZoomY +=  mTouchDistanceY;
-
-            ratio =  ((float)mPhotoBitmap.getWidth()+mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
-            movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX , mModifiedPhoto.getStartXY().y);
-
-            mModifiedPhoto.setRatio(ratio);
-
-
-        }else{
-            mFrameZoomX += (int)mTouchDistanceX;
-            mFrameZoomY += (int) mTouchDistanceY;
-
-            ratio =  ((float)mPhotoBitmap.getHeight()-mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
-            movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX ,mModifiedPhoto.getStartXY().y);
-
-            mModifiedPhoto.setRatio(ratio);}
-
-        this.postInvalidate();
-
-        mFrameZoomX = 0;
-        mFrameZoomY = 0;
-    }
-    private void zoomEventBottomRight(MotionEvent event){
-        float ratio;
-        mTouchDistanceX = touchPastX - event.getX();
-        mTouchDistanceY = touchPastY - event.getY();
-
-        touchPastX = event.getX();
-        touchPastY = event.getY();
-
-        if(mTouchDistanceX>=mTouchDistanceY){
-            mFrameZoomX += mTouchDistanceX;
-            mFrameZoomY +=  mTouchDistanceY;
-            ratio =  ((float)mPhotoBitmap.getWidth()-mFrameZoomX)/(float)mModifiedPhoto.getOutSize().getWidth();
-
-
-        }else{
-            mFrameZoomX += mTouchDistanceX;
-            mFrameZoomY +=  mTouchDistanceY;
-
-            ratio =  ((float)mPhotoBitmap.getHeight()-mFrameZoomY)/(float)mModifiedPhoto.getOutSize().getHeight();
-
-        }
-
-        mModifiedPhoto.setRatio(ratio);
-        mFrameZoomX = 0;
-        mFrameZoomY = 0;
+        movePhotoXY((int)( mModifiedPhoto.getStartXY().x - mTouchDistanceX),(int)( mModifiedPhoto.getStartXY().y - mTouchDistanceY));
 
         this.postInvalidate();
     }
-
-
-    private boolean isEdgeTop(MotionEvent event){
-
-        if(event.getY()<mModifiedPhoto.getStartXY().y+boarderWidth){
-            return true;
-
-        }
-        return false;
-    }
-    private boolean isEdgeBottom(MotionEvent event){
-
-        if(event.getY()>mModifiedPhoto.getStartXY().y+mPhotoBitmap.getHeight()-boarderWidth){
-            return true;
-        }
-        return false;
-    }
-    private boolean isEdgeLeft(MotionEvent event){
-
-        if(event.getX()<mModifiedPhoto.getStartXY().x+boarderWidth){
-            return true;
-        }
-        return false;
-    }
-    private boolean isEdgeRight(MotionEvent event){
-
-        if(event.getX()>mModifiedPhoto.getStartXY().x+mPhotoBitmap.getWidth()-boarderWidth){
-
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public ModifiedPhoto getModifiedPhoto() {
        return super.getModifiedPhoto();

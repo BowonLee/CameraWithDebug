@@ -127,7 +127,7 @@ public class PreviewResultFragment extends Fragment {
 
         ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
         float resizeRatio = (float) (1080.0/720.0);
-
+/*
         Log.e("resize",resizeRatio+"");
 
         tempphoto.setRatio((tempphoto.getRatio()*resizeRatio));
@@ -140,18 +140,24 @@ public class PreviewResultFragment extends Fragment {
         tempview.postInvalidate();
 
 
-        //Bitmap b = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);
         Bitmap b = Bitmap.createBitmap(1080,1920,Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
-        //view.draw(c);
+
         tempview.draw(c);
         new BitmapSaver(b,getActivity()).run();
-//        new BitmapSaver(Bitmap.createScaledBitmap(b,1080,1920,false),getActivity()).run();
 
         mPreviewResultView = null;
 
         mPreviewResultInterface.onCancelPreviewResult();
+*/
 
+        Bitmap b = Bitmap.createBitmap(mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight(),Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        view.draw(c);
+        new BitmapSaver(Bitmap.createScaledBitmap(b,mCapturedBitmap.getWidth(), mCapturedBitmap.getHeight(),false),getActivity()).run();
+        mPreviewResultView = null;
+
+        mPreviewResultInterface.onCancelPreviewResult();
 
     }
 
