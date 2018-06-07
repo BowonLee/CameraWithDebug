@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="50dp"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="화변비"
+        />
+    <RadioGroup
+        android:id="@+id/radioGroup_aspectRatio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/radioButton_ratio_916"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9:16" />
+        <RadioButton
+            android:id="@+id/radioButton_ratio_34"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3:4"
+            />
+        <RadioButton
+            android:id="@+id/radioButton_ratio_11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1:1"
+            />
+    </RadioGroup>
+
+
+
+
+
+
+
+</LinearLayout>

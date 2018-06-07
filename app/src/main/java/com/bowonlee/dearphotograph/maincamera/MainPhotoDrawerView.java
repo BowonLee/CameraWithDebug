@@ -189,8 +189,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
 
                     mDistanceRateChange = mPastDistance - (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
                     mPastDistance = (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
-                    Log.e("RateChage",mDistanceRateChange+"");
-
 
                     if(Math.abs(mDistanceRateChange)>8) {
                         float ratio = ((float) mPhotoBitmap.getWidth() - mDistanceRateChange / 2) / mModifiedPhoto.getOutSize().getWidth();
@@ -208,43 +206,6 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
             return false;
         }
 
-
-    }
-
-
-    private void zoomEventTopLeft(MotionEvent event){
-        float ratio;
-
-        mTouchDistanceX = touchPastX - event.getX();
-        mTouchDistanceY = touchPastY - event.getY();
-
-        touchPastX = event.getX();
-        touchPastY = event.getY();
-
-        if(mTouchDistanceX>=mTouchDistanceY){
-            mFrameZoomX += mTouchDistanceX;
-            mFrameZoomY +=  mTouchDistanceY;
-
-            ratio =  ((float)mPhotoBitmap.getWidth()+mFrameZoomX)/mModifiedPhoto.getOutSize().getWidth();
-
-            movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX , mModifiedPhoto.getStartXY().y-mFrameZoomY);
-
-            mModifiedPhoto.setRatio(ratio);
-
-
-        }else{
-            mFrameZoomX += (int)mTouchDistanceX;
-            mFrameZoomY += (int) mTouchDistanceY;
-           ratio =  ((float)mPhotoBitmap.getHeight()+mFrameZoomY)/mModifiedPhoto.getOutSize().getHeight();
-
-            movePhotoXY(mModifiedPhoto.getStartXY().x-mFrameZoomX ,mModifiedPhoto.getStartXY().y-mFrameZoomY);
-
-            mModifiedPhoto.setRatio(ratio);}
-
-        this.postInvalidate();
-
-        mFrameZoomX = 0;
-        mFrameZoomY = 0;
 
     }
 

@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,17 +75,23 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private ArrayList<ImageButton> mButtonGroup;
     private ImageButton mButtonOpenGallary;
     private ImageButton mButtonTakePicture;
+
     private ImageButton mButtonRotatePicture;
     private CheckBox mCheckBoxCameraFacing;
     private CheckBox mCheckBoxTimerActivate;
     private ImageButton mButtonFlashState;
+    private ImageButton mButtonMoreOption;
+
+
+
+
 
     private TextView mTextviewCountDown;
 
     private int mStateFlash = 0;
     /*CameraSetting - BottomSheetBehavior with NestedScrollView*/
-    BottomSheetBehavior mBottomSheetBehavior;
-    NestedScrollView mNestedScrollView;
+    private BottomSheetBehavior mBottomSheetBehavior;
+
 
     /*CameraView */
     private CameraView mCameraView;
@@ -109,13 +116,18 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         setCheckbox(view);
         setModifiedView();
         setCameraView();
+        setBottonSheet(view);
         setAutoFlashButton(view);
         getLoaderManager().initLoader(0,null,this);
 
 
     }
 
+    private void setBottonSheet(View view){
+        LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
 
+    }
 
 
     private void setAutoFlashButton(View view){
@@ -250,15 +262,19 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mButtonTakePicture = (ImageButton)view.findViewById(R.id.btn_fragment_camera_takepicture);
         mButtonOpenGallary= (ImageButton)view.findViewById(R.id.btn_fragment_camera_open_gallary);
         mButtonRotatePicture = (ImageButton)view.findViewById(R.id.btn_fragment_camera_rotate_picture);
+        mButtonMoreOption = (ImageButton)view.findViewById(R.id.btn_fragment_camera_more_option);
+
 
         mButtonGroup.add(mButtonOpenGallary);
         mButtonGroup.add(mButtonTakePicture);
         mButtonGroup.add(mButtonRotatePicture);
+        mButtonGroup.add(mButtonMoreOption);
         for(ImageButton button : mButtonGroup){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     switch (v.getId()){
+                        case R.id.btn_fragment_camera_more_option : {oprnButtonSheetOptionArea();}break;
                         case R.id.btn_fragment_camera_open_gallary : {openGallary();}break;
                         case R.id.btn_fragment_camera_takepicture : {takePicture();}break;
                         case R.id.btn_fragment_camera_rotate_picture : {rotatePicture();};break;
@@ -268,6 +284,17 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
             });
         }
 
+    }
+    private void oprnButtonSheetOptionArea(){
+        //mButtom
+        mBottomSheetBehavior.setSkipCollapsed(true);
+
+        if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
+        else{
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 
 
