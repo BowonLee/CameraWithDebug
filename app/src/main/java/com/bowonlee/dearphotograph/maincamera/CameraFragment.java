@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,13 +110,18 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         setCheckbox(view);
         setModifiedView();
         setCameraView();
+        setBottonSheet(view);
         setAutoFlashButton(view);
         getLoaderManager().initLoader(0,null,this);
 
 
     }
 
+    private void setBottonSheet(View view){
+        LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
 
+    }
 
 
     private void setAutoFlashButton(View view){
