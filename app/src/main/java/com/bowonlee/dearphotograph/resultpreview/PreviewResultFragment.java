@@ -59,17 +59,25 @@ public class PreviewResultFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPreviewResultView = new PreviewResultView(getActivity(),mCapturedBitmap,mModifiedPhoto);
+        mPreviewResultView = new PreviewResultView(getActivity(),mCapturedBitmap);
 
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
 
+        Log.e("before",""+mModifiedPhoto.getStartXY().y);
+        mModifiedPhoto.setStartXY(new PointF(
+                mModifiedPhoto.getStartXY().x,
+                (float)( ((mModifiedPhoto.getStartXY().y -  (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0)
+                        )
 
+                )
+        ));
+        Log.e("after",""+mModifiedPhoto.getStartXY().y+" : "+ (float)mCapturedBitmap.getHeight()/((float) getResources().getDisplayMetrics().widthPixels*16.0/9.0)
+        +" : " + (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0
+        );
         mPreviewResultView.setPhoto(mModifiedPhoto);
-        mPreviewResultView.setOnTouchListener(mPreviewResultView);
-
         mParentLayout.addView(mPreviewResultView);
-        //this.getActivity().addContentView(mPreviewResultView,new ActionBar.LayoutParams(1080,1920));
+
         mButtonSaveImage = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_cancel);
 

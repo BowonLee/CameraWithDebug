@@ -14,12 +14,12 @@ import com.bowonlee.dearphotograph.BasePhotoDrawerView;
 import com.bowonlee.dearphotograph.maincamera.MainPhotoDrawerView;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 
-public class PreviewResultView extends MainPhotoDrawerView{
+public class PreviewResultView extends BasePhotoDrawerView{
 
     private Bitmap mCapturedBitmap;
 
 
-    public PreviewResultView(Context context, Bitmap capturedBitmap, ModifiedPhoto mModifiedPhoto){
+    public PreviewResultView(Context context, Bitmap capturedBitmap){
 
         super(context);
         this.mCapturedBitmap = capturedBitmap;
@@ -32,9 +32,6 @@ public class PreviewResultView extends MainPhotoDrawerView{
 
 
 
-    public void setCapturedBitmap(Bitmap bitmap){
-        mCapturedBitmap =bitmap;
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {

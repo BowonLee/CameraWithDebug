@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bowonlee.dearphotograph.BottomSheetOptionSpaceCamera;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
@@ -126,6 +128,45 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private void setBottonSheet(View view){
         LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
+        bottomSheetLayout.addView(new BottomSheetOptionSpaceCamera(getContext(), new BottomSheetOptionSpaceCamera.CameraOptionCallback() {
+            @Override
+            public void changeAspectRatio(int ratioType) {
+
+                switch (ratioType){
+                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_9_16 : {
+
+                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(9,16), 0));
+                    }break;
+                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_3_4 : {
+                        mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+                        mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*4/3;
+                        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(3,4), 0));
+                    }break;
+                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_1_1 : {
+                        mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+                        mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels;
+                        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+
+                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(1,1), 0));
+
+                    }break;
+                }
+                mCameraView.stop();
+                mCameraView.start();
+
+            }
+
+            @Override
+            public void changeWhiteBalance() {
+
+            }
+
+            @Override
+            public void timerTimeSet() {
+
+            }
+        }));
 
     }
 
@@ -219,36 +260,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
         });
 
-/*        SizeSelector width = SizeSelectors.minWidth(100);
-        SizeSelector height = SizeSelectors.minWidth(100);
-        SizeSelector dimensions = SizeSelectors.and(width,height);
-        SizeSelector ratio = SizeSelectors.aspectRatio(AspectRatio.of(1,1),0);
-
-        SizeSelector result = SizeSelectors.or(SizeSelectors.and(ratio,dimensions),ratio
-        );
-
-        mCameraView.setPictureSize(result);
-*/
-        mCameraView.getLayoutParams().width = (int)720;
-        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
-        mCameraView.getLayoutParams().height = (int)720;
         mCameraView.setLayoutParams(mCameraView.getLayoutParams());
 
     }
-
-    private void chagePreviewSize(){
-
-        int width = 0;
-        int height = 0;
-
-
-        mCameraView.getLayoutParams().width = (int)720;
-        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
-        mCameraView.getLayoutParams().height = (int)720;
-        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
-
-    }
-
 
     private void setModifiedView(){
         mMainPhotoDrawerView = new MainPhotoDrawerView(getActivity());
