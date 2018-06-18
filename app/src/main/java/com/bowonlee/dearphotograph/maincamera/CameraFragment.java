@@ -60,7 +60,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private final int FLASH_ON = 1;
     private final int FLASH_OFF = 0;
 
-    private long mTimerSet = 3000;
+    private long mTimerSet = 0;
     private long mTimerSettingValue = 3000;
 
     interface CameraInterface{

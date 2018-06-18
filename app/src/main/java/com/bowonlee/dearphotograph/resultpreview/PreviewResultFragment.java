@@ -138,6 +138,7 @@ public class PreviewResultFragment extends Fragment {
         ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
 
         float outputAspectRatio = (float) mCapturedBitmap.getWidth()/(float)mCapturedBitmap.getHeight();
+
         float expendRatio = (float) tempphoto.getOutSize().getWidth()*tempphoto.getRatio()/(float) getResources().getDisplayMetrics().widthPixels;
 
         float outputWidth =  (float) tempphoto.getOutSize().getWidth()/expendRatio;
@@ -151,8 +152,7 @@ public class PreviewResultFragment extends Fragment {
                 outputWidth = MAX_OUTPUT_WIDTH;
             }
         }
-        Log.e("outputValue",String.format("%f %f %f",outputWidth, outputAspectRatio , expendRatio));
-
+        outputWidth = 1080;
         float resizeRatio =  (outputWidth/(float) getResources().getDisplayMetrics().widthPixels);
 
 
