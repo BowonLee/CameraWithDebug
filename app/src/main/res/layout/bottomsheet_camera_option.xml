@@ -8,35 +8,161 @@
     android:paddingBottom="50dp"
     >
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="30dp" />
+
+    <!-- Aspect Ratio-->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="화변비"
+        android:text="화면비"
+        android:layout_margin="5dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
         />
     <RadioGroup
         android:id="@+id/radioGroup_aspectRatio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 
         <RadioButton
             android:id="@+id/radioButton_ratio_916"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="9:16" />
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            android:layout_margin="5dp"
+            android:button="@null"
+            android:elevation="10dp"
+            android:text=" 9:16 "
+            android:textAlignment="center"
+            android:background="@drawable/selector_radio_btn_background"
+            android:textSize="15sp"
+
+            />
+
         <RadioButton
             android:id="@+id/radioButton_ratio_34"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3:4" />
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_radio_btn_background"
+            android:button="@null"
+            android:elevation="10dp"
+            android:text=" 3:4 "
+            android:textAlignment="center"
+            android:textSize="15sp"
+            />
+
         <RadioButton
             android:id="@+id/radioButton_ratio_11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1:1" />
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_radio_btn_background"
+            android:button="@null"
+            android:elevation="10dp"
+            android:text=" 1:1 "
+            android:textSize="15sp"
+            android:textAlignment="center"
+
+            />
     </RadioGroup>
 
-    <android.support.v4.widget.Space
+    <!-- white balance-->
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="wrap_content"
+        android:text="화이트 벨런스"
+        android:layout_margin="5dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        />
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarStyle="insideInset"
+        android:visibility="visible">
+
+        <RadioGroup
+            android:id="@+id/radioGroup_whiteBalance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:scrollbars="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButton_whitebalance_auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="auto" />
+
+            <RadioButton
+                android:id="@+id/radioButton_whitebalance_cloudy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cloudy" />
+
+            <RadioButton
+                android:id="@+id/radioButton_whitebalance_daylight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="daylight" />
+
+            <RadioButton
+                android:id="@+id/radioButton_whitebalance_fluorescent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fluorescent" />
+
+            <RadioButton
+                android:id="@+id/radioButton_whitebalance_incandscent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="incandscent" />
+
+        </RadioGroup>
+    </HorizontalScrollView>
+
+
+    <!-- timer second-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="타이머"
+        android:layout_margin="5dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        />
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/radioGroup_timerSecond"
+        >
+        <RadioButton
+            android:id="@+id/radioButton_timersec_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="type1"
+            />
+        <RadioButton
+            android:id="@+id/radioButton_timersec_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="type2"/>
+        <RadioButton
+            android:id="@+id/radioButton_timersec_10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="type3"/>
+    </RadioGroup>
+    
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
 </LinearLayout>

@@ -35,6 +35,10 @@ import java.util.Collections;
 
 public class PreviewResultFragment extends Fragment {
 
+    public final int MAX_OUTPUT_WIDTH = 3120;
+    public final int MAX_OUTPUT_HEIGHT = 4160;
+
+
     public interface PreviewResultInterface{
 
         public void onCancelPreviewResult();
@@ -99,8 +103,6 @@ public class PreviewResultFragment extends Fragment {
     public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
         //this.mModifiedPhoto = modifiedPhoto;
         this.mModifiedPhoto = new ModifiedPhoto(modifiedPhoto);
-     //   mModifiedPhoto.setOutSize(mModifiedPhoto.getOutSize());
-    //    mModifiedPhoto.setRotation(modifiedPhoto.getRotation());
     }
 
     public void setCapturedBitmap(Bitmap capturedBitmap){
@@ -134,21 +136,40 @@ public class PreviewResultFragment extends Fragment {
     private void saveView(View view){
 
         ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
-        float resizeRatio = (float) (1080.0/720.0);
-/*
-        Log.e("resize",resizeRatio+"");
+
+        float outputAspectRatio = (float) mCapturedBitmap.getWidth()/(float)mCapturedBitmap.getHeight();
+        float expendRatio = (float) tempphoto.getOutSize().getWidth()*tempphoto.getRatio()/(float) getResources().getDisplayMetrics().widthPixels;
+
+        float outputWidth =  (float) tempphoto.getOutSize().getWidth()/expendRatio;
+
+        if(outputAspectRatio == 9/16){
+            if(outputWidth / (9/16)  > 4160){
+                outputWidth = 2340;
+            }
+        }else{
+            if(outputWidth > 3120){
+                outputWidth = MAX_OUTPUT_WIDTH;
+            }
+        }
+        Log.e("outputValue",String.format("%f %f %f",outputWidth, outputAspectRatio , expendRatio));
+
+        float resizeRatio =  (outputWidth/(float) getResources().getDisplayMetrics().widthPixels);
+
+
 
         tempphoto.setRatio((tempphoto.getRatio()*resizeRatio));
         tempphoto.setStartXY(new PointF(mModifiedPhoto.getStartXY().x*resizeRatio,mModifiedPhoto.getStartXY().y*resizeRatio));
-        Log.e("Result XY",String.format("(%f,%f),(%f,%f)",mModifiedPhoto.getStartXY().x,mModifiedPhoto.getStartXY().y,tempphoto.getStartXY().x,tempphoto.getStartXY().y));
 
-        PreviewResultView tempview = new PreviewResultView(getActivity(),Bitmap.createScaledBitmap(mCapturedBitmap,1080,1920,false),tempphoto);
+        PreviewResultView tempview = new PreviewResultView(getActivity(),
+                Bitmap.createScaledBitmap(mCapturedBitmap,(int) outputWidth,(int) (outputWidth/outputAspectRatio),false),
+                tempphoto);
+
         tempview.setPhoto(tempphoto);
         tempview.setPhotoRotation(tempphoto.getRotation());
         tempview.postInvalidate();
 
 
-        Bitmap b = Bitmap.createBitmap(1080,1920,Bitmap.Config.ARGB_8888);
+        Bitmap b = Bitmap.createBitmap((int) outputWidth,(int) (outputWidth/outputAspectRatio),Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
 
         tempview.draw(c);
@@ -157,8 +178,8 @@ public class PreviewResultFragment extends Fragment {
         mPreviewResultView = null;
 
         mPreviewResultInterface.onCancelPreviewResult();
-*/
 
+/*
         Bitmap b = Bitmap.createBitmap(mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight(),Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
         view.draw(c);
@@ -166,7 +187,7 @@ public class PreviewResultFragment extends Fragment {
         mPreviewResultView = null;
 
         mPreviewResultInterface.onCancelPreviewResult();
-
+*/
     }
 
 

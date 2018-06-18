@@ -17,7 +17,6 @@
         app:cameraGrid="off"
         app:cameraFlash="auto"
         app:cameraJpegQuality="100"
-        app:cameraWhiteBalance="auto"
         app:cameraGesturePinch="zoom"
         app:cameraGestureTap="focusWithMarker"
         app:cameraHdr="on"
@@ -153,12 +152,13 @@
         android:id="@+id/bottom_sheet_fragment_camera_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/cardview_shadow_start_color"
+        android:background="#59FFFFFF"
         android:orientation="vertical"
         android:paddingBottom="50dp"
+        android:touchscreenBlocksFocus="false"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="0dp"
 
+        app:behavior_peekHeight="0dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
     </LinearLayout>

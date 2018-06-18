@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="green_theme_v1">#03dac5</color>
+    <color name="green_theme_v_alpha">#b403dac5</color>
 </resources>

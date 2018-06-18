@@ -15,8 +15,6 @@ import android.support.annotation.Nullable;
 
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -30,7 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.BottomSheetOptionSpaceCamera;
+import com.bowonlee.dearphotograph.BottomSheetOptionPanelCamera;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
@@ -39,15 +37,12 @@ import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
 import com.otaliastudios.cameraview.AspectRatio;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
-import com.otaliastudios.cameraview.Control;
 import com.otaliastudios.cameraview.Facing;
 import com.otaliastudios.cameraview.Flash;
-import com.otaliastudios.cameraview.GestureAction;
-import com.otaliastudios.cameraview.SizeSelector;
 import com.otaliastudios.cameraview.SizeSelectors;
+import com.otaliastudios.cameraview.WhiteBalance;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -65,7 +60,8 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private final int FLASH_ON = 1;
     private final int FLASH_OFF = 0;
 
-    private long mTimerSet = 0;
+    private long mTimerSet = 3000;
+    private long mTimerSettingValue = 3000;
 
     interface CameraInterface{
         void onPostTakePicture(Bitmap bitmap,ModifiedPhoto modifiedPhoto);
@@ -128,22 +124,22 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private void setBottonSheet(View view){
         LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-        bottomSheetLayout.addView(new BottomSheetOptionSpaceCamera(getContext(), new BottomSheetOptionSpaceCamera.CameraOptionCallback() {
+        bottomSheetLayout.addView(new BottomSheetOptionPanelCamera(getContext(), new BottomSheetOptionPanelCamera.CameraOptionCallback() {
             @Override
             public void changeAspectRatio(int ratioType) {
 
                 switch (ratioType){
-                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_9_16 : {
+                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_9_16 : {
 
                         mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(9,16), 0));
                     }break;
-                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_3_4 : {
+                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_3_4 : {
                         mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
                         mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*4/3;
                         mCameraView.setLayoutParams(mCameraView.getLayoutParams());
                         mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(3,4), 0));
                     }break;
-                    case BottomSheetOptionSpaceCamera.ASPECT_RATIO_1_1 : {
+                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_1_1 : {
                         mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
                         mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels;
                         mCameraView.setLayoutParams(mCameraView.getLayoutParams());
@@ -158,14 +154,27 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
             }
 
             @Override
-            public void changeWhiteBalance() {
+            public void changeWhiteBalance(int whiteBalacneType) {
+                switch (whiteBalacneType){
+                    case BottomSheetOptionPanelCamera.WHITEBALANCE_AUTO : {mCameraView.setWhiteBalance(WhiteBalance.AUTO);}break;
+                    case BottomSheetOptionPanelCamera.WHITEBALANCE_COLUDY : {mCameraView.setWhiteBalance(WhiteBalance.CLOUDY);}break;
+                    case BottomSheetOptionPanelCamera.WHITEBALANCE_DAYLIGHT : {mCameraView.setWhiteBalance(WhiteBalance.DAYLIGHT);}break;
+                    case BottomSheetOptionPanelCamera.WHITEBALANCE_INCANDSCENT : {mCameraView.setWhiteBalance(WhiteBalance.INCANDESCENT);}break;
+                    case BottomSheetOptionPanelCamera.WHITEBALANCE_FLUORSCENT : {mCameraView.setWhiteBalance(WhiteBalance.FLUORESCENT);}break;
+                }
 
             }
 
             @Override
-            public void timerTimeSet() {
+            public void changeTimerSecond(int timerSec) {
 
+                switch (timerSec){
+                    case BottomSheetOptionPanelCamera.TIMER_SEC_3 : {mTimerSettingValue = 3000;}break;
+                    case BottomSheetOptionPanelCamera.TIMER_SEC_5 : {mTimerSettingValue = 5000;}break;
+                    case BottomSheetOptionPanelCamera.TIMER_SEC_10 : {mTimerSettingValue = 10000;}break;
+                }
             }
+
         }));
 
     }
@@ -213,7 +222,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
                 if(isChecked){
                     mTimerSet = 0;
                 }else{
-                    mTimerSet = 6000;
+                    mTimerSet = mTimerSettingValue;
                 }
             }
         });
