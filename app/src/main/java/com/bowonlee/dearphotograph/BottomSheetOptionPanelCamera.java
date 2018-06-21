@@ -1,29 +1,14 @@
 package com.bowonlee.dearphotograph;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
+
+import com.bowonlee.dearphotograph.models.OptionData;
 
 public class BottomSheetOptionPanelCamera extends LinearLayout {
 
-    static public final int ASPECT_RATIO_9_16 = 1;
-    static public final int ASPECT_RATIO_3_4 = 2;
-    static public final int ASPECT_RATIO_1_1 = 3;
 
-    static public final int WHITEBALANCE_AUTO = 11;
-    static public final int WHITEBALANCE_COLUDY = 12;
-    static public final int WHITEBALANCE_DAYLIGHT = 13;
-    static public final int WHITEBALANCE_FLUORSCENT = 14;
-    static public final int WHITEBALANCE_INCANDSCENT = 15;
-
-    static public final int TIMER_SEC_3 = 21;
-    static public final int TIMER_SEC_5 = 22;
-    static public final int TIMER_SEC_10 = 23;
 
     public interface CameraOptionCallback{
         void changeAspectRatio(int ratioType);
@@ -49,6 +34,7 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
         setWhiteBalance();
         setTimerSecond();
 
+
     }
 
     private void setAspectRatioGroup(){
@@ -60,13 +46,13 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.radioButton_ratio_916 :{
-                        mOptionCallback.changeAspectRatio(ASPECT_RATIO_9_16);
+                        mOptionCallback.changeAspectRatio(OptionData.ASPECT_RATIO_9_16);
                     }break;
                     case R.id.radioButton_ratio_34 :{
-                        mOptionCallback.changeAspectRatio(ASPECT_RATIO_3_4);
+                        mOptionCallback.changeAspectRatio(OptionData.ASPECT_RATIO_3_4);
                     }break;
                     case R.id.radioButton_ratio_11 :{
-                        mOptionCallback.changeAspectRatio(ASPECT_RATIO_1_1);
+                        mOptionCallback.changeAspectRatio(OptionData.ASPECT_RATIO_1_1);
                     }break;
                 }
             }
@@ -79,11 +65,11 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
-                    case R.id.radioButton_whitebalance_auto : {mOptionCallback.changeWhiteBalance(WHITEBALANCE_AUTO);}break;
-                    case R.id.radioButton_whitebalance_cloudy : {mOptionCallback.changeWhiteBalance(WHITEBALANCE_COLUDY);}break;
-                    case R.id.radioButton_whitebalance_daylight : {mOptionCallback.changeWhiteBalance(WHITEBALANCE_DAYLIGHT);}break;
-                    case R.id.radioButton_whitebalance_fluorescent : {mOptionCallback.changeWhiteBalance(WHITEBALANCE_FLUORSCENT);}break;
-                    case R.id.radioButton_whitebalance_incandscent : {mOptionCallback.changeWhiteBalance(WHITEBALANCE_INCANDSCENT);}break;
+                    case R.id.radioButton_whitebalance_auto : {mOptionCallback.changeWhiteBalance(OptionData.WHITEBALANCE_AUTO);}break;
+                    case R.id.radioButton_whitebalance_cloudy : {mOptionCallback.changeWhiteBalance(OptionData.WHITEBALANCE_COLUDY);}break;
+                    case R.id.radioButton_whitebalance_daylight : {mOptionCallback.changeWhiteBalance(OptionData.WHITEBALANCE_DAYLIGHT);}break;
+                    case R.id.radioButton_whitebalance_fluorescent : {mOptionCallback.changeWhiteBalance(OptionData.WHITEBALANCE_FLUORSCENT);}break;
+                    case R.id.radioButton_whitebalance_incandscent : {mOptionCallback.changeWhiteBalance(OptionData.WHITEBALANCE_INCANDSCENT);}break;
                 }
             }
         });
@@ -91,17 +77,41 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
 
     private void setTimerSecond(){
         mRadiogruopTimerSecond = findViewById(R.id.radioGroup_timerSecond);
-
         mRadiogruopTimerSecond.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
-                    case R.id.radioButton_timersec_3 : {mOptionCallback.changeTimerSecond(TIMER_SEC_3);}break;
-                    case R.id.radioButton_timersec_5 : {mOptionCallback.changeTimerSecond(TIMER_SEC_5);}break;
-                    case R.id.radioButton_timersec_10 : {mOptionCallback.changeTimerSecond(TIMER_SEC_10);}break;
+                    case R.id.radioButton_timersec_3 : {mOptionCallback.changeTimerSecond(OptionData.TIMER_SEC_3);}break;
+                    case R.id.radioButton_timersec_5 : {mOptionCallback.changeTimerSecond(OptionData.TIMER_SEC_5);}break;
+                    case R.id.radioButton_timersec_10 : {mOptionCallback.changeTimerSecond(OptionData.TIMER_SEC_10);}break;
                 }
             }
         });
+    }
+
+
+    public void applyAspectRatio(int ratioType){
+       switch (ratioType){
+           case OptionData.ASPECT_RATIO_1_1 : {mRadiogroupAspectRatio.check(R.id.radioButton_ratio_11);}break;
+           case OptionData.ASPECT_RATIO_3_4 : {mRadiogroupAspectRatio.check(R.id.radioButton_ratio_34);}break;
+           case OptionData.ASPECT_RATIO_9_16 : {mRadiogroupAspectRatio.check(R.id.radioButton_ratio_916);}break;
+       }
+    }
+    public void applyWhiteBalance(int whiteBalanceType){
+        switch (whiteBalanceType){
+            case OptionData.WHITEBALANCE_AUTO : {mRadiogroupWhiteBalance.check(R.id.radioButton_whitebalance_auto);}break;
+            case OptionData.WHITEBALANCE_COLUDY : {mRadiogroupWhiteBalance.check(R.id.radioButton_whitebalance_cloudy);}break;
+            case OptionData.WHITEBALANCE_DAYLIGHT : {mRadiogroupWhiteBalance.check(R.id.radioButton_whitebalance_daylight);}break;
+            case OptionData.WHITEBALANCE_FLUORSCENT : {mRadiogroupWhiteBalance.check(R.id.radioButton_whitebalance_fluorescent);}break;
+            case OptionData.WHITEBALANCE_INCANDSCENT : {mRadiogroupWhiteBalance.check(R.id.radioButton_whitebalance_incandscent);}break;
+        }
+    }
+    public void applyTimerSecond(int timerSet){
+        switch (timerSet){
+            case OptionData.TIMER_SEC_3 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_3);}break;
+            case OptionData.TIMER_SEC_5 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_5);}break;
+            case OptionData.TIMER_SEC_10 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_10);}break;
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package com.bowonlee.dearphotograph.maincamera;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,6 +34,7 @@ import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
 import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotograph.models.OptionData;
 import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
 import com.otaliastudios.cameraview.AspectRatio;
 import com.otaliastudios.cameraview.CameraListener;
@@ -53,12 +55,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
     private static final String TAG = "Camera2PreviewFragment";
 
-
     private RelativeLayout mRootLayout;
 
-    private final int FLASH_AUTO = 2;
-    private final int FLASH_ON = 1;
-    private final int FLASH_OFF = 0;
+
 
     private long mTimerSet = 0;
     private long mTimerSettingValue = 3000;
@@ -79,17 +78,12 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private CheckBox mCheckBoxTimerActivate;
     private ImageButton mButtonFlashState;
     private ImageButton mButtonMoreOption;
-
-
-
-
-
     private TextView mTextviewCountDown;
 
     private int mStateFlash = 0;
     /*CameraSetting - BottomSheetBehavior with NestedScrollView*/
     private BottomSheetBehavior mBottomSheetBehavior;
-
+    private BottomSheetOptionPanelCamera mBottomSheetOptionPanelCamera;
 
     /*CameraView */
     private CameraView mCameraView;
@@ -101,6 +95,8 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private int mPhotoRotation = 0;
     private MainPhotoDrawerView mMainPhotoDrawerView;
 
+    private OptionData mOptionData;
+
 
 
     @Override
@@ -109,107 +105,141 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mRootLayout = (RelativeLayout)view.findViewById(R.id.layout_camera_root);
         mCameraView = (CameraView)view.findViewById(R.id.cameraview_fragment_camera);
 
-
+        setCameraView();
         setButtons(view);
         setCheckbox(view);
         setModifiedView();
-        setCameraView();
         setBottonSheet(view);
         setAutoFlashButton(view);
         getLoaderManager().initLoader(0,null,this);
+        setOptions(getContext());
+
+    }
+    private void setOptions(Context context){
+        mOptionData = new OptionData(context);
+
+        setCameraFacing(mOptionData.getSingleData(OptionData.KEY_CAMERA_FACING));
+        setTimerActivate(mOptionData.getSingleData(OptionData.KEY_TIMER_ON));
+        setFlashSetting(mOptionData.getSingleData(OptionData.KEY_FLASH_STATE));
+
+        setCameraSize(mOptionData.getSingleData(OptionData.KEY_ASPECT_RATIO));
+        setTimerSceond(mOptionData.getSingleData(OptionData.KEY_TIMER_SET));
+        setWhiteBalance(mOptionData.getSingleData(OptionData.KEY_WHITE_BALANCE));
+
+        /*
+        * 해당 설정에 맞게 UI맞추기
+        * */
+
 
 
     }
 
+    private void setCameraSize(int ratioType){
+        switch (ratioType){
+            case OptionData.ASPECT_RATIO_9_16 : {
+                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+                mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*16/9;
+                mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+                mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(9,16), 0));
+            }break;
+            case OptionData.ASPECT_RATIO_3_4 : {
+                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+                mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*4/3;
+                mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+                mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(3,4), 0));
+            }break;
+            case OptionData.ASPECT_RATIO_1_1 : {
+                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+                mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels;
+                mCameraView.setLayoutParams(mCameraView.getLayoutParams());
+                mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(1,1), 0));
+            }break;
+        }
+        mBottomSheetOptionPanelCamera.applyAspectRatio(ratioType);
+        mOptionData.setData(OptionData.KEY_ASPECT_RATIO,ratioType);
+        mCameraView.stop();
+        mCameraView.start();
+
+
+
+    }
+
+    private void setWhiteBalance(int whiteBalanceType){
+        switch (whiteBalanceType){
+            case OptionData.WHITEBALANCE_AUTO : {mCameraView.setWhiteBalance(WhiteBalance.AUTO);}break;
+            case OptionData.WHITEBALANCE_COLUDY : {mCameraView.setWhiteBalance(WhiteBalance.CLOUDY);}break;
+            case OptionData.WHITEBALANCE_DAYLIGHT : {mCameraView.setWhiteBalance(WhiteBalance.DAYLIGHT);}break;
+            case OptionData.WHITEBALANCE_INCANDSCENT : {mCameraView.setWhiteBalance(WhiteBalance.INCANDESCENT);}break;
+            case OptionData.WHITEBALANCE_FLUORSCENT : {mCameraView.setWhiteBalance(WhiteBalance.FLUORESCENT);}break;
+            }
+            mBottomSheetOptionPanelCamera.applyWhiteBalance(whiteBalanceType);
+        mOptionData.setData(OptionData.KEY_WHITE_BALANCE,whiteBalanceType);
+
+    }
+    private void setTimerSceond(int timerSec){
+        switch (timerSec){
+            case OptionData.TIMER_SEC_3 : {mTimerSettingValue = 3000;}break;
+            case OptionData.TIMER_SEC_5 : {mTimerSettingValue = 5000;}break;
+            case OptionData.TIMER_SEC_10 : {mTimerSettingValue = 10000;}break;
+        }
+        mBottomSheetOptionPanelCamera.applyTimerSecond(timerSec);
+        mOptionData.setData(OptionData.KEY_TIMER_SET,timerSec);
+
+    }
     private void setBottonSheet(View view){
         LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
+
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-        bottomSheetLayout.addView(new BottomSheetOptionPanelCamera(getContext(), new BottomSheetOptionPanelCamera.CameraOptionCallback() {
+        mBottomSheetOptionPanelCamera = new BottomSheetOptionPanelCamera(getContext(), new BottomSheetOptionPanelCamera.CameraOptionCallback() {
             @Override
-            public void changeAspectRatio(int ratioType) {
-
-                switch (ratioType){
-                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_9_16 : {
-
-                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(9,16), 0));
-                    }break;
-                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_3_4 : {
-                        mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
-                        mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*4/3;
-                        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
-                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(3,4), 0));
-                    }break;
-                    case BottomSheetOptionPanelCamera.ASPECT_RATIO_1_1 : {
-                        mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
-                        mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels;
-                        mCameraView.setLayoutParams(mCameraView.getLayoutParams());
-
-                        mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(1,1), 0));
-
-                    }break;
-                }
-                mCameraView.stop();
-                mCameraView.start();
-
-            }
+            public void changeAspectRatio(int ratioType) { setCameraSize(ratioType);  }
 
             @Override
-            public void changeWhiteBalance(int whiteBalacneType) {
-                switch (whiteBalacneType){
-                    case BottomSheetOptionPanelCamera.WHITEBALANCE_AUTO : {mCameraView.setWhiteBalance(WhiteBalance.AUTO);}break;
-                    case BottomSheetOptionPanelCamera.WHITEBALANCE_COLUDY : {mCameraView.setWhiteBalance(WhiteBalance.CLOUDY);}break;
-                    case BottomSheetOptionPanelCamera.WHITEBALANCE_DAYLIGHT : {mCameraView.setWhiteBalance(WhiteBalance.DAYLIGHT);}break;
-                    case BottomSheetOptionPanelCamera.WHITEBALANCE_INCANDSCENT : {mCameraView.setWhiteBalance(WhiteBalance.INCANDESCENT);}break;
-                    case BottomSheetOptionPanelCamera.WHITEBALANCE_FLUORSCENT : {mCameraView.setWhiteBalance(WhiteBalance.FLUORESCENT);}break;
-                }
-
-            }
+            public void changeWhiteBalance(int whiteBalacneType) { setWhiteBalance(whiteBalacneType); }
 
             @Override
-            public void changeTimerSecond(int timerSec) {
+            public void changeTimerSecond(int timerSec) { setTimerSceond(timerSec); }
 
-                switch (timerSec){
-                    case BottomSheetOptionPanelCamera.TIMER_SEC_3 : {mTimerSettingValue = 3000;}break;
-                    case BottomSheetOptionPanelCamera.TIMER_SEC_5 : {mTimerSettingValue = 5000;}break;
-                    case BottomSheetOptionPanelCamera.TIMER_SEC_10 : {mTimerSettingValue = 10000;}break;
-                }
-            }
-
-        }));
+        });
+        bottomSheetLayout.addView(mBottomSheetOptionPanelCamera);
 
     }
+
 
 
     private void setAutoFlashButton(View view){
         mButtonFlashState = (ImageButton)view.findViewById(R.id.btn_fragment_camera_flash);
 
-        setFlashSetting();
         mButtonFlashState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mStateFlash = (mStateFlash+1)%3;
-                setFlashSetting();
+                setFlashSetting(mStateFlash);
             }
         });
-
     }
-    private void setFlashSetting(){
-        switch (mStateFlash){
-            case FLASH_AUTO : { mCameraView.setFlash(Flash.AUTO);
+    private void setFlashSetting(int state){
+        switch (state){
+            case OptionData.FLASH_AUTO : { mCameraView.setFlash(Flash.AUTO);
            mButtonFlashState.setImageResource(R.drawable.baseline_flash_auto_white_18);}break;
-            case FLASH_ON :   {mButtonFlashState.setImageResource(R.drawable.baseline_flash_on_white_18); mCameraView.setFlash(Flash.ON); }break;
-            case FLASH_OFF :  {mButtonFlashState.setImageResource(R.drawable.baseline_flash_off_white_18); mCameraView.setFlash(Flash.OFF);}
+            case OptionData.FLASH_ON :   {mButtonFlashState.setImageResource(R.drawable.baseline_flash_on_white_18); mCameraView.setFlash(Flash.ON); }break;
+            case OptionData.FLASH_OFF :  {mButtonFlashState.setImageResource(R.drawable.baseline_flash_off_white_18); mCameraView.setFlash(Flash.OFF);}
         }
+        mOptionData.setData(OptionData.KEY_FLASH_STATE,state);
     }
 
 
     private void setCheckbox(View view){
+
         mCheckBoxCameraFacing = (CheckBox)view.findViewById(R.id.checkbox_fragment_camera_facing);
         mCheckBoxCameraFacing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 switch (buttonView.getId()){
-                    case R.id.checkbox_fragment_camera_facing : { setCameraFacing(isChecked);}
+                    case R.id.checkbox_fragment_camera_facing : {
+                        if(isChecked){ setCameraFacing(OptionData.CAMERA_FACING_BACK); }
+                            else{ setCameraFacing(OptionData.CAMERA_FACING_FRONT); }
+                    }
                 }
             }
         });
@@ -219,21 +249,33 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mCheckBoxTimerActivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    mTimerSet = 0;
-                }else{
-                    mTimerSet = mTimerSettingValue;
-                }
+                if(isChecked){ setTimerActivate(OptionData.TIMER_OFF); }
+                else{ setTimerActivate(OptionData.TIMER_ON); }
             }
         });
 
     }
-    private void setCameraFacing(boolean checked_state){
-        if(checked_state){
-            mCameraView.setFacing(Facing.FRONT);
-        }else{
-            mCameraView.setFacing(Facing.BACK);
+    private void setTimerActivate(int state){
+        if(state == OptionData.TIMER_OFF){ mTimerSet = 0;
+        mCheckBoxTimerActivate.setChecked(true);
+        }else{ mTimerSet = mTimerSettingValue;
+            mCheckBoxTimerActivate.setChecked(false);
         }
+        mOptionData.setData(OptionData.KEY_TIMER_ON,state);
+
+    }
+
+    private void setCameraFacing(int state){
+        if(state == OptionData.CAMERA_FACING_BACK){ mCameraView.setFacing(Facing.BACK);
+            mCheckBoxCameraFacing.setChecked(true);
+        }
+        else{ mCameraView.setFacing(Facing.FRONT);
+            mCheckBoxCameraFacing.setChecked(false);
+        }
+
+
+        mOptionData.setData(OptionData.KEY_CAMERA_FACING,state);
+
     }
 
     private void setCameraView(){
