@@ -1,9 +1,10 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotograph.maincamera;
 
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.OptionData;
 
 public class BottomSheetOptionPanelCamera extends LinearLayout {
@@ -28,7 +29,7 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
         super(context);
         mOptionCallback = cameraOptionCallback;
 
-        addView(inflate(context,R.layout.bottomsheet_camera_option,null)
+        addView(inflate(context, R.layout.bottomsheet_camera_option,null)
         , new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
         setAspectRatioGroup();
         setWhiteBalance();

@@ -1,37 +1,22 @@
 package com.bowonlee.dearphotograph.resultpreview;
 
-import android.app.ActionBar;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
-import com.bowonlee.dearphotograph.BitmapSaver;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.otaliastudios.cameraview.CameraView;
-import com.yalantis.ucrop.UCrop;
-import com.yalantis.ucrop.UCropFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class PreviewResultFragment extends Fragment {
 
@@ -41,7 +26,8 @@ public class PreviewResultFragment extends Fragment {
 
     public interface PreviewResultInterface{
 
-        public void onCancelPreviewResult();
+
+        public void onFinishPreviewResult(ModifiedPhoto photo);
 
     }
 
@@ -59,6 +45,7 @@ public class PreviewResultFragment extends Fragment {
     private RelativeLayout mParentLayout;
     private ModifiedPhoto mModifiedPhoto;
 
+    private int mOrientation;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -68,7 +55,6 @@ public class PreviewResultFragment extends Fragment {
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
 
-        Log.e("before",""+mModifiedPhoto.getStartXY().y);
         mModifiedPhoto.setStartXY(new PointF(
                 mModifiedPhoto.getStartXY().x,
                 (float)( ((mModifiedPhoto.getStartXY().y -  (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0)
@@ -76,9 +62,7 @@ public class PreviewResultFragment extends Fragment {
 
                 )
         ));
-        Log.e("after",""+mModifiedPhoto.getStartXY().y+" : "+ (float)mCapturedBitmap.getHeight()/((float) getResources().getDisplayMetrics().widthPixels*16.0/9.0)
-        +" : " + (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0
-        );
+
         mPreviewResultView.setPhoto(mModifiedPhoto);
         mParentLayout.addView(mPreviewResultView);
 
@@ -101,8 +85,11 @@ public class PreviewResultFragment extends Fragment {
 
     }
     public void setModifiedPhoto(ModifiedPhoto modifiedPhoto){
-        //this.mModifiedPhoto = modifiedPhoto;
         this.mModifiedPhoto = new ModifiedPhoto(modifiedPhoto);
+    }
+
+    public void setOrientation(int orientation){
+        this.mOrientation = orientation;
     }
 
     public void setCapturedBitmap(Bitmap capturedBitmap){
@@ -121,10 +108,10 @@ public class PreviewResultFragment extends Fragment {
                 public void onClick(View v) {
                     switch (v.getId()){
                         case R.id.btn_fragment_preview_result_cancel :{
-                            mPreviewResultInterface.onCancelPreviewResult();
+                            mPreviewResultInterface.onFinishPreviewResult(mModifiedPhoto);
                             onDestroy();}break;
                         case R.id.btn_fragment_preview_result_save : {
-                            saveView(mPreviewResultView);
+                            saveView();
                         }break;
                     }
                 }
@@ -133,7 +120,7 @@ public class PreviewResultFragment extends Fragment {
 
     }
 
-    private void saveView(View view){
+    private void saveView(){
 
         ModifiedPhoto tempphoto = new ModifiedPhoto(mModifiedPhoto);
 
@@ -141,18 +128,8 @@ public class PreviewResultFragment extends Fragment {
 
         float expendRatio = (float) tempphoto.getOutSize().getWidth()*tempphoto.getRatio()/(float) getResources().getDisplayMetrics().widthPixels;
 
-        float outputWidth =  (float) tempphoto.getOutSize().getWidth()/expendRatio;
+        float outputWidth =  1080;
 
-        if(outputAspectRatio == 9/16){
-            if(outputWidth / (9/16)  > 4160){
-                outputWidth = 2340;
-            }
-        }else{
-            if(outputWidth > 3120){
-                outputWidth = MAX_OUTPUT_WIDTH;
-            }
-        }
-        outputWidth = 1080;
         float resizeRatio =  (outputWidth/(float) getResources().getDisplayMetrics().widthPixels);
 
 
@@ -173,22 +150,13 @@ public class PreviewResultFragment extends Fragment {
         Canvas c = new Canvas(b);
 
         tempview.draw(c);
-        new BitmapSaver(b,getActivity()).run();
+        new BitmapSaver(b,getActivity(),mOrientation).run();
 
         mPreviewResultView = null;
 
-        mPreviewResultInterface.onCancelPreviewResult();
+        mPreviewResultInterface.onFinishPreviewResult(mModifiedPhoto);
 
-/*
-        Bitmap b = Bitmap.createBitmap(mCapturedBitmap.getWidth(),mCapturedBitmap.getHeight(),Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        view.draw(c);
-        new BitmapSaver(Bitmap.createScaledBitmap(b,mCapturedBitmap.getWidth(), mCapturedBitmap.getHeight(),false),getActivity()).run();
-        mPreviewResultView = null;
-
-        mPreviewResultInterface.onCancelPreviewResult();
-*/
-    }
+        }
 
 
     @Nullable
@@ -208,10 +176,4 @@ public class PreviewResultFragment extends Fragment {
     }
 
 
-    private Size getLargestSize(){
-
-
-
-        return null;
-    }
 }

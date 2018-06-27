@@ -51,9 +51,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private Sensor mMagneticSensor;
     private SensorManager mSensorManager;
     private OrientationHelper mSensorOrientation;
-
-    //FileSystem
-    private FileIOHelper mFileIOHelper;
+    private int currentOrientation;
 
     //FragmentControl Camera & ResultPreview
     private FragmentManager mFragmentManager;
@@ -70,9 +68,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         Log.e("MainActivity","onCreate");
         setContentView(R.layout.activity_main);
         Fabric.with(this, new Crashlytics());
-        mFileIOHelper = new FileIOHelper();
-        mFileIOHelper.getAlbumStorageDir(ALBUMNAME);
-
 
         setRequestCameraPermission();
         mSensorOrientation = new OrientationHelper();
@@ -149,31 +144,12 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     @Override
     public void onPostTakePicture(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto) {
-        Toast.makeText(this,"Post Excute In CapturePreview ",Toast.LENGTH_SHORT).show();
-        Log.e("main rotate",modifiedPhoto.getRotation()+"");
+
+
         startPreviewResultFragment(captureBitmap,modifiedPhoto);
 
 
 
-    }
-
-
-    @Override
-    public void onCancelPreviewResult() {
-        startCameraFragment();
-    }
-
-    public void startCameraFragment(){
-
-        mCameraFragment = CameraFragment.newInstance();
-
-        mFragmentManager = getSupportFragmentManager();
-        mFragmentTransaction = mFragmentManager.beginTransaction();
-
-        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
-        mCameraFragment.setOnCameraInterface(this);
-      ;
-        //   mCameraFragment.setTextureSize(3,4);
     }
 
     private void startPreviewResultFragment(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto){
@@ -184,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         mPreviewResultFragment.setCapturedBitmap(captureBitmap);
         mPreviewResultFragment.setModifiedPhoto(modifiedPhoto);
+        mPreviewResultFragment.setOrientation(currentOrientation);
 
         mFragmentTransaction.replace(R.id.main_container,mPreviewResultFragment).commit();
         mPreviewResultFragment.setPreviewResultInterface(this);
@@ -191,6 +168,41 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
 
 
+
+
+    @Override
+    public void onFinishPreviewResult(ModifiedPhoto photo) {
+
+        restartCameraFragment(photo);
+    }
+
+    private void restartCameraFragment(ModifiedPhoto photo){
+
+        mCameraFragment = CameraFragment.newInstance();
+
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+
+        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
+        mCameraFragment.setOnCameraInterface(this);
+
+
+        mCameraFragment.setPostPhoto(photo);
+
+    }
+
+    private void startCameraFragment(){
+
+        mCameraFragment = CameraFragment.newInstance();
+
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+
+        mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
+        mCameraFragment.setOnCameraInterface(this);
+
+
+    }
 
 
     @Override
@@ -230,22 +242,17 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
 
     }
-    public void rotateItemsByOrientation(float roation){
-        // 내가 디바이스의 화면을 바라볼 때 기준 좌측으로 돌리기 + 90(nomal) 우측 - 90(reverse)
+    public void rotateItemsByOrientation(int roation){
         if(mCameraFragment.isVisible()){
-          //mCameraFragment.setItemOrientation(roation);
+            currentOrientation = roation;
         }
     }
 
 
 
 
-
-
-
     @Override
     public void onBackPressed() {
-     //   super.onBackPressed();
 
         if(System.currentTimeMillis()>mBackPressedTime+2000){
                 mBackPressedTime = System.currentTimeMillis();
@@ -253,7 +260,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                 return;
         }
         if(System.currentTimeMillis()<=mBackPressedTime+2000){
-            //Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT);
             this.finish();
         }
     }

@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotograph.resultpreview;
 
 
 import android.content.Context;
@@ -9,6 +9,8 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.bowonlee.dearphotograph.FileIOHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,9 +27,12 @@ public class BitmapSaver implements Runnable{
     private FileIOHelper mFileIOHelper;
     private String mFileName;
     private Bitmap bitmap;
-    public BitmapSaver(Bitmap bitmap, Context context){
+    private int mOrientation;
+
+    public BitmapSaver(Bitmap bitmap, Context context,int orientation){
         this.bitmap = bitmap;
         mContext = context;
+        this.mOrientation = orientation;
     }
 
     @Override
@@ -45,11 +50,12 @@ public class BitmapSaver implements Runnable{
         mFile = new File(mFileIOHelper.getAlbumStorageDir("DearPhotograph"),mFileName);
 
         FileOutputStream output = null;
-/*
+
+
         Matrix tempMatrix = new Matrix();
-        tempMatrix.setRotate(-90);
+        tempMatrix.setRotate(-1 * mOrientation);
         bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),tempMatrix,false);
-*/
+
         try {
             output = new FileOutputStream(mFile);
 

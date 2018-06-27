@@ -31,7 +31,7 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
     private final int EVENT_INSIDE = 401;
     private final int EVENT_EDGE = 405;
     private final int EVENT_OUTSIDE = 408;
-
+    private final int TOLERANCE_PINCH = 8;
 
     private float mFrameZoomX = 0;
     private float mFrameZoomY = 0;
@@ -190,10 +190,11 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
                     mDistanceRateChange = mPastDistance - (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
                     mPastDistance = (float) Math.sqrt(Math.pow(Math.abs(touchX1-touchX2),2)+Math.pow(Math.abs(touchY1-touchY2),2));
 
-                    if(Math.abs(mDistanceRateChange)>8) {
+                    if(Math.abs(mDistanceRateChange)>TOLERANCE_PINCH) {
                         float ratio = ((float) mPhotoBitmap.getWidth() - mDistanceRateChange / 2) / mModifiedPhoto.getOutSize().getWidth();
-                        mModifiedPhoto.setRatio(ratio);
+                        if(ratio < 1.0&&calculateMaxSize(ratio)){ mModifiedPhoto.setRatio(ratio);}
                         this.postInvalidate();
+
                     }
 
                     return true;
@@ -224,5 +225,14 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
     @Override
     public ModifiedPhoto getModifiedPhoto() {
        return super.getModifiedPhoto();
+    }
+
+
+    private boolean calculateMaxSize(float ratio){
+
+        if((float)mModifiedPhoto.getOutSize().getWidth() * ratio > getContext().getResources().getDisplayMetrics().widthPixels
+                ||(float)mModifiedPhoto.getOutSize().getHeight() * ratio > getContext().getResources().getDisplayMetrics().heightPixels){
+            return false;
+        }else{ return true;}
     }
 }

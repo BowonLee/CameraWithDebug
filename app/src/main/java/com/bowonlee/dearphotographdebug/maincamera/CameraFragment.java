@@ -29,7 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.BottomSheetOptionPanelCamera;
 import com.bowonlee.dearphotograph.R;
 import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotograph.models.ModifiedPhoto;
@@ -96,6 +95,8 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private MainPhotoDrawerView mMainPhotoDrawerView;
 
     private OptionData mOptionData;
+
+    private ModifiedPhoto postPhoto;
 
 
 
@@ -220,8 +221,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
     private void setFlashSetting(int state){
         switch (state){
-            case OptionData.FLASH_AUTO : { mCameraView.setFlash(Flash.AUTO);
-           mButtonFlashState.setImageResource(R.drawable.baseline_flash_auto_white_18);}break;
+            case OptionData.FLASH_AUTO : { mButtonFlashState.setImageResource(R.drawable.baseline_flash_auto_white_18);mCameraView.setFlash(Flash.AUTO);}break;
             case OptionData.FLASH_ON :   {mButtonFlashState.setImageResource(R.drawable.baseline_flash_on_white_18); mCameraView.setFlash(Flash.ON); }break;
             case OptionData.FLASH_OFF :  {mButtonFlashState.setImageResource(R.drawable.baseline_flash_off_white_18); mCameraView.setFlash(Flash.OFF);}
         }
@@ -316,9 +316,15 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
 
     private void setModifiedView(){
-        mMainPhotoDrawerView = new MainPhotoDrawerView(getActivity());
-        mMainPhotoDrawerView.setOnTouchListener(mMainPhotoDrawerView);
-        mRootLayout.addView(mMainPhotoDrawerView);
+
+
+            mMainPhotoDrawerView = new MainPhotoDrawerView(getActivity());
+            mMainPhotoDrawerView.setOnTouchListener(mMainPhotoDrawerView);
+            mRootLayout.addView(mMainPhotoDrawerView);
+
+            if(postPhoto !=null){
+                mMainPhotoDrawerView.setPhoto(postPhoto);
+            }
 
     }
 
@@ -441,11 +447,6 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         this.cameraInterface = cameraInterface;
     }
 
-    public void refreshFragment(){
-        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-    }
-
-
     public void setOrientation(int orientation){
         mOrientation = orientation;
     }
@@ -474,10 +475,13 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
 
 
+    public void setPostPhoto(ModifiedPhoto postPhoto){
+
+        this.postPhoto = postPhoto;
+    }
 
 
-
-     void setmImageOnView(Photo photo){
+     private void setmImageOnView(Photo photo){
 
         ModifiedPhoto modifiedPhoto = new ModifiedPhoto(photo);
 
@@ -487,7 +491,6 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
 
         this.mMainPhotoDrawerView.setPhoto(modifiedPhoto);
-        Log.e("dummy",String.format("%s , %s",modifiedPhoto.getImageUri(),modifiedPhoto.getThumnailUri()));
 
         this.mMainPhotoDrawerView.postInvalidate();
 

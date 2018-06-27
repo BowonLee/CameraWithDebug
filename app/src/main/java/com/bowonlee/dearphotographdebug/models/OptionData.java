@@ -29,9 +29,9 @@ public class OptionData {
     static public final int TIMER_SEC_5 = 22;
     static public final int TIMER_SEC_10 = 23;
 
-    static public final int FLASH_AUTO      = 31 ;
-    static public final int FLASH_ON        = 32 ;
-    static public final int FLASH_OFF       = 33 ;
+    static public final int FLASH_AUTO      = 0 ;
+    static public final int FLASH_ON        = 1 ;
+    static public final int FLASH_OFF       = 2 ;
 
     static public final int CAMERA_FACING_BACK = 41;
     static public final int CAMERA_FACING_FRONT = 42;
