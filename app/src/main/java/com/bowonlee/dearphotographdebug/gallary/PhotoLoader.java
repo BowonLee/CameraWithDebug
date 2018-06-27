@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.gallary;
+package com.bowonlee.dearphotographdebug.gallary;
 
 import android.content.AsyncTaskLoader;
 import android.content.ContentResolver;
@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotographdebug.models.Photo;
 
 import java.util.ArrayList;
 import java.util.List;

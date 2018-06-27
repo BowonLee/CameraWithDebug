@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.gallary;
+package com.bowonlee.dearphotographdebug.gallary;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,7 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.bowonlee.dearphotograph.R;
+import com.bowonlee.dearphotographdebug.R;
 
 /**
  * Created by bowon on 2018-04-11.

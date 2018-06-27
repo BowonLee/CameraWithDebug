@@ -1,26 +1,18 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotographdebug.maincamera;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
-import android.view.DragEvent;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.BasePhotoDrawerView;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.BasePhotoDrawerView;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
 
 public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnTouchListener{
 
@@ -193,6 +185,8 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
                     if(Math.abs(mDistanceRateChange)>TOLERANCE_PINCH) {
                         float ratio = ((float) mPhotoBitmap.getWidth() - mDistanceRateChange / 2) / mModifiedPhoto.getOutSize().getWidth();
                         if(ratio < 1.0&&calculateMaxSize(ratio)){ mModifiedPhoto.setRatio(ratio);}
+                        else{
+                            Toast.makeText(getContext(),"max size",Toast.LENGTH_SHORT).show();}
                         this.postInvalidate();
 
                     }

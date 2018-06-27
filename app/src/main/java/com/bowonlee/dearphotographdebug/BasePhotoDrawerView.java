@@ -1,28 +1,16 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotographdebug;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Xfermode;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.util.Size;
 import android.view.View;
 
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.models.Photo;
-
-import java.io.IOException;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
 
 public class BasePhotoDrawerView extends View{
 

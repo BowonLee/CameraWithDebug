@@ -1,8 +1,10 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotographdebug.maincamera;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -14,6 +16,7 @@ import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -29,12 +32,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.gallary.RecentPhotoLoader;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.models.Photo;
-import com.bowonlee.dearphotograph.models.OptionData;
-import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.gallary.RecentPhotoLoader;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.models.Photo;
+import com.bowonlee.dearphotographdebug.models.OptionData;
+import com.bowonlee.dearphotographdebug.modifier.ModifyPhotoActivity;
 import com.otaliastudios.cameraview.AspectRatio;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
@@ -43,6 +46,9 @@ import com.otaliastudios.cameraview.Flash;
 import com.otaliastudios.cameraview.SizeSelectors;
 import com.otaliastudios.cameraview.WhiteBalance;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
@@ -104,6 +110,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRootLayout = (RelativeLayout)view.findViewById(R.id.layout_camera_root);
+
         mCameraView = (CameraView)view.findViewById(R.id.cameraview_fragment_camera);
 
         setCameraView();
@@ -114,8 +121,29 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         setAutoFlashButton(view);
         getLoaderManager().initLoader(0,null,this);
         setOptions(getContext());
+        setDummyPhoto();
 
     }
+
+    private void setDummyPhoto(){
+        /*테스트용 더미 데이터 적용
+        * 카페- 데모 이미지
+        * */
+        File dummyFile = new File(getContext().getCacheDir(),"temp");
+        try {
+            BitmapFactory.decodeResource(getResources(),R.drawable.cafe_demoimage).
+                    compress(Bitmap.CompressFormat.JPEG,100,new FileOutputStream(dummyFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Photo dummyPhoto = new Photo(Uri.fromFile(dummyFile),Uri.fromFile(dummyFile));
+        setmImageOnView(dummyPhoto);
+
+
+
+    }
+
     private void setOptions(Context context){
         mOptionData = new OptionData(context);
 
@@ -422,7 +450,10 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     @Override
     public void onResume() {
         super.onResume();
-        mCameraView.start();
+
+        if(getContext().checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+            mCameraView.start();
+        }
 
         getLoaderManager().restartLoader(0,null,this);
     }
@@ -510,12 +541,12 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
 
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public android.support.v4.content.Loader<Photo> onCreateLoader(int id, Bundle args) {
 
         return new RecentPhotoLoader(getActivity());
+
     }
 
     @Override

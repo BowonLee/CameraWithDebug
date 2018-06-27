@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.models;
+package com.bowonlee.dearphotographdebug.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;

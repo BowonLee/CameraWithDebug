@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.resultpreview;
+package com.bowonlee.dearphotographdebug.resultpreview;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -6,15 +6,14 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
 
 import java.util.ArrayList;
 
@@ -64,7 +63,7 @@ public class PreviewResultFragment extends Fragment {
         ));
 
         mPreviewResultView.setPhoto(mModifiedPhoto);
-        mParentLayout.addView(mPreviewResultView);
+        mParentLayout.addView(mPreviewResultView,new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mCapturedBitmap.getHeight()));
 
         mButtonSaveImage = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_save);
         mButtonCancel = (ImageButton)view.findViewById(R.id.btn_fragment_preview_result_cancel);

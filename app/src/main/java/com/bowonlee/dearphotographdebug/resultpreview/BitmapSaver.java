@@ -1,21 +1,19 @@
-package com.bowonlee.dearphotograph.resultpreview;
+package com.bowonlee.dearphotographdebug.resultpreview;
 
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.media.Image;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.FileIOHelper;
+import com.bowonlee.dearphotographdebug.FileIOHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 

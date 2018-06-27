@@ -1,34 +1,19 @@
-package com.bowonlee.dearphotograph.modifier;
+package com.bowonlee.dearphotographdebug.modifier;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.Size;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import com.bowonlee.dearphotograph.BuildConfig;
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.gallary.PhotoGallaryActivity;
-import com.bowonlee.dearphotograph.maincamera.MainPhotoDrawerView;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.gallary.PhotoGallaryActivity;
+import com.bowonlee.dearphotographdebug.models.Photo;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;

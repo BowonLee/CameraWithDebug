@@ -1,16 +1,16 @@
-package com.bowonlee.dearphotograph.gallary;
+package com.bowonlee.dearphotographdebug.gallary;
 
-import android.content.AsyncTaskLoader;
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 
-import com.bowonlee.dearphotograph.models.Photo;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.bowonlee.dearphotographdebug.models.Photo;
 
 /**
  * Created by bowon on 2018-04-19.
@@ -32,16 +32,21 @@ public class RecentPhotoLoader extends android.support.v4.content.AsyncTaskLoade
     Photo photo;
     public RecentPhotoLoader(Context context) {
         super(context);
+
         contentResolver = context.getContentResolver();
-       // this.contentResolver = contentResolver;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public Photo loadInBackground() {
         tableUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         projection = new String[]{MediaStore.Images.Media.DATA, MediaStore.Images.Media._ID};
         selection = null ;// return all row
         selectionArgs = null;
+
+        if(getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            return null;
+        }
 
         Cursor imageCursor = contentResolver.query(tableUri,projection,selection,selectionArgs, MediaStore.MediaColumns.DATE_ADDED + " desc");
         int dataColumnIndex = imageCursor.getColumnIndex(projection[0]);

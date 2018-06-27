@@ -1,13 +1,11 @@
-package com.bowonlee.dearphotograph.gallary;
+package com.bowonlee.dearphotographdebug.gallary;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.models.Photo;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.models.Photo;
 
 /**
  * Created by bowon on 2018-04-20.

@@ -1,11 +1,11 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotographdebug.maincamera;
 
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.models.OptionData;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.models.OptionData;
 
 public class BottomSheetOptionPanelCamera extends LinearLayout {
 

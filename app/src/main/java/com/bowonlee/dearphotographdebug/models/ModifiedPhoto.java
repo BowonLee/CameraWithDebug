@@ -1,6 +1,5 @@
-package com.bowonlee.dearphotograph.models;
+package com.bowonlee.dearphotographdebug.models;
 
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.util.Size;

@@ -1,19 +1,11 @@
-package com.bowonlee.dearphotograph.resultpreview;
+package com.bowonlee.dearphotographdebug.resultpreview;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 
-import com.bowonlee.dearphotograph.BasePhotoDrawerView;
-import com.bowonlee.dearphotograph.maincamera.MainPhotoDrawerView;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.BasePhotoDrawerView;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
 
 public class PreviewResultView extends BasePhotoDrawerView{
 

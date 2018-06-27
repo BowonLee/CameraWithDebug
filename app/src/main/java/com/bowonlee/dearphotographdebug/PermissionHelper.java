@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph;
+package com.bowonlee.dearphotographdebug;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,7 +17,8 @@ import android.support.annotation.RequiresApi;
 public class PermissionHelper {
 
     public static int REQUEST_CAMERA_PERMISSION = 1;
-    public static int REQUEST_LOCATE_PERMISSION = 2;
+    public static int REQUEST_READ_PERMISSION = 2;
+    public static int REQUEST_ALL_PERMISSION = 3;
     private Activity mParentActivity;
 
     public PermissionHelper(Activity parentActivity){
@@ -38,7 +39,7 @@ public class PermissionHelper {
                         @RequiresApi(api = Build.VERSION_CODES.M)
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA},REQUEST_CAMERA_PERMISSION);
+                            parent.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_ALL_PERMISSION);
                         }
                     }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
@@ -53,12 +54,7 @@ public class PermissionHelper {
 
         }
     }
-    /*
-    * 권한요청이 한번이상 거부되었을 경우 출력되는 다이얼로그
-    * */
-    public static class DeniedDialog extends DialogFragment{
 
-    }
 
 }
 

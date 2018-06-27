@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.maincamera;
+package com.bowonlee.dearphotographdebug.maincamera;
 
 import android.Manifest;
 import android.app.Activity;
@@ -14,26 +14,20 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.bowonlee.dearphotograph.FileIOHelper;
-import com.bowonlee.dearphotograph.OrientationHelper;
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.models.ModifiedPhoto;
-import com.bowonlee.dearphotograph.resultpreview.PreviewResultFragment;
-import com.crashlytics.android.Crashlytics;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.bowonlee.dearphotographdebug.OrientationHelper;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.resultpreview.PreviewResultFragment;
 
-import io.fabric.sdk.android.Fabric;
 
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -60,24 +54,20 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     private PreviewResultFragment mPreviewResultFragment;
 
     //For FireBaseSet
-    FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e("MainActivity","onCreate");
         setContentView(R.layout.activity_main);
-        Fabric.with(this, new Crashlytics());
 
-        setRequestCameraPermission();
+
+
         mSensorOrientation = new OrientationHelper();
         mSensorOrientation.setOnOrientationListener(this);
+        setRequestCameraPermission();
         startCameraFragment();
-        setFireBase();
-    }
 
-    private void setFireBase(){
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
 
@@ -93,9 +83,10 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     @Override
     protected void onResume() {
         super.onResume();
+
         hideUi();
         setSensors();
-        setSensorListener();
+        if(mCameraFragment!=null){ setSensorListener(); }
 
     }
 
@@ -123,24 +114,6 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
         mSensorManager.unregisterListener(mSensorOrientation.getEventListener());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void setRequestCameraPermission(){
-
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                //권한 요청이 거부당함
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
 
     @Override
     public void onPostTakePicture(Bitmap captureBitmap,ModifiedPhoto modifiedPhoto) {
@@ -193,11 +166,10 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
     private void startCameraFragment(){
 
-        mCameraFragment = CameraFragment.newInstance();
 
+        mCameraFragment = CameraFragment.newInstance();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-
         mFragmentTransaction.replace(R.id.main_container,mCameraFragment).commit();
         mCameraFragment.setOnCameraInterface(this);
 
@@ -265,6 +237,27 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void setRequestCameraPermission(){
+
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED||
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                ||checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            new ConfirmationDialog().show(getSupportFragmentManager(),"dialog");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+    }
+
     //Dialog for Permissions
     public static class ConfirmationDialog extends DialogFragment{
         @NonNull
@@ -275,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CAMERA_PERMISSION);
+                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_CAMERA_PERMISSION);
                         }
                     }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override

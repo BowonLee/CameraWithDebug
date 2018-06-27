@@ -1,4 +1,4 @@
-package com.bowonlee.dearphotograph.gallary;
+package com.bowonlee.dearphotographdebug.gallary;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -12,12 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bowonlee.dearphotograph.R;
-import com.bowonlee.dearphotograph.maincamera.CameraFragment;
-import com.bowonlee.dearphotograph.maincamera.MainActivity;
-import com.bowonlee.dearphotograph.models.Photo;
-
-import com.bowonlee.dearphotograph.modifier.ModifyPhotoActivity;
+import com.bowonlee.dearphotographdebug.R;
+import com.bowonlee.dearphotographdebug.models.Photo;
 
 
 import java.util.ArrayList;
