@@ -1,19 +1,24 @@
 package com.bowonlee.dearphotographdebug.gallary;
 
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.bowonlee.dearphotographdebug.R;
+
+import java.util.List;
 
 /**
  * Created by bowon on 2018-04-11.
  */
 
-public class PhotoGallaryActivity extends AppCompatActivity{
+public class PhotoGallaryActivity extends AppCompatActivity {
 
 
     private static final String TAG = "PhotoGallary";
@@ -31,9 +36,10 @@ public class PhotoGallaryActivity extends AppCompatActivity{
         mGridPhotoGallary = (RecyclerView) findViewById(R.id.gallary_recyclerview);
         mPhotoAdapter = new PhotoAdapter(this);
 
-        getLoaderManager().initLoader(0,null,mPhotoAdapter);
+     //   getLoaderManager().initLoader(0,null,mPhotoAdapter);
         mGridPhotoGallary.setLayoutManager(new GridLayoutManager(null,3, LinearLayoutManager.VERTICAL,false));
         mGridPhotoGallary.setAdapter(mPhotoAdapter);
+
 
 
     }
