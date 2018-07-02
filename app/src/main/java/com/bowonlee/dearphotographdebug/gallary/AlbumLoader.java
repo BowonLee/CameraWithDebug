@@ -13,7 +13,7 @@ import com.bowonlee.dearphotographdebug.models.Photo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlbumLoader extends AsyncTaskLoader<List<String>> {
+public class AlbumLoader extends AsyncTaskLoader<List<String>>{
 
     private ContentResolver mContentResolver;
     private Uri tableUri;
@@ -26,10 +26,14 @@ public class AlbumLoader extends AsyncTaskLoader<List<String>> {
     public AlbumLoader(Context context) {
         super(context);
         mContentResolver = context.getContentResolver();
+        Log.e("album","on loader start1");
+
     }
 
     @Override
     public List<String> loadInBackground() {
+
+        Log.e("album","on loader start2");
 
         mAlbums = new ArrayList<>();
         tableUri = MediaStore.Files.getContentUri("external");

@@ -29,10 +29,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
 
     private Activity activity;
     private List<Photo> photos;
+    private String mCurrentAlbum;
 
-    public PhotoAdapter(Activity activity){
+    public PhotoAdapter(Activity activity,String albumName){
         this.activity = activity;
-
+        mCurrentAlbum = albumName;
     }
 
     @Override
@@ -54,9 +55,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
         return (photos != null)? photos.size() : 0;
     }
 
+
     @Override
     public Loader<List<Photo>> onCreateLoader(int id, Bundle args) {
-        return new PhotoLoader(activity);
+        return new PhotoLoader(activity,mCurrentAlbum);
     }
 
     @Override
@@ -87,4 +89,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
 
 */
     }
+
+
+    public void setAlbumName(String albumName){
+        mCurrentAlbum = albumName;
+    }
+
 }
