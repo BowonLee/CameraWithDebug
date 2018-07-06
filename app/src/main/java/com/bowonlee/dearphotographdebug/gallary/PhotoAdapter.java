@@ -79,7 +79,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder>
     public void onItemClick(Photo photo) {
 
         Intent intent = activity.getIntent();
-        intent.putExtra(String.valueOf(R.string.parcelable_result),photo);
+        intent.putExtra(activity.getString(R.string.parcelable_result),photo);
+
         activity.setResult(Activity.RESULT_OK,intent);
         activity.finish();
 /*

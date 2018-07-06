@@ -10,7 +10,7 @@
 
 
     <com.otaliastudios.cameraview.CameraView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:keepScreenOn="true"
         app:cameraSessionType="picture"
@@ -20,10 +20,39 @@
         app:cameraGesturePinch="zoom"
         app:cameraGestureTap="focusWithMarker"
         app:cameraHdr="on"
+        app:cameraCropOutput="true"
         android:id="@+id/cameraview_fragment_camera"
         android:layout_gravity="center"
+
         >
     </com.otaliastudios.cameraview.CameraView>
+
+    <LinearLayout
+        android:id="@+id/layout_camera_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#59FFFFFF"
+        android:elevation="10dp"
+        android:visibility="gone">
+
+        <android.support.v4.widget.ContentLoadingProgressBar
+            android:id="@+id/progressbar_camera_captureImage"
+            style="@android:style/Widget.Material.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:text="capturing image"
+            android:textSize="15sp" />
+
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/layout_camera_root"

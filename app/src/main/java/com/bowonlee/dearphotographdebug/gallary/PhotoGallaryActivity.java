@@ -53,6 +53,7 @@ public class PhotoGallaryActivity extends AppCompatActivity {
      //   mTextviewCurrentAlbum = (TextView)findViewById(R.id.textview_gallary_currentalbum);
 
         setPhotoAdapter();
+
         mGridPhotoGallary.setLayoutManager(new GridLayoutManager(null,3, LinearLayoutManager.VERTICAL,false));
         mGridPhotoGallary.setAdapter(mPhotoAdapter);
 

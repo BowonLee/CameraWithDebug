@@ -6,6 +6,7 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,15 +54,15 @@ public class PreviewResultFragment extends Fragment {
 
         mParentLayout = (RelativeLayout)view.findViewById(R.id.layout_preview_result);
 
-
+        Log.e("before modified Y",mModifiedPhoto.getStartXY().y+"");
         mModifiedPhoto.setStartXY(new PointF(
                 mModifiedPhoto.getStartXY().x,
-                (float)( ((mModifiedPhoto.getStartXY().y -  (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0)
-                        )
+                (float)( ((mModifiedPhoto.getStartXY().y -  (float)( (float)getResources().getDisplayMetrics().widthPixels*16.0/9.0 - (float)mCapturedBitmap.getHeight())/2.0)))
+            )
+        );
 
-                )
-        ));
 
+        Log.e("post modified Y",mModifiedPhoto.getStartXY().y+"");
         mPreviewResultView.setPhoto(mModifiedPhoto);
         mParentLayout.addView(mPreviewResultView,new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mCapturedBitmap.getHeight()));
 

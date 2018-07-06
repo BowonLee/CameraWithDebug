@@ -34,6 +34,7 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
     public static final int REQUEST_CODE = 3001;
     public static final int PARCELABLE_MODIFIY_RESULT = 3002;
 
+
     private Button mButtonComplete;
     private Button mButtonGallary;
 
@@ -100,9 +101,11 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
     }
 
 
+
     private void completeModify(){
         Intent intent = getIntent();
-        intent.putExtra(String.valueOf(R.string.parcelable_result),resultPhoto);
+        intent.putExtra(getString(R.string.parcelable_result),resultPhoto);
+
         setResult(RESULT_OK,intent);
         finish();
 
@@ -121,9 +124,11 @@ public class ModifyPhotoActivity extends AppCompatActivity  {
                 completeModify();
             }
             if(requestCode == PhotoGallaryActivity.REQUEST_CODE){
-                resultPhoto = data.getParcelableExtra(String.valueOf(R.string.parcelable_result));
+                resultPhoto = data.getParcelableExtra(getString(R.string.parcelable_result));
                 getPhotoFromGallary();
+
             }
+
         }else{
             finish();
         }

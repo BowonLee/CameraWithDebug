@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +45,7 @@ import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.Facing;
 import com.otaliastudios.cameraview.Flash;
+import com.otaliastudios.cameraview.SizeSelector;
 import com.otaliastudios.cameraview.SizeSelectors;
 import com.otaliastudios.cameraview.WhiteBalance;
 
@@ -77,13 +80,15 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private ArrayList<ImageButton> mButtonGroup;
     private ImageButton mButtonOpenGallary;
     private ImageButton mButtonTakePicture;
-
     private ImageButton mButtonRotatePicture;
-    private CheckBox mCheckBoxCameraFacing;
-    private CheckBox mCheckBoxTimerActivate;
     private ImageButton mButtonFlashState;
     private ImageButton mButtonMoreOption;
+
     private TextView mTextviewCountDown;
+
+    private ArrayList<CheckBox> mCheckBoxGroup;
+    private CheckBox mCheckBoxCameraFacing;
+    private CheckBox mCheckBoxTimerActivate;
 
     private int mStateFlash = 0;
     /*CameraSetting - BottomSheetBehavior with NestedScrollView*/
@@ -104,6 +109,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
     private ModifiedPhoto postPhoto;
 
+    private ContentLoadingProgressBar mProgressBarCaptureImage;
+    private LinearLayout mProgressBarLayout;
+
 
 
     @Override
@@ -115,15 +123,48 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
         setCameraView();
         setButtons(view);
-        setCheckbox(view);
+        setCheckboxs(view);
         setModifiedView();
         setBottonSheet(view);
-        setAutoFlashButton(view);
+        setProgressBar(view);
         getLoaderManager().initLoader(0,null,this);
         setOptions(getContext());
         setDummyPhoto();
 
     }
+
+    private void setProgressBar(View view){
+        mProgressBarCaptureImage = (ContentLoadingProgressBar) view.findViewById(R.id.progressbar_camera_captureImage);
+        mProgressBarLayout = (LinearLayout)view.findViewById(R.id.layout_camera_progressbar);
+
+    }
+    private void startProgressImageCapture(){
+
+        mProgressBarLayout.setVisibility(View.VISIBLE);
+
+        mMainPhotoDrawerView.setOnTouchListener(null);
+        for(ImageButton btn : mButtonGroup){
+            btn.setVisibility(View.GONE);
+        }
+        for(CheckBox checkBox : mCheckBoxGroup){
+            checkBox.setVisibility(View.GONE);
+        }
+
+
+    }
+    private void finishProgressImageCapture(){
+
+        mProgressBarLayout.setVisibility(View.GONE);
+
+        for(ImageButton btn : mButtonGroup){
+            btn.setVisibility(View.VISIBLE);
+        }
+        for(CheckBox checkBox : mCheckBoxGroup){
+            checkBox.setVisibility(View.VISIBLE);
+        }
+    }
+
+
 
     private void setDummyPhoto(){
         /*테스트용 더미 데이터 적용
@@ -166,22 +207,22 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private void setCameraSize(int ratioType){
         switch (ratioType){
             case OptionData.ASPECT_RATIO_9_16 : {
-                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+
                 mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*16/9;
                 mCameraView.setLayoutParams(mCameraView.getLayoutParams());
                 mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(9,16), 0));
             }break;
             case OptionData.ASPECT_RATIO_3_4 : {
-                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
                 mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels*4/3;
                 mCameraView.setLayoutParams(mCameraView.getLayoutParams());
                 mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(3,4), 0));
             }break;
             case OptionData.ASPECT_RATIO_1_1 : {
-                mCameraView.getLayoutParams().width = getResources().getDisplayMetrics().widthPixels;
+
                 mCameraView.getLayoutParams().height = getResources().getDisplayMetrics().widthPixels;
                 mCameraView.setLayoutParams(mCameraView.getLayoutParams());
                 mCameraView.setPictureSize(SizeSelectors.aspectRatio(AspectRatio.of(1,1), 0));
+
             }break;
         }
         mBottomSheetOptionPanelCamera.applyAspectRatio(ratioType);
@@ -190,6 +231,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mCameraView.start();
 
 
+        Log.e("camera preview size",""+mCameraView.getPreviewSize());
 
     }
 
@@ -236,17 +278,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
 
 
-    private void setAutoFlashButton(View view){
-        mButtonFlashState = (ImageButton)view.findViewById(R.id.btn_fragment_camera_flash);
 
-        mButtonFlashState.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mStateFlash = (mStateFlash+1)%3;
-                setFlashSetting(mStateFlash);
-            }
-        });
-    }
     private void setFlashSetting(int state){
         switch (state){
             case OptionData.FLASH_AUTO : { mButtonFlashState.setImageResource(R.drawable.baseline_flash_auto_white_18);mCameraView.setFlash(Flash.AUTO);}break;
@@ -257,30 +289,33 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
 
 
-    private void setCheckbox(View view){
-
+    private void setCheckboxs(View view){
+        mCheckBoxGroup = new ArrayList<>();
         mCheckBoxCameraFacing = (CheckBox)view.findViewById(R.id.checkbox_fragment_camera_facing);
-        mCheckBoxCameraFacing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                switch (buttonView.getId()){
-                    case R.id.checkbox_fragment_camera_facing : {
-                        if(isChecked){ setCameraFacing(OptionData.CAMERA_FACING_BACK); }
-                            else{ setCameraFacing(OptionData.CAMERA_FACING_FRONT); }
-                    }
-                }
-            }
-        });
-
         mTextviewCountDown = (TextView)view.findViewById(R.id.textview_fragment_camera_timertext);
         mCheckBoxTimerActivate = (CheckBox)view.findViewById(R.id.checkbox_fragment_timer_activate);
-        mCheckBoxTimerActivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){ setTimerActivate(OptionData.TIMER_OFF); }
-                else{ setTimerActivate(OptionData.TIMER_ON); }
-            }
-        });
+
+        mCheckBoxGroup.add(mCheckBoxCameraFacing);
+        mCheckBoxGroup.add(mCheckBoxTimerActivate);
+
+        for(CheckBox checkBox : mCheckBoxGroup){
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    switch (buttonView.getId()){
+                        case R.id.checkbox_fragment_camera_facing : {
+                            if(isChecked){ setCameraFacing(OptionData.CAMERA_FACING_BACK); }
+                            else{ setCameraFacing(OptionData.CAMERA_FACING_FRONT); }
+                        }break;
+                        case R.id.checkbox_fragment_timer_activate : {
+                            if(isChecked){ setTimerActivate(OptionData.TIMER_OFF); }
+                            else{ setTimerActivate(OptionData.TIMER_ON); }
+                        }break;
+                    }
+                }
+            });
+        }
+
 
     }
     private void setTimerActivate(int state){
@@ -308,7 +343,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
     private void setCameraView(){
 
+
         mCameraView.addCameraListener(new CameraListener() {
+
             @Override
             public void onPictureTaken(byte[] jpeg) {
                 super.onPictureTaken(jpeg);
@@ -328,10 +365,13 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
                 }else{
                     matrix.postRotate(90);
+                    if(result.getWidth()==result.getHeight()){
+                        matrix.postRotate(-90);
+                    }
                 }
                 result = Bitmap.createBitmap(result,0,0,result.getWidth(),result.getHeight(),matrix,true);
 
-
+                finishProgressImageCapture();
                 cameraInterface.onPostTakePicture(result, mMainPhotoDrawerView.getModifiedPhoto());
 
 
@@ -362,12 +402,17 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mButtonOpenGallary= (ImageButton)view.findViewById(R.id.btn_fragment_camera_open_gallary);
         mButtonRotatePicture = (ImageButton)view.findViewById(R.id.btn_fragment_camera_rotate_picture);
         mButtonMoreOption = (ImageButton)view.findViewById(R.id.btn_fragment_camera_more_option);
+        mButtonFlashState = (ImageButton)view.findViewById(R.id.btn_fragment_camera_flash);
+
 
 
         mButtonGroup.add(mButtonOpenGallary);
         mButtonGroup.add(mButtonTakePicture);
         mButtonGroup.add(mButtonRotatePicture);
         mButtonGroup.add(mButtonMoreOption);
+        mButtonGroup.add(mButtonFlashState);
+
+
         for(ImageButton button : mButtonGroup){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -377,6 +422,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
                         case R.id.btn_fragment_camera_open_gallary : {openGallary();}break;
                         case R.id.btn_fragment_camera_takepicture : {takePicture();}break;
                         case R.id.btn_fragment_camera_rotate_picture : {rotatePicture();};break;
+                        case R.id.btn_fragment_camera_flash : { mStateFlash = (mStateFlash+1)%3; setFlashSetting(mStateFlash); }break;
                     }
                 }
 
@@ -416,7 +462,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
                 @Override
                 public void onFinish() {
                     mTextviewCountDown.setVisibility(View.GONE);
+                    startProgressImageCapture();
                     mCameraView.capturePicture();
+
                 }
             };
 
@@ -498,8 +546,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         switch (requestCode){
             case ModifyPhotoActivity.REQUEST_CODE : {
                 if(resultCode == RESULT_OK){
-                    Photo photo = data.getParcelableExtra(String.valueOf(R.string.parcelable_result));
+                    Photo photo = data.getParcelableExtra(getString(R.string.parcelable_result));
                     setmImageOnView(photo);
+
                 }break;
             }
         }
