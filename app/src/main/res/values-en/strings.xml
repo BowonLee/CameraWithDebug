@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">DearPhotographDebug</string>
-
     <string name="request_caemra_permission">This app needs camera,read and write storage permission,
     For more information, please refer to the Play Store's Privacy Policy
     </string>
@@ -18,12 +17,10 @@
     <!-- StringValues for intent-->
     <string name ="parcelable_result">parcelable result</string>
 
-    <!-- StringValues for UI-->
-
+    <!-- StringValues for Gallary-->
     <string name="gallary_all_albums">All Photo</string>
     <string name="camera_progress_save_photo">Saving picture</string>
     <string name="camera_not_placed_photo">Please set a photo</string>
     <string name="main_back_button">Press the back button again to exit the app</string>
-
 
 </resources>

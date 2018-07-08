@@ -143,7 +143,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
        // mProgressBarLayout.setVisibility(View.VISIBLE);
         mProgressLoading.startProgress();
-        mProgressLoading.setProgressText("사진 저장 중 입니다");
+        mProgressLoading.setProgressText(getString(R.string.camera_progress_save_photo));
 
         mMainPhotoDrawerView.setOnTouchListener(null);
         for(ImageButton btn : mButtonGroup){
@@ -473,7 +473,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
             timer.start();
         }else{
-            Toast.makeText(getActivity(),"Not Placed Photo" , Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),getString(R.string.camera_not_placed_photo) , Toast.LENGTH_SHORT).show();
         }
 
     }

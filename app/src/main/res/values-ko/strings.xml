@@ -1,10 +1,6 @@
 <resources>
     <string name="app_name">DearPhotographDebug</string>
-
-    <string name="request_caemra_permission">This app needs camera,read and write storage permission,
-    For more information, please refer to the Play Store's Privacy Policy
-    </string>
-
+    <string name="request_caemra_permission">이 앱은 카메라, 파일 읽기, 쓰기 권한이 필요합니다. 플레이스토어의 개인정보처리방침 참고</string>
     <string name="request_locate_permission">This app needs locate permission</string>
     <string name="request_memory_permission">This app needs memory permission</string>
 
@@ -18,12 +14,11 @@
     <!-- StringValues for intent-->
     <string name ="parcelable_result">parcelable result</string>
 
-    <!-- StringValues for UI-->
-
+    <!-- StringValues for Gallary-->
     <string name="gallary_all_albums">All Photo</string>
-    <string name="camera_progress_save_photo">Saving picture</string>
-    <string name="camera_not_placed_photo">Please set a photo</string>
-    <string name="main_back_button">Press the back button again to exit the app</string>
 
+    <string name="camera_progress_save_photo">사진 저장 중 입니다</string>
+    <string name="camera_not_placed_photo">사진을 등록해 주세요</string>
+    <string name="main_back_button">한번 더 누르면 앱이 종료됩니다</string>
 
 </resources>
