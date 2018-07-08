@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.bowonlee.dearphotographdebug.BasePhotoDrawerView;
 import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
+import com.bowonlee.dearphotographdebug.models.OptionData;
 
 public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnTouchListener{
 
@@ -59,6 +60,13 @@ public class MainPhotoDrawerView extends BasePhotoDrawerView implements View.OnT
     }
 
 
+    public void setFrameType(int frameType){
+        switch (frameType){
+            case OptionData.FRMAE_TYPE_NO_FRAME : {}break;
+            case OptionData.FRMAE_TYPE_TYPE_1 : {}break;
+        }
+
+    }
     @Override
     protected void onDraw(Canvas canvas) {
 

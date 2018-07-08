@@ -25,5 +25,26 @@
     <string name="camera_not_placed_photo">Please set a photo</string>
     <string name="main_back_button">Press the back button again to exit the app</string>
 
+    <string name="camera_option_aspect_ratio">Aspect Ratio</string>
+    <string name="camera_option_white_balance">White Balance</string>
+    <string name="camera_option_timer_second">Timer Second</string>
+    <string name="camera_option_frame_type">Frame Type</string>
 
+
+    <string name="camera_option_aspect_ratio_9_16"> 9:16 </string>
+    <string name="camera_option_aspect_ratio_3_4"> 3:4 </string>
+    <string name="camera_option_aspect_ratio_1_1"> 1:1 </string>
+
+    <string name="camera_option_white_balance_auto">auto</string>
+    <string name="camera_option_white_balance_cloudy">cloudy</string>
+    <string name="camera_option_white_balance_daylight">daylight</string>
+    <string name="camera_option_white_balance_fluorescent">fluorescent</string>
+    <string name="camera_option_white_balance_incandscent">incandscent</string>
+
+    <string name="camera_option_timer_second_3">3sec</string>
+    <string name="camera_option_timer_second_5">5sec</string>
+    <string name="camera_option_timer_second_10">10sec</string>
+
+    <string name="camera_option_frame_no_frame">No Frame</string>
+    <string name="camera_option_frame_frame_1">frame1</string>
 </resources>

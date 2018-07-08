@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements CameraFragment.Ca
 
         if(System.currentTimeMillis()>mBackPressedTime+2000){
                 mBackPressedTime = System.currentTimeMillis();
-                Toast.makeText(this,"한번 더 누르시면 종료합니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,getString(R.string.main_back_button),Toast.LENGTH_SHORT).show();
                 return;
         }
         if(System.currentTimeMillis()<=mBackPressedTime+2000){

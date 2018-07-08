@@ -260,6 +260,12 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mOptionData.setData(OptionData.KEY_TIMER_SET,timerSec);
 
     }
+    private void setFrameType(int frameType){
+        switch (frameType){
+            case OptionData.FRMAE_TYPE_NO_FRAME : {}break;
+            case OptionData.FRMAE_TYPE_TYPE_1 : {}break;
+        }
+    }
     private void setBottonSheet(View view){
         LinearLayout bottomSheetLayout = (LinearLayout)view.findViewById(R.id.bottom_sheet_fragment_camera_root);
 
@@ -273,6 +279,10 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
             @Override
             public void changeTimerSecond(int timerSec) { setTimerSceond(timerSec); }
+
+            @Override
+            public void chageFrame(int frameType) { setFrameType(frameType); }
+
 
         });
         bottomSheetLayout.addView(mBottomSheetOptionPanelCamera);

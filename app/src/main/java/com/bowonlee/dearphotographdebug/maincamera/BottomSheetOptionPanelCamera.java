@@ -15,6 +15,7 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
         void changeAspectRatio(int ratioType);
         void changeWhiteBalance(int whiteBalacneType);
         void changeTimerSecond(int timerSec);
+        void chageFrame(int frameType);
     }
 
     private CameraOptionCallback mOptionCallback;
@@ -22,7 +23,7 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
     private RadioGroup mRadiogroupAspectRatio;
     private RadioGroup mRadiogroupWhiteBalance;
     private RadioGroup mRadiogruopTimerSecond;
-
+    private RadioGroup mRadiogroupFrameType;
 
 
     public BottomSheetOptionPanelCamera(Context context, CameraOptionCallback cameraOptionCallback) {
@@ -90,6 +91,19 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
         });
     }
 
+    private void setFrmaeType(){
+        mRadiogroupFrameType = findViewById(R.id.radioGroup_frameType);
+        mRadiogroupFrameType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.radioButton_frameType_noFrame : {mOptionCallback.chageFrame(OptionData.FRMAE_TYPE_NO_FRAME);}break;
+                    case R.id.radioButton_frameType_type1 : {mOptionCallback.chageFrame(OptionData.FRMAE_TYPE_TYPE_1);}break;
+
+                }
+            }
+        });
+    }
 
     public void applyAspectRatio(int ratioType){
        switch (ratioType){
@@ -112,6 +126,12 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
             case OptionData.TIMER_SEC_3 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_3);}break;
             case OptionData.TIMER_SEC_5 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_5);}break;
             case OptionData.TIMER_SEC_10 : {mRadiogruopTimerSecond.check(R.id.radioButton_timersec_10);}break;
+        }
+    }
+    public void applyFrmaeType(int frameType){
+        switch (frameType){
+            case OptionData.FRMAE_TYPE_NO_FRAME : {mRadiogroupFrameType.check(R.id.radioButton_frameType_noFrame);}break;
+            case OptionData.FRMAE_TYPE_TYPE_1 : {mRadiogroupFrameType.check(R.id.radioButton_frameType_type1);}break;
         }
     }
 

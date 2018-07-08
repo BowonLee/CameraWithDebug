@@ -13,6 +13,7 @@ public class OptionData {
     public static final String KEY_CAMERA_FACING = "cameraFacing";
     public static final String KEY_TIMER_ON = "tImerOn";
     public static final String KEY_FLASH_STATE = "flashState";
+    public static final String KEY_FRAME_TYPE = "frameType";
 
 
     static public final int ASPECT_RATIO_9_16 = 1;
@@ -39,6 +40,9 @@ public class OptionData {
     static public final int TIMER_OFF = 51;
     static public final int TIMER_ON = 52;
 
+    static public final int FRMAE_TYPE_NO_FRAME = 0;
+    static public final int FRMAE_TYPE_TYPE_1 = 1;
+
 
     private SharedPreferences mPreference;
     private SharedPreferences.Editor mEditor;
@@ -59,26 +63,6 @@ public class OptionData {
     public int getSingleData(String key){
         return mPreference.getInt(key,0);
     }
-
-
-
-    public int[] getAllData(){
-        int[] result = new int[6];
-
-        result[0] = mPreference.getInt(KEY_ASPECT_RATIO,ASPECT_RATIO_3_4);
-        result[1] = mPreference.getInt(KEY_WHITE_BALANCE,WHITEBALANCE_AUTO);
-        result[2] = mPreference.getInt(KEY_TIMER_SET,TIMER_SEC_3);
-        result[3] = mPreference.getInt(KEY_CAMERA_FACING,CAMERA_FACING_BACK);
-        result[4] = mPreference.getInt(KEY_TIMER_ON,TIMER_OFF);
-        result[5] = mPreference.getInt(KEY_FLASH_STATE,FLASH_AUTO);
-
-        return result;
-
-    }
-
-
-
-
 
 
 
