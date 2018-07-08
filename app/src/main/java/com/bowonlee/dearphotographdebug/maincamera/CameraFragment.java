@@ -34,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bowonlee.dearphotographdebug.ProgressLoading;
 import com.bowonlee.dearphotographdebug.R;
 import com.bowonlee.dearphotographdebug.gallary.RecentPhotoLoader;
 import com.bowonlee.dearphotographdebug.models.ModifiedPhoto;
@@ -91,7 +92,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     private CheckBox mCheckBoxTimerActivate;
 
     private int mStateFlash = 0;
-    /*CameraSetting - BottomSheetBehavior with NestedScrollView*/
+    /*CameraSetting - BottomSheetBehavior*/
     private BottomSheetBehavior mBottomSheetBehavior;
     private BottomSheetOptionPanelCamera mBottomSheetOptionPanelCamera;
 
@@ -109,10 +110,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
     private ModifiedPhoto postPhoto;
 
-    private ContentLoadingProgressBar mProgressBarCaptureImage;
     private LinearLayout mProgressBarLayout;
 
-
+    private ProgressLoading mProgressLoading;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -134,13 +134,16 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
 
     private void setProgressBar(View view){
-        mProgressBarCaptureImage = (ContentLoadingProgressBar) view.findViewById(R.id.progressbar_camera_captureImage);
-        mProgressBarLayout = (LinearLayout)view.findViewById(R.id.layout_camera_progressbar);
-
+            mProgressBarLayout = (LinearLayout)view.findViewById(R.id.layout_camera_progressbar);
+            mProgressLoading = new ProgressLoading(getContext());
+            mRootLayout.addView(mProgressLoading,new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
     private void startProgressImageCapture(){
 
-        mProgressBarLayout.setVisibility(View.VISIBLE);
+
+       // mProgressBarLayout.setVisibility(View.VISIBLE);
+        mProgressLoading.startProgress();
+        mProgressLoading.setProgressText("사진 저장 중 입니다");
 
         mMainPhotoDrawerView.setOnTouchListener(null);
         for(ImageButton btn : mButtonGroup){
@@ -154,8 +157,8 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
     }
     private void finishProgressImageCapture(){
 
-        mProgressBarLayout.setVisibility(View.GONE);
-
+      //  mProgressBarLayout.setVisibility(View.GONE);
+        mProgressLoading.endProgress();
         for(ImageButton btn : mButtonGroup){
             btn.setVisibility(View.VISIBLE);
         }
