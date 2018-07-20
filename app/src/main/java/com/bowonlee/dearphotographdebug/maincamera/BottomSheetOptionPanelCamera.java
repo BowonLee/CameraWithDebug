@@ -1,6 +1,8 @@
 package com.bowonlee.dearphotographdebug.maincamera;
 
 import android.content.Context;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
@@ -35,14 +37,18 @@ public class BottomSheetOptionPanelCamera extends LinearLayout {
         setAspectRatioGroup();
         setWhiteBalance();
         setTimerSecond();
-
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
     }
 
     private void setAspectRatioGroup(){
         mRadiogroupAspectRatio = findViewById(R.id.radioGroup_aspectRatio);
-
-
+        
         mRadiogroupAspectRatio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {

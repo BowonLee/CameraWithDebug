@@ -145,20 +145,16 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         mProgressLoading.startProgress();
         mProgressLoading.setProgressText(getString(R.string.camera_progress_save_photo));
 
-        mMainPhotoDrawerView.setOnTouchListener(null);
-        for(ImageButton btn : mButtonGroup){
-            btn.setVisibility(View.GONE);
-        }
-        for(CheckBox checkBox : mCheckBoxGroup){
-            checkBox.setVisibility(View.GONE);
-        }
-
-
+        disableAllUI();
     }
     private void finishProgressImageCapture(){
 
       //  mProgressBarLayout.setVisibility(View.GONE);
         mProgressLoading.endProgress();
+        enableAllUI();
+    }
+
+    private void enableAllUI(){
         for(ImageButton btn : mButtonGroup){
             btn.setVisibility(View.VISIBLE);
         }
@@ -166,7 +162,15 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
             checkBox.setVisibility(View.VISIBLE);
         }
     }
-
+    private void disableAllUI(){
+        mMainPhotoDrawerView.setOnTouchListener(null);
+        for(ImageButton btn : mButtonGroup){
+            btn.setVisibility(View.GONE);
+        }
+        for(CheckBox checkBox : mCheckBoxGroup){
+            checkBox.setVisibility(View.GONE);
+        }
+    }
 
 
     private void setDummyPhoto(){
@@ -461,6 +465,7 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
         this.startActivityForResult(intent,ModifyPhotoActivity.REQUEST_CODE);
     }
     private void takePicture(){
+
         if(mMainPhotoDrawerView.getModifiedPhoto() != null){
 
             CountDownTimer timer = new CountDownTimer(mTimerSet,1000) {
@@ -480,8 +485,9 @@ public class CameraFragment extends Fragment implements android.support.v4.app.L
 
                 }
             };
-
+            disableAllUI();
             timer.start();
+
         }else{
             Toast.makeText(getActivity(),getString(R.string.camera_not_placed_photo) , Toast.LENGTH_SHORT).show();
         }
