@@ -1,5 +1,6 @@
 package com.bowonlee.dearphotographdebug.gallary;
 
+import android.Manifest;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.bowonlee.dearphotographdebug.R;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,10 +60,15 @@ public class PhotoGallaryActivity extends AppCompatActivity {
         mGridPhotoGallary.setAdapter(mPhotoAdapter);
 
         getBucketDisplayList();
-
         setSpinnerAlbumList();
 
+
     }
+
+    private void checkReadPermission(){
+        //if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
+    }
+
 
     private void setPhotoAdapter(){
         mPhotoAdapter = new PhotoAdapter(this,getString(R.string.gallary_all_albums));
